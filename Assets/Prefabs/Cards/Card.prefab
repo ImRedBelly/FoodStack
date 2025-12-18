@@ -409,7 +409,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1159043657
   m_SortingLayer: 1
-  m_SortingOrder: 1000
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 05cffc793a4bdaf4d922322d83fa3e64, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -483,13 +483,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3065266410136154668}
-  - component: {fileID: 2681738902667783834}
+  - component: {fileID: 1544634973983324521}
   - component: {fileID: 2356970878897535938}
   - component: {fileID: 2213407193188008977}
   - component: {fileID: 1218051796238218355}
   - component: {fileID: 6932598654288050141}
+  - component: {fileID: 5597953463210702415}
   m_Layer: 3
-  m_Name: BaseCard
+  m_Name: Card
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -517,7 +518,7 @@ Transform:
   - {fileID: 5680492940914991199}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2681738902667783834
+--- !u!114 &1544634973983324521
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -526,10 +527,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 3643708850651908717}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb2f7d6bd57d494495908676b56f42ed, type: 3}
+  m_Script: {fileID: 11500000, guid: a1b4ae5bb6698f5438f45ad9668cc5e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _container: {fileID: 6740006200816206417}
+  _collider2D: {fileID: 6932598654288050141}
   _viewHandler: {fileID: 2356970878897535938}
 --- !u!114 &2356970878897535938
 MonoBehaviour:
@@ -543,6 +545,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd2f5fd2fde943eb8a1b33d9b6ac4937, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _sortingGroup: {fileID: 5597953463210702415}
   _viewCard: {fileID: 8072306673068367198}
   _shadowCard: {fileID: 559238255479582005}
   _eligibleFrame: {fileID: 7698091752084571987}
@@ -615,6 +618,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.8, y: 1}
   m_EdgeRadius: 0
+--- !u!210 &5597953463210702415
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3643708850651908717}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
 --- !u!1 &3999757139462971583
 GameObject:
   m_ObjectHideFlags: 0

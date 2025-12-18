@@ -8,11 +8,18 @@ namespace Gameplay.Cards.Core
 {
     public sealed class CardDragService : DisposableClass
     {
+        public IObservable<ICard> OnStartDrag => _onStartDrag;
+        public IObservable<ICard> OnEndDrag => _onEndDrag;
+
+        private readonly Subject<ICard> _onStartDrag = new();
+        private readonly Subject<ICard> _onEndDrag = new();
+
         private readonly Camera _camera;
         private readonly LayerMask _cardLayer;
 
-        private IDraggableCard _currentCard;
+        private ICard _currentCard;
         private IDisposable _dragDisposable;
+
         private Vector3 _offset;
 
         public CardDragService(Camera camera, LayerMask cardLayer)
@@ -34,8 +41,10 @@ namespace Gameplay.Cards.Core
                 .Where(_ => Input.GetMouseButtonUp(0))
                 .Subscribe(_ => EndDrag())
                 .AddTo(Disposables);
-        }
 
+            _onStartDrag.AddTo(Disposables);
+            _onEndDrag.AddTo(Disposables);
+        }
 
         private void TryBeginDrag()
         {
@@ -45,15 +54,16 @@ namespace Gameplay.Cards.Core
             if (!hit.collider)
                 return;
 
-            if (!hit.collider.TryGetComponent<IDraggableCard>(out var card))
+            if (!hit.collider.TryGetComponent<ICard>(out var card))
                 return;
-            
+
             _currentCard = card;
             _currentCard.OnDragStart();
 
             _offset = card.Transform.position - worldPos;
             _offset.z = 0;
-     
+
+            _onStartDrag?.OnNext(_currentCard.Transform.GetComponent<Card>());
             _dragDisposable = Observable.EveryUpdate().Subscribe(_ => UpdateDrag());
         }
 
@@ -61,7 +71,7 @@ namespace Gameplay.Cards.Core
         {
             if (_currentCard == null)
                 return;
-            
+
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
             var plane = new Plane(Vector3.forward, Vector3.zero);
 
@@ -77,9 +87,13 @@ namespace Gameplay.Cards.Core
         {
             _dragDisposable?.Dispose();
             _dragDisposable = null;
-            
-            _currentCard?.OnDragEnd();
-            _currentCard = null;
+
+            if (_currentCard != null)
+            {
+                _onEndDrag?.OnNext(_currentCard);
+                _currentCard.OnDragEnd();
+                _currentCard = null;
+            }
         }
     }
 }

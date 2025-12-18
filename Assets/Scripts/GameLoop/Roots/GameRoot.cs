@@ -1,5 +1,6 @@
 using Core;
 using Gameplay.Cards;
+using Gameplay.Cards.Configs;
 using Gameplay.Cards.Core;
 using Support;
 using UniRx;
@@ -12,6 +13,9 @@ namespace GameLoop.Roots
     {
         [SerializeField] private Camera _camera;
         [SerializeField] private LayerMask _cardLayer;
+        [SerializeField] private Card _cardPrefab;
+
+        [SerializeField] private IngredientConfig[] _startCards;
 
         [SerializeField] private Button _quitButton;
 
@@ -27,13 +31,23 @@ namespace GameLoop.Roots
                 .SafeSubscribe(_ => ActiveModel.WindowsService.Open(playConfirmWindow, false))
                 .AddTo(Disposables);
 
-            new CardDragService(_camera, _cardLayer)
+            CardDragService cardDragService = new CardDragService(_camera, _cardLayer);
+            cardDragService
                 .Init()
                 .AddTo(Disposables);
 
-            foreach (var card in FindObjectsOfType<BaseCard>())
+            CardFactory cardFactory = new CardFactory(_cardPrefab);
+            cardFactory
+                .Init()
+                .AddTo(Disposables);
+
+            new CardMergeService(cardFactory, cardDragService)
+                .Init()
+                .AddTo(Disposables);
+
+            foreach (var startCard in _startCards)
             {
-                card.Init(new BaseCard.Model());
+                cardFactory.CreateIngredient(startCard);
             }
         }
     }

@@ -1,22 +1,29 @@
 using Core;
+using Gameplay.Cards.Configs;
 using Gameplay.Cards.Core;
 using Gameplay.Cards.Interfaces;
 using UnityEngine;
 
 namespace Gameplay.Cards
 {
-    public abstract class BaseCard : DisposableBehaviour<BaseCard.Model>, IDraggableCard
+    public class Card : DisposableBehaviour<Card.Model>, ICard
     {
         public class Model
         {
-            public Model()
+            public readonly IngredientConfig Config;
+
+            public Model(IngredientConfig config)
             {
+                Config = config;
             }
         }
 
         public Transform Transform => transform;
+        public Transform Container => _container;
+        public Collider2D Collider => _collider2D;
 
         [SerializeField] private Transform _container;
+        [SerializeField] private Collider2D _collider2D;
         [SerializeField] private CardViewHandler _viewHandler;
 
         private readonly int _defaultSortingOrder = 1;
@@ -25,7 +32,7 @@ namespace Gameplay.Cards
         protected override void OnInit()
         {
             base.OnInit();
-            _viewHandler.Initialize(_defaultSortingOrder);
+            _viewHandler.Initialize(ActiveModel.Config.Sprite, _defaultSortingOrder);
         }
 
 
@@ -33,14 +40,19 @@ namespace Gameplay.Cards
         {
             _viewHandler.SetSortingOrder(_dragSortingOrder);
             _viewHandler.SetStateShadow(true);
-            _viewHandler.SetStateEligibleFrame(true);
+            transform.localScale = Vector3.one * 1.1f;
         }
 
         public virtual void OnDragEnd()
         {
             _viewHandler.SetSortingOrder(_defaultSortingOrder);
             _viewHandler.SetStateShadow(false);
-            _viewHandler.SetStateEligibleFrame(false);
+            transform.localScale = Vector3.one;
+        }
+
+        public void SetStateEligibleFrame(bool state)
+        {
+            _viewHandler.SetStateEligibleFrame(state);
         }
     }
 }

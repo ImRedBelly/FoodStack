@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Gameplay.Cards.Core
 {
     public class CardViewHandler : MonoBehaviour
     {
+        [SerializeField] private SortingGroup _sortingGroup;
         [SerializeField] private SpriteRenderer _viewCard;
         [SerializeField] private SpriteRenderer _shadowCard;
         [SerializeField] private SpriteRenderer _eligibleFrame;
 
-        public void Initialize(int sortingOrder)
+        public void Initialize(Sprite sprite, int sortingOrder)
         {
+            _viewCard.sprite = sprite;
+
             SetSortingOrder(sortingOrder);
             SetStateShadow(false);
             SetStateEligibleFrame(false);
@@ -17,8 +21,7 @@ namespace Gameplay.Cards.Core
 
         public void SetSortingOrder(int sortingOrder)
         {
-            _viewCard.sortingOrder = sortingOrder;
-            _shadowCard.sortingOrder = sortingOrder - 1;
+            _sortingGroup.sortingOrder = sortingOrder;
         }
 
         public void SetStateShadow(bool active)
