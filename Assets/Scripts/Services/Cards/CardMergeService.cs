@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
@@ -14,7 +15,7 @@ namespace Services.Cards
         private readonly CardStackService _cardStackService;
 
         private readonly List<ICard> _cards = new();
-        
+
         private CardStack _dragOriginStack;
 
         public CardMergeService(CardFactory cardFactory, CardDragService dragService, CardStackService cardStackService)
@@ -38,7 +39,7 @@ namespace Services.Cards
             _dragService.OnEndDrag
                 .SafeSubscribe(EndDrag)
                 .AddTo(Disposables);
-            
+
             Observable.EveryUpdate()
                 .Subscribe(_ => UpdateSortingOrder())
                 .AddTo(Disposables);
@@ -51,6 +52,7 @@ namespace Services.Cards
                 card.UpdateSortingOrder();
             }
         }
+
         private void AddCard(ICard newCard)
         {
             if (!_cards.Contains(newCard))
@@ -66,8 +68,7 @@ namespace Services.Cards
             _cardStackService.DetachSubStack(draggedCard);
 
             foreach (var card in _cards)
-                if (card != draggedCard)
-                    card.SetStateEligibleFrame(true);
+                card.SetStateEligibleFrame(TryActivateEligibleFrame(draggedCard, card));
         }
 
 
@@ -85,6 +86,7 @@ namespace Services.Cards
 
             _dragOriginStack = null;
         }
+
         private bool DroppedOnOriginStack(ICard draggedCard)
         {
             if (_dragOriginStack == null)
@@ -115,7 +117,7 @@ namespace Services.Cards
 
             return false;
         }
-        
+
         private bool IsOverlapping(ICard draggedCard, ICard other)
         {
             var draggedStack = _cardStackService.GetStack(draggedCard);
@@ -123,6 +125,18 @@ namespace Services.Cards
                 return false;
 
             return draggedCard.Collider.bounds.Intersects(other.Collider.bounds);
+        }
+
+        private bool TryActivateEligibleFrame(ICard draggedCard, ICard targetCard)
+        {
+            var draggedStack = _cardStackService.GetStack(draggedCard);
+            var targetStack = _cardStackService.GetStack(targetCard);
+
+            bool equalCards = draggedCard == targetCard;
+            bool draggedStackContainsTarget = draggedStack.Cards.Contains(targetCard);
+            bool isLastCardInStack = targetStack.Cards.Last() == targetCard;
+
+            return !equalCards && !draggedStackContainsTarget && isLastCardInStack;
         }
     }
 }
