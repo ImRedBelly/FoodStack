@@ -45,14 +45,6 @@ namespace Services.Cards
                 .AddTo(Disposables);
         }
 
-        private void UpdateSortingOrder()
-        {
-            foreach (var card in _cards)
-            {
-                card.UpdateSortingOrder();
-            }
-        }
-
         private void AddCard(ICard newCard)
         {
             if (!_cards.Contains(newCard))
@@ -85,6 +77,14 @@ namespace Services.Cards
             }
 
             _dragOriginStack = null;
+        }
+        
+        private void UpdateSortingOrder()
+        {
+            foreach (var card in _cards)
+            {
+                card.UpdateSortingOrder();
+            }
         }
 
         private bool DroppedOnOriginStack(ICard draggedCard)

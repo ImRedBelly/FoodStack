@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Core;
 using Gameplay.Cards;
 using Gameplay.Cards.Interfaces;
@@ -21,7 +20,6 @@ namespace Services.Cards
         private readonly CardStackService _cardStackService;
 
         private ICard _currentCard;
-        private List<ICard> _draggedSubStack;
 
         private Vector3 _offset;
         private IDisposable _dragDisposable;
@@ -75,17 +73,6 @@ namespace Services.Cards
 
             _currentCard.OnDragStart();
 
-            var stack = _cardStackService.GetStack(_currentCard);
-            if (stack != null)
-            {
-                int index = stack.Cards.IndexOf(_currentCard);
-                _draggedSubStack = stack.Cards.GetRange(index, stack.Cards.Count - index);
-            }
-            else
-            {
-                _draggedSubStack = new List<ICard> { _currentCard };
-            }
-
             _offset = _currentCard.Transform.position - worldPos;
             _offset.z = 0;
 
@@ -95,7 +82,7 @@ namespace Services.Cards
 
         private void UpdateDrag()
         {
-            if (_currentCard == null || _draggedSubStack == null)
+            if (_currentCard == null)
                 return;
 
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
@@ -107,18 +94,14 @@ namespace Services.Cards
 
             var basePos = worldPos + _offset;
 
-            for (var i = 0; i < _draggedSubStack.Count; i++)
-            {
-                _draggedSubStack[i].Transform.position = basePos - Vector3.up * (i * 0.2f);
-            }
+            var stack = _cardStackService.GetStack(_currentCard);
+            stack.UpdateWorldPositions(basePos);
         }
 
         private void EndDrag()
         {
             _dragDisposable?.Dispose();
             _dragDisposable = null;
-
-            _draggedSubStack = null;
 
             if (_currentCard != null)
             {
