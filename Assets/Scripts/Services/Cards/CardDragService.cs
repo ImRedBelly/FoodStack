@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core;
+using Gameplay.Cards;
 using Gameplay.Cards.Interfaces;
 using UniRx;
 using UnityEngine;
 
-namespace Gameplay.Cards.Core
+namespace Services.Cards
 {
     public sealed class CardDragService : DisposableClass
     {
@@ -16,16 +18,19 @@ namespace Gameplay.Cards.Core
 
         private readonly Camera _camera;
         private readonly LayerMask _cardLayer;
+        private readonly CardStackService _cardStackService;
 
         private ICard _currentCard;
-        private IDisposable _dragDisposable;
+        private List<ICard> _draggedSubStack;
 
         private Vector3 _offset;
+        private IDisposable _dragDisposable;
 
-        public CardDragService(Camera camera, LayerMask cardLayer)
+        public CardDragService(Camera camera, LayerMask cardLayer, CardStackService cardStackService)
         {
             _camera = camera;
             _cardLayer = cardLayer;
+            _cardStackService = cardStackService;
         }
 
         protected override void OnInit()
@@ -46,21 +51,42 @@ namespace Gameplay.Cards.Core
             _onEndDrag.AddTo(Disposables);
         }
 
+
         private void TryBeginDrag()
         {
             var worldPos = _camera.ScreenToWorldPoint(Input.mousePosition);
-            var hit = Physics2D.Raycast(worldPos, Vector2.zero, 0f, _cardLayer);
 
-            if (!hit.collider)
-                return;
+            var allCards = Physics2D.RaycastAll(worldPos, Vector2.zero, 0f, _cardLayer);
 
-            if (!hit.collider.TryGetComponent<ICard>(out var card))
-                return;
+            float minPositionY = float.MaxValue;
+            foreach (var hit in allCards)
+            {
+                if (hit.collider.TryGetComponent<ICard>(out var card))
+                {
+                    if (hit.collider.transform.position.y < minPositionY)
+                    {
+                        minPositionY = hit.collider.transform.position.y;
+                        _currentCard = card;
+                    }
+                }
+            }
 
-            _currentCard = card;
+            if (_currentCard == null) return;
+
             _currentCard.OnDragStart();
 
-            _offset = card.Transform.position - worldPos;
+            var stack = _cardStackService.GetStack(_currentCard);
+            if (stack != null)
+            {
+                int index = stack.Cards.IndexOf(_currentCard);
+                _draggedSubStack = stack.Cards.GetRange(index, stack.Cards.Count - index);
+            }
+            else
+            {
+                _draggedSubStack = new List<ICard> { _currentCard };
+            }
+
+            _offset = _currentCard.Transform.position - worldPos;
             _offset.z = 0;
 
             _onStartDrag?.OnNext(_currentCard.Transform.GetComponent<Card>());
@@ -69,7 +95,7 @@ namespace Gameplay.Cards.Core
 
         private void UpdateDrag()
         {
-            if (_currentCard == null)
+            if (_currentCard == null || _draggedSubStack == null)
                 return;
 
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
@@ -79,14 +105,20 @@ namespace Gameplay.Cards.Core
             var worldPos = ray.GetPoint(distance);
             worldPos.z = 0;
 
-            _currentCard.Transform.position = worldPos + _offset;
-        }
+            var basePos = worldPos + _offset;
 
+            for (var i = 0; i < _draggedSubStack.Count; i++)
+            {
+                _draggedSubStack[i].Transform.position = basePos - Vector3.up * (i * 0.2f);
+            }
+        }
 
         private void EndDrag()
         {
             _dragDisposable?.Dispose();
             _dragDisposable = null;
+
+            _draggedSubStack = null;
 
             if (_currentCard != null)
             {

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Gameplay.Cards.Core
+namespace Gameplay.Cards.Handlers
 {
     public class CardViewHandler : MonoBehaviour
     {

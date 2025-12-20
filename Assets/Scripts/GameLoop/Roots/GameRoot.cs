@@ -1,7 +1,8 @@
 using Core;
 using Gameplay.Cards;
 using Gameplay.Cards.Configs;
-using Gameplay.Cards.Core;
+using Gameplay.Cards.Factory;
+using Services.Cards;
 using Support;
 using UniRx;
 using UnityEngine;
@@ -31,7 +32,9 @@ namespace GameLoop.Roots
                 .SafeSubscribe(_ => ActiveModel.WindowsService.Open(playConfirmWindow, false))
                 .AddTo(Disposables);
 
-            CardDragService cardDragService = new CardDragService(_camera, _cardLayer);
+            CardStackService cardStackService = new CardStackService();
+
+            CardDragService cardDragService = new CardDragService(_camera, _cardLayer, cardStackService);
             cardDragService
                 .Init()
                 .AddTo(Disposables);
@@ -41,7 +44,7 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            new CardMergeService(cardFactory, cardDragService)
+            new CardMergeService(cardFactory, cardDragService, cardStackService)
                 .Init()
                 .AddTo(Disposables);
 

@@ -5,7 +5,7 @@ using Gameplay.Cards.Interfaces;
 using UniRx;
 using Object = UnityEngine.Object;
 
-namespace Gameplay.Cards.Core
+namespace Gameplay.Cards.Factory
 {
     public class CardFactory : DisposableClass
     {
@@ -29,6 +29,7 @@ namespace Gameplay.Cards.Core
         public void CreateIngredient(IngredientConfig config)
         {
             var card = Object.Instantiate(_cardPrefab);
+            card.name = config.Name;
             card.Init(new Card.Model(config));
 
             _onCardCreated?.OnNext(card);
