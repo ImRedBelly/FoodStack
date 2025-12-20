@@ -107,8 +107,7 @@ namespace Services.Cards
                 if (card == draggedCard) continue;
                 if (!IsOverlapping(draggedCard, card)) continue;
 
-                var targetStack = _cardStackService.GetStack(card) 
-                                  ?? _cardStackService.CreateStack(card);
+                var targetStack = _cardStackService.GetStack(card);
 
                 _cardStackService.MergeStacks(draggedCard, targetStack);
                 return true;
@@ -116,10 +115,13 @@ namespace Services.Cards
 
             return false;
         }
-
-
+        
         private bool IsOverlapping(ICard draggedCard, ICard other)
         {
+            var draggedStack = _cardStackService.GetStack(draggedCard);
+            if (draggedStack != null && draggedStack == _cardStackService.GetStack(other))
+                return false;
+
             return draggedCard.Collider.bounds.Intersects(other.Collider.bounds);
         }
     }

@@ -160,6 +160,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a71bb69b67a8bc242b52543be1c99f6e, type: 2}
   - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
   - {fileID: 11400000, guid: ec838ee8855394344b653c19cdc5c895, type: 2}
+  - {fileID: 11400000, guid: 94c31a528eda9da4aba65d8cf10db2ec, type: 2}
   _quitButton: {fileID: 332112253}
 --- !u!4 &316752952
 Transform:

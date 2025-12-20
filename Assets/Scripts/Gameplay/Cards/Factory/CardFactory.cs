@@ -3,6 +3,7 @@ using Core;
 using Gameplay.Cards.Configs;
 using Gameplay.Cards.Interfaces;
 using UniRx;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Gameplay.Cards.Factory
@@ -26,9 +27,9 @@ namespace Gameplay.Cards.Factory
             _onCardCreated.AddTo(Disposables);
         }
 
-        public void CreateIngredient(IngredientConfig config)
+        public void CreateIngredient(IngredientConfig config, Vector3 position)
         {
-            var card = Object.Instantiate(_cardPrefab);
+            var card = Object.Instantiate(_cardPrefab,  position, Quaternion.identity);
             card.name = config.Name;
             card.Init(new Card.Model(config));
 

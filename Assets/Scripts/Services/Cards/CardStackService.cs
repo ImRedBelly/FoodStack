@@ -11,49 +11,34 @@ namespace Services.Cards
         private CardStack _lastSourceStack;
         private List<ICard> _lastDetachedCards;
 
-        
+
         public CardStack GetStack(ICard card)
         {
-            _cardToStack.TryGetValue(card, out CardStack stack);
-            return stack;
+            return _cardToStack.TryGetValue(card, out CardStack stack) ? stack : CreateStack(card);
         }
 
-        public CardStack CreateStack(ICard card)
+        public void MergeStacks(ICard draggedCard, CardStack targetStack)
         {
-            CardStack stack = new CardStack();
-            stack.Cards.Add(card);
+            var sourceStack = GetStack(draggedCard);
 
-            _stacks.Add(stack);
-            _cardToStack[card] = stack;
-
-            return stack;
-        }
-        
-        
-        public void MergeStacks(ICard draggedRoot, CardStack target)
-        {
-            if (!_cardToStack.TryGetValue(draggedRoot, out var source))
+            if (sourceStack == targetStack)
                 return;
 
-            if (source == target)
-                return;
-
-            foreach (var card in source.Cards)
+            foreach (var card in sourceStack.Cards)
             {
-                target.Cards.Add(card);
-                _cardToStack[card] = target;
+                targetStack.Cards.Add(card);
+                _cardToStack[card] = targetStack;
             }
 
-            source.Cards.Clear();
-            _stacks.Remove(source);
+            sourceStack.Cards.Clear();
+            _stacks.Remove(sourceStack);
 
-            target.UpdateWorldPositions();
+            targetStack.UpdateWorldPositions();
         }
-        
+
         public void DetachSubStack(ICard card)
         {
-            if (!_cardToStack.TryGetValue(card, out var stack))
-                return;
+            var stack = GetStack(card);
 
             int index = stack.Cards.IndexOf(card);
             if (index < 0)
@@ -78,6 +63,7 @@ namespace Services.Cards
 
             _stacks.Add(newStack);
         }
+
         public void RestoreDetachedStack(ICard root)
         {
             if (_lastSourceStack == null || _lastDetachedCards == null)
@@ -103,5 +89,15 @@ namespace Services.Cards
             _lastDetachedCards = null;
         }
 
+        private CardStack CreateStack(ICard card)
+        {
+            CardStack stack = new CardStack();
+            stack.Cards.Add(card);
+
+            _stacks.Add(stack);
+            _cardToStack[card] = stack;
+
+            return stack;
+        }
     }
 }

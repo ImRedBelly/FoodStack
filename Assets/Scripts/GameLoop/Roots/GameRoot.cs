@@ -48,9 +48,9 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            foreach (var startCard in _startCards)
+            for (int i = 0; i < _startCards.Length; i++)
             {
-                cardFactory.CreateIngredient(startCard);
+                cardFactory.CreateIngredient(_startCards[i], new Vector3(i, 0, 0));
             }
         }
     }
