@@ -23,6 +23,8 @@ namespace Services.Cards
 
         private Vector3 _offset;
         private IDisposable _dragDisposable;
+        
+        private const float DragSpeed = 75f; 
 
         public CardDragService(Camera camera, LayerMask cardLayer, CardStackService cardStackService)
         {
@@ -95,7 +97,7 @@ namespace Services.Cards
             var basePos = worldPos + _offset;
 
             var stack = _cardStackService.GetStack(_currentCard);
-            stack.UpdateWorldPositions(basePos);
+            stack.UpdateWorldPositions(basePos, DragSpeed);
         }
 
         private void EndDrag()

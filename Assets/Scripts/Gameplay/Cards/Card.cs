@@ -38,14 +38,12 @@ namespace Gameplay.Cards
         {
             _viewHandler.SetSortingOrder(_dragSortingOrder);
             _viewHandler.SetStateShadow(true);
-            transform.localScale = Vector3.one * 1.1f;
         }
 
         public virtual void OnDragEnd()
         {
             _viewHandler.SetSortingOrder(_defaultSortingOrder);
             _viewHandler.SetStateShadow(false);
-            transform.localScale = Vector3.one;
         }
 
         public void SetStateEligibleFrame(bool state)

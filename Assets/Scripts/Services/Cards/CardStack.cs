@@ -8,14 +8,24 @@ namespace Services.Cards
     {
         public readonly List<ICard> Cards = new();
 
-        public void UpdateWorldPositions() => 
-            UpdateWorldPositions(Cards[0].Transform.position);
+        private const float BaseSpeed = 2500f;
 
-        public void UpdateWorldPositions(Vector3 basePos)
+        public void UpdateWorldPositions() => UpdateWorldPositions(Cards[0].Transform.position, BaseSpeed);
+
+        public void UpdateWorldPositions(Vector3 basePos, float lerpSpeed)
         {
             for (int i = 0; i < Cards.Count; i++)
             {
-                Cards[i].Transform.position = basePos - Vector3.up * (i * 0.2f);
+                float indexFactor = 1f / (i + 1f);
+
+                var targetPosition = basePos - Vector3.up * (i * 0.2f);
+                var transform = Cards[i].Transform;
+
+                transform.position = Vector3.Lerp(
+                    transform.position,
+                    targetPosition,
+                    Time.deltaTime * lerpSpeed * indexFactor
+                );
             }
         }
     }
