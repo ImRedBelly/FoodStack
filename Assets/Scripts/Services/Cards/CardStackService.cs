@@ -3,13 +3,25 @@ using Gameplay.Cards.Interfaces;
 
 namespace Services.Cards
 {
+    public class CardStack
+    {
+        public readonly List<ICard> Cards = new();
+    }
+
     public class CardStackService
     {
+        private readonly CardStackMoveService _cardStackMoveService;
+
         private readonly List<CardStack> _stacks = new();
         private readonly Dictionary<ICard, CardStack> _cardToStack = new();
 
         private CardStack _lastSourceStack;
         private List<ICard> _lastDetachedCards;
+
+        public CardStackService(CardStackMoveService cardStackMoveService)
+        {
+            _cardStackMoveService = cardStackMoveService;
+        }
 
 
         public CardStack GetStack(ICard card)
@@ -32,8 +44,7 @@ namespace Services.Cards
 
             sourceStack.Cards.Clear();
             _stacks.Remove(sourceStack);
-
-            targetStack.UpdateWorldPositions();
+            _cardStackMoveService.UpdateWorldPositions(targetStack);
         }
 
         public void DetachSubStack(ICard card)
@@ -52,7 +63,7 @@ namespace Services.Cards
             if (stack.Cards.Count == 0)
                 _stacks.Remove(stack);
             else
-                stack.UpdateWorldPositions();
+                _cardStackMoveService.UpdateWorldPositions(stack);
 
             var newStack = new CardStack();
             foreach (var c in _lastDetachedCards)
@@ -83,7 +94,7 @@ namespace Services.Cards
             if (current.Cards.Count == 0)
                 _stacks.Remove(current);
 
-            _lastSourceStack.UpdateWorldPositions();
+            _cardStackMoveService.UpdateWorldPositions(_lastSourceStack);
 
             _lastSourceStack = null;
             _lastDetachedCards = null;

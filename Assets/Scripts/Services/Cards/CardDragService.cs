@@ -18,6 +18,7 @@ namespace Services.Cards
         private readonly Camera _camera;
         private readonly LayerMask _cardLayer;
         private readonly CardStackService _cardStackService;
+        private readonly CardStackMoveService _cardStackMoveService;
 
         private ICard _currentCard;
 
@@ -26,11 +27,12 @@ namespace Services.Cards
         private IDisposable _dragDisposable;
 
 
-        public CardDragService(Camera camera, LayerMask cardLayer, CardStackService cardStackService)
+        public CardDragService(Camera camera, LayerMask cardLayer, CardStackService cardStackService, CardStackMoveService cardStackMoveService)
         {
             _camera = camera;
             _cardLayer = cardLayer;
             _cardStackService = cardStackService;
+            _cardStackMoveService = cardStackMoveService;
         }
 
         protected override void OnInit()
@@ -117,7 +119,7 @@ namespace Services.Cards
             var basePos = worldPos + _offsetClick + offset;
 
             var stack = _cardStackService.GetStack(_currentCard);
-            stack.UpdateWorldPositions(basePos, lerpSpeed);
+            _cardStackMoveService.UpdateWorldPositions(stack, basePos, lerpSpeed);
         }
     }
 }

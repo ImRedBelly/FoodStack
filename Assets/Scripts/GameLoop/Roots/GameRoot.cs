@@ -32,9 +32,10 @@ namespace GameLoop.Roots
                 .SafeSubscribe(_ => ActiveModel.WindowsService.Open(playConfirmWindow, false))
                 .AddTo(Disposables);
 
-            CardStackService cardStackService = new CardStackService();
+            CardStackMoveService cardStackMoveService = new CardStackMoveService();
+            CardStackService cardStackService = new CardStackService(cardStackMoveService);
 
-            CardDragService cardDragService = new CardDragService(_camera, _cardLayer, cardStackService);
+            CardDragService cardDragService = new CardDragService(_camera, _cardLayer, cardStackService, cardStackMoveService);
             cardDragService
                 .Init()
                 .AddTo(Disposables);

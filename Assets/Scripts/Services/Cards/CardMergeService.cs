@@ -78,7 +78,7 @@ namespace Services.Cards
 
             _dragOriginStack = null;
         }
-        
+
         private void UpdateSortingOrder()
         {
             foreach (var card in _cards)
