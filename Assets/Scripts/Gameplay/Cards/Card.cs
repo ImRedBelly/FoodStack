@@ -19,8 +19,10 @@ namespace Gameplay.Cards
         }
 
         public Transform Transform => transform;
+        public Transform Container => _container;
         public Collider2D Collider => _collider2D;
 
+        [SerializeField] private Transform _container;
         [SerializeField] private Collider2D _collider2D;
         [SerializeField] private CardViewHandler _viewHandler;
 

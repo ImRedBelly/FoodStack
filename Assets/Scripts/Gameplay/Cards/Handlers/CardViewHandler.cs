@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace Gameplay.Cards.Handlers
@@ -27,6 +28,11 @@ namespace Gameplay.Cards.Handlers
         public void SetStateShadow(bool active)
         {
             _shadowCard.gameObject.SetActive(active);
+            
+            _shadowCard.transform
+                .DOLocalMove(Constants.CardDragOffset * -1, 0.1f)
+                .From(Vector3.zero)
+                .SetLink(_shadowCard.gameObject, LinkBehaviour.KillOnDisable);
         }
 
         public void SetStateEligibleFrame(bool active)

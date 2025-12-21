@@ -8,9 +8,8 @@ namespace Services.Cards
     {
         public readonly List<ICard> Cards = new();
 
-        private const float BaseSpeed = 2500f;
 
-        public void UpdateWorldPositions() => UpdateWorldPositions(Cards[0].Transform.position, BaseSpeed);
+        public void UpdateWorldPositions() => UpdateWorldPositions(Cards[0].Container.position, Constants.MaxDragSpeed);
 
         public void UpdateWorldPositions(Vector3 basePos, float lerpSpeed)
         {

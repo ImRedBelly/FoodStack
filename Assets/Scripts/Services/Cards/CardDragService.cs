@@ -21,10 +21,10 @@ namespace Services.Cards
 
         private ICard _currentCard;
 
-        private Vector3 _offset;
+        private Vector3 _offsetDrag;
+        private Vector3 _offsetClick;
         private IDisposable _dragDisposable;
-        
-        private const float DragSpeed = 75f; 
+
 
         public CardDragService(Camera camera, LayerMask cardLayer, CardStackService cardStackService)
         {
@@ -75,8 +75,8 @@ namespace Services.Cards
 
             _currentCard.OnDragStart();
 
-            _offset = _currentCard.Transform.position - worldPos;
-            _offset.z = 0;
+            _offsetClick = _currentCard.Transform.position - worldPos;
+            _offsetClick.z = 0;
 
             _onStartDrag?.OnNext(_currentCard.Transform.GetComponent<Card>());
             _dragDisposable = Observable.EveryUpdate().Subscribe(_ => UpdateDrag());
@@ -87,17 +87,7 @@ namespace Services.Cards
             if (_currentCard == null)
                 return;
 
-            var ray = _camera.ScreenPointToRay(Input.mousePosition);
-            var plane = new Plane(Vector3.forward, Vector3.zero);
-
-            plane.Raycast(ray, out var distance);
-            var worldPos = ray.GetPoint(distance);
-            worldPos.z = 0;
-
-            var basePos = worldPos + _offset;
-
-            var stack = _cardStackService.GetStack(_currentCard);
-            stack.UpdateWorldPositions(basePos, DragSpeed);
+            UpdateCardPositions(Constants.DragSpeed, Constants.CardDragOffset);
         }
 
         private void EndDrag()
@@ -107,10 +97,27 @@ namespace Services.Cards
 
             if (_currentCard != null)
             {
+                UpdateCardPositions(Constants.MaxDragSpeed, Vector3.zero);
+
                 _onEndDrag?.OnNext(_currentCard);
                 _currentCard.OnDragEnd();
                 _currentCard = null;
             }
+        }
+
+        private void UpdateCardPositions(float lerpSpeed, Vector3 offset)
+        {
+            var ray = _camera.ScreenPointToRay(Input.mousePosition);
+            var plane = new Plane(Vector3.forward, Vector3.zero);
+
+            plane.Raycast(ray, out var distance);
+            var worldPos = ray.GetPoint(distance);
+            worldPos.z = 0;
+
+            var basePos = worldPos + _offsetClick + offset;
+
+            var stack = _cardStackService.GetStack(_currentCard);
+            stack.UpdateWorldPositions(basePos, lerpSpeed);
         }
     }
 }
