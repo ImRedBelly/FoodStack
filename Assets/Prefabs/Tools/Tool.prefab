@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3878948556359446745}
   - component: {fileID: 4282725370430460823}
+  - component: {fileID: 3646978919938445393}
   - component: {fileID: 293173628409258239}
   - component: {fileID: 6563627711140332414}
   - component: {fileID: 4073811254039909750}
@@ -50,6 +51,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider2D: {fileID: 4073811254039909750}
+  _toolViewHandler: {fileID: 3646978919938445393}
+--- !u!114 &3646978919938445393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1122786379117311094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 995f316aae804063b0cd779ea87b2635, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sortingGroup: {fileID: 681374533860535588}
+  _viewCard: {fileID: 8714571887867431021}
+  _viewSlider: {fileID: 2735023488619332166}
+  _eligibleFrame: {fileID: 4675772481442360416}
 --- !u!114 &293173628409258239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,7 +165,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8889736145576023810
 Transform:
   m_ObjectHideFlags: 0
@@ -2944,7 +2962,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 0.675, y: 0.11}
+  m_Size: {x: 0.4, y: 0.11}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -3023,7 +3041,7 @@ SpriteRenderer:
   m_SortingLayerID: -1159043657
   m_SortingLayer: 1
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 4e9c4fc47b159ce4d9c6ceeda1aeb8a7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 491b346601f2a8345ac274a7c7f3d496, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

@@ -1,8 +1,5 @@
 using System;
 using Core;
-using Cysharp.Threading.Tasks;
-using Gameplay.Cards;
-using Gameplay.Cards.Configs;
 using Gameplay.Tools.Configs;
 using Gameplay.Tools.Interfaces;
 using UniRx;
@@ -12,14 +9,14 @@ namespace Gameplay.Tools.Factory
 {
     public class ToolFactory : DisposableClass
     {
-        public IObservable<ITool> OnCardCreated => _onToolCreated;
-        private readonly Subject<ITool> _onToolCreated = new();
+        public IObservable<IToolCard> OnCardCreated => _onToolCreated;
+        private readonly Subject<IToolCard> _onToolCreated = new();
 
-        private readonly Tool _toolPrefab;
+        private readonly ToolCard _toolCardPrefab;
 
-        public ToolFactory(Tool toolPrefab)
+        public ToolFactory(ToolCard toolCardPrefab)
         {
-            _toolPrefab = toolPrefab;
+            _toolCardPrefab = toolCardPrefab;
         }
 
         protected override void OnInit()
@@ -31,9 +28,9 @@ namespace Gameplay.Tools.Factory
 
         public void CreateTool(ToolConfig config, Vector3 position)
         {
-            var tool = UnityEngine.Object.Instantiate(_toolPrefab, position, Quaternion.identity);
+            var tool = UnityEngine.Object.Instantiate(_toolCardPrefab, position, Quaternion.identity);
             tool.name = config.Name;
-            tool.Init(new Tool.Model(config));
+            tool.Init(new ToolCard.Model(config));
 
             _onToolCreated?.OnNext(tool);
         }

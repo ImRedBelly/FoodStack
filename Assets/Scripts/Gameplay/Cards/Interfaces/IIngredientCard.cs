@@ -1,12 +1,14 @@
-﻿using UnityEngine;
+﻿using Gameplay.Cards.Configs;
+using UnityEngine;
 
 namespace Gameplay.Cards.Interfaces
 {
-    public interface ICard
+    public interface IIngredientCard
     {
         Transform Transform { get; }
         Transform Container { get; }
         Collider2D Collider { get; }
+        IngredientConfig IngredientConfig { get; }
         
         void OnDragStart();
         void OnDragEnd();

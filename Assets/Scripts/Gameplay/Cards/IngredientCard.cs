@@ -6,45 +6,43 @@ using UnityEngine;
 
 namespace Gameplay.Cards
 {
-    public class Card : DisposableBehaviour<Card.Model>, ICard
+    public class IngredientCard : DisposableBehaviour<IngredientCard.Model>, IIngredientCard
     {
         public class Model
         {
-            public readonly IngredientConfig Config;
+            public readonly IngredientConfig IngredientConfig;
 
-            public Model(IngredientConfig config)
+            public Model(IngredientConfig ingredientConfig)
             {
-                Config = config;
+                IngredientConfig = ingredientConfig;
             }
         }
 
         public Transform Transform => transform;
         public Transform Container => _container;
         public Collider2D Collider => _collider2D;
+        public IngredientConfig IngredientConfig => ActiveModel.IngredientConfig;
 
         [SerializeField] private Transform _container;
         [SerializeField] private Collider2D _collider2D;
         [SerializeField] private CardViewHandler _viewHandler;
 
-        private readonly int _defaultSortingOrder = 1;
-        private readonly int _dragSortingOrder = 100;
-
         protected override void OnInit()
         {
             base.OnInit();
-            _viewHandler.Initialize(ActiveModel.Config.Sprite, _defaultSortingOrder);
+            _viewHandler.Initialize(ActiveModel.IngredientConfig.Sprite, Constants.DefaultSortingOrder);
         }
 
 
         public virtual void OnDragStart()
         {
-            _viewHandler.SetSortingOrder(_dragSortingOrder);
+            _viewHandler.SetSortingOrder(Constants.DragSortingOrder);
             _viewHandler.SetStateShadow(true);
         }
 
         public virtual void OnDragEnd()
         {
-            _viewHandler.SetSortingOrder(_defaultSortingOrder);
+            _viewHandler.SetSortingOrder(Constants.DefaultSortingOrder);
             _viewHandler.SetStateShadow(false);
         }
 

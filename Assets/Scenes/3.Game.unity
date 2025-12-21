@@ -155,15 +155,20 @@ MonoBehaviour:
   _cardLayer:
     serializedVersion: 2
     m_Bits: 8
-  _cardPrefab: {fileID: 1544634973983324521, guid: b3b55a921a629794299f02e44e4fa8e3, type: 3}
-  _toolPrefab: {fileID: 4282725370430460823, guid: 0e75b786d063f4c69bf082a151e4038c, type: 3}
+  ingredientCardPrefab: {fileID: 1544634973983324521, guid: b3b55a921a629794299f02e44e4fa8e3, type: 3}
+  toolCardPrefab: {fileID: 4282725370430460823, guid: 0e75b786d063f4c69bf082a151e4038c, type: 3}
+  _recipeConfigs:
+  - {fileID: 11400000, guid: 37212f132c55ade46bcee60f9cebf3bf, type: 2}
+  - {fileID: 11400000, guid: e22f07d4b660e4a63b1d268f834f67ac, type: 2}
+  _quitButton: {fileID: 332112253}
   _startCards:
   - {fileID: 11400000, guid: a71bb69b67a8bc242b52543be1c99f6e, type: 2}
   - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
   - {fileID: 11400000, guid: ec838ee8855394344b653c19cdc5c895, type: 2}
   - {fileID: 11400000, guid: 94c31a528eda9da4aba65d8cf10db2ec, type: 2}
+  - {fileID: 11400000, guid: 50c9acf77dba91949a1efe566fffb111, type: 2}
+  - {fileID: 11400000, guid: e5a15839b2e54d941b54eb2ce6c52caf, type: 2}
   _panConfig: {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
-  _quitButton: {fileID: 332112253}
 --- !u!4 &316752952
 Transform:
   m_ObjectHideFlags: 0

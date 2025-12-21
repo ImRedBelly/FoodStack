@@ -1,4 +1,4 @@
-using Gameplay.Cards.Configs;
+using Gameplay.Recipes.Configs;
 using UnityEngine;
 
 namespace Gameplay.Tools.Configs

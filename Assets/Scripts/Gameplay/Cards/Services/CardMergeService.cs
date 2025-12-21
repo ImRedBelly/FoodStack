@@ -14,7 +14,7 @@ namespace Gameplay.Cards.Services
         private readonly CardDragService _dragService;
         private readonly CardStackService _cardStackService;
 
-        private readonly List<ICard> _cards = new();
+        private readonly List<IIngredientCard> _cards = new();
 
         private CardStack _dragOriginStack;
 
@@ -45,35 +45,35 @@ namespace Gameplay.Cards.Services
                 .AddTo(Disposables);
         }
 
-        private void AddCard(ICard newCard)
+        private void AddCard(IIngredientCard newIngredientCard)
         {
-            if (!_cards.Contains(newCard))
+            if (!_cards.Contains(newIngredientCard))
             {
-                _cards.Add(newCard);
+                _cards.Add(newIngredientCard);
             }
         }
 
-        private void StartDrag(ICard draggedCard)
+        private void StartDrag(IIngredientCard draggedIngredientCard)
         {
-            _dragOriginStack = _cardStackService.GetStack(draggedCard);
+            _dragOriginStack = _cardStackService.GetStack(draggedIngredientCard);
 
-            _cardStackService.DetachSubStack(draggedCard);
+            _cardStackService.DetachSubStack(draggedIngredientCard);
 
             foreach (var card in _cards)
-                card.SetStateEligibleFrame(TryActivateEligibleFrame(draggedCard, card));
+                card.SetStateEligibleFrame(TryActivateEligibleFrame(draggedIngredientCard, card));
         }
 
 
-        private void EndDrag(ICard draggedCard)
+        private void EndDrag(IIngredientCard draggedIngredientCard)
         {
             foreach (var card in _cards)
                 card.SetStateEligibleFrame(false);
 
-            bool merged = TryMerge(draggedCard);
+            bool merged = TryMerge(draggedIngredientCard);
 
-            if (!merged && DroppedOnOriginStack(draggedCard))
+            if (!merged && DroppedOnOriginStack(draggedIngredientCard))
             {
-                _cardStackService.RestoreDetachedStack(draggedCard);
+                _cardStackService.RestoreDetachedStack(draggedIngredientCard);
             }
 
             _dragOriginStack = null;
@@ -87,14 +87,14 @@ namespace Gameplay.Cards.Services
             }
         }
 
-        private bool DroppedOnOriginStack(ICard draggedCard)
+        private bool DroppedOnOriginStack(IIngredientCard draggedIngredientCard)
         {
             if (_dragOriginStack == null)
                 return false;
 
             foreach (var card in _dragOriginStack.Cards)
             {
-                if (IsOverlapping(draggedCard, card))
+                if (IsOverlapping(draggedIngredientCard, card))
                     return true;
             }
 
@@ -102,39 +102,39 @@ namespace Gameplay.Cards.Services
         }
 
 
-        private bool TryMerge(ICard draggedCard)
+        private bool TryMerge(IIngredientCard draggedIngredientCard)
         {
             foreach (var card in _cards)
             {
-                if (card == draggedCard) continue;
-                if (!IsOverlapping(draggedCard, card)) continue;
+                if (card == draggedIngredientCard) continue;
+                if (!IsOverlapping(draggedIngredientCard, card)) continue;
 
                 var targetStack = _cardStackService.GetStack(card);
 
-                _cardStackService.MergeStacks(draggedCard, targetStack);
+                _cardStackService.MergeStacks(draggedIngredientCard, targetStack);
                 return true;
             }
 
             return false;
         }
 
-        private bool IsOverlapping(ICard draggedCard, ICard other)
+        private bool IsOverlapping(IIngredientCard draggedIngredientCard, IIngredientCard other)
         {
-            var draggedStack = _cardStackService.GetStack(draggedCard);
+            var draggedStack = _cardStackService.GetStack(draggedIngredientCard);
             if (draggedStack != null && draggedStack == _cardStackService.GetStack(other))
                 return false;
 
-            return draggedCard.Collider.bounds.Intersects(other.Collider.bounds);
+            return draggedIngredientCard.Collider.bounds.Intersects(other.Collider.bounds);
         }
 
-        private bool TryActivateEligibleFrame(ICard draggedCard, ICard targetCard)
+        private bool TryActivateEligibleFrame(IIngredientCard draggedIngredientCard, IIngredientCard targetIngredientCard)
         {
-            var draggedStack = _cardStackService.GetStack(draggedCard);
-            var targetStack = _cardStackService.GetStack(targetCard);
+            var draggedStack = _cardStackService.GetStack(draggedIngredientCard);
+            var targetStack = _cardStackService.GetStack(targetIngredientCard);
 
-            bool equalCards = draggedCard == targetCard;
-            bool draggedStackContainsTarget = draggedStack.Cards.Contains(targetCard);
-            bool isLastCardInStack = targetStack.Cards.Last() == targetCard;
+            bool equalCards = draggedIngredientCard == targetIngredientCard;
+            bool draggedStackContainsTarget = draggedStack.Cards.Contains(targetIngredientCard);
+            bool isLastCardInStack = targetStack.Cards.Last() == targetIngredientCard;
 
             return !equalCards && !draggedStackContainsTarget && isLastCardInStack;
         }

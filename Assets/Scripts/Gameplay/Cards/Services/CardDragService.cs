@@ -8,18 +8,18 @@ namespace Gameplay.Cards.Services
 {
     public sealed class CardDragService : DisposableClass
     {
-        public IObservable<ICard> OnStartDrag => _onStartDrag;
-        public IObservable<ICard> OnEndDrag => _onEndDrag;
+        public IObservable<IIngredientCard> OnStartDrag => _onStartDrag;
+        public IObservable<IIngredientCard> OnEndDrag => _onEndDrag;
 
-        private readonly Subject<ICard> _onStartDrag = new();
-        private readonly Subject<ICard> _onEndDrag = new();
+        private readonly Subject<IIngredientCard> _onStartDrag = new();
+        private readonly Subject<IIngredientCard> _onEndDrag = new();
 
         private readonly Camera _camera;
         private readonly LayerMask _cardLayer;
         private readonly CardStackService _cardStackService;
         private readonly CardStackMoveService _cardStackMoveService;
 
-        private ICard _currentCard;
+        private IIngredientCard _currentIngredientCard;
 
         private Vector3 _offsetDrag;
         private Vector3 _offsetClick;
@@ -62,30 +62,30 @@ namespace Gameplay.Cards.Services
             float minPositionY = float.MaxValue;
             foreach (var hit in allCards)
             {
-                if (hit.collider.TryGetComponent<ICard>(out var card))
+                if (hit.collider.TryGetComponent<IIngredientCard>(out var card))
                 {
                     if (hit.collider.transform.position.y < minPositionY)
                     {
                         minPositionY = hit.collider.transform.position.y;
-                        _currentCard = card;
+                        _currentIngredientCard = card;
                     }
                 }
             }
 
-            if (_currentCard == null) return;
+            if (_currentIngredientCard == null) return;
 
-            _currentCard.OnDragStart();
+            _currentIngredientCard.OnDragStart();
 
-            _offsetClick = _currentCard.Transform.position - worldPos;
+            _offsetClick = _currentIngredientCard.Transform.position - worldPos;
             _offsetClick.z = 0;
 
-            _onStartDrag?.OnNext(_currentCard.Transform.GetComponent<Card>());
+            _onStartDrag?.OnNext(_currentIngredientCard.Transform.GetComponent<IngredientCard>());
             _dragDisposable = Observable.EveryUpdate().Subscribe(_ => UpdateDrag());
         }
 
         private void UpdateDrag()
         {
-            if (_currentCard == null)
+            if (_currentIngredientCard == null)
                 return;
 
             UpdateCardPositions(Constants.DragSpeed, Constants.CardDragOffset);
@@ -96,13 +96,13 @@ namespace Gameplay.Cards.Services
             _dragDisposable?.Dispose();
             _dragDisposable = null;
 
-            if (_currentCard != null)
+            if (_currentIngredientCard != null)
             {
                 UpdateCardPositions(Constants.MaxDragSpeed, Vector3.zero);
 
-                _onEndDrag?.OnNext(_currentCard);
-                _currentCard.OnDragEnd();
-                _currentCard = null;
+                _onEndDrag?.OnNext(_currentIngredientCard);
+                _currentIngredientCard.OnDragEnd();
+                _currentIngredientCard = null;
             }
         }
 
@@ -117,7 +117,7 @@ namespace Gameplay.Cards.Services
 
             var basePos = worldPos + _offsetClick + offset;
 
-            var stack = _cardStackService.GetStack(_currentCard);
+            var stack = _cardStackService.GetStack(_currentIngredientCard);
             _cardStackMoveService.UpdateWorldPositions(stack, basePos, lerpSpeed);
         }
     }

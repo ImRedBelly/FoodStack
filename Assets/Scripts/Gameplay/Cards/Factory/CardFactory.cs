@@ -10,14 +10,17 @@ namespace Gameplay.Cards.Factory
 {
     public class CardFactory : DisposableClass
     {
-        public IObservable<ICard> OnCardCreated => _onCardCreated;
-        private readonly Subject<ICard> _onCardCreated = new();
+        public IObservable<IIngredientCard> OnCardCreated => _onCardCreated;
+        public IObservable<IIngredientCard> OnCardRemoved => _onCardRemoved;
 
-        private readonly Card _cardPrefab;
+        private readonly Subject<IIngredientCard> _onCardCreated = new();
+        private readonly Subject<IIngredientCard> _onCardRemoved = new();
 
-        public CardFactory(Card cardPrefab)
+        private readonly IngredientCard _ingredientCardPrefab;
+
+        public CardFactory(IngredientCard ingredientCardPrefab)
         {
-            _cardPrefab = cardPrefab;
+            _ingredientCardPrefab = ingredientCardPrefab;
         }
 
         protected override void OnInit()
@@ -29,11 +32,17 @@ namespace Gameplay.Cards.Factory
 
         public void CreateIngredient(IngredientConfig config, Vector3 position)
         {
-            var card = Object.Instantiate(_cardPrefab,  position, Quaternion.identity);
+            var card = Object.Instantiate(_ingredientCardPrefab, position, Quaternion.identity);
             card.name = config.Name;
-            card.Init(new Card.Model(config));
+            card.Init(new IngredientCard.Model(config));
 
             _onCardCreated?.OnNext(card);
+        }
+
+        public void RemoveIngredient(GameObject objectToRemove)
+        {
+            Object.Instantiate(objectToRemove);
+            _onCardCreated?.OnNext(objectToRemove.GetComponent<IngredientCard>());
         }
     }
 }

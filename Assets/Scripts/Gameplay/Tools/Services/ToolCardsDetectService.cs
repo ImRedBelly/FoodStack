@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Core;
 using Gameplay.Cards.Interfaces;
@@ -6,16 +7,19 @@ using Gameplay.Tools.Factory;
 using Gameplay.Tools.Interfaces;
 using Support;
 using UniRx;
-using UnityEngine;
 
 namespace Gameplay.Tools.Services
 {
     public class ToolCardsDetectService : DisposableClass
     {
+        public IObservable<(IToolCard, IIngredientCard)> OnDetectTool => _onDetectTool;
+
+        private readonly Subject<(IToolCard, IIngredientCard)> _onDetectTool = new();
+
         private readonly ToolFactory _toolFactory;
         private readonly CardDragService _cardDragService;
 
-        private readonly List<ITool> _tools = new();
+        private readonly List<IToolCard> _tools = new();
 
         public ToolCardsDetectService(ToolFactory toolFactory, CardDragService cardDragService)
         {
@@ -36,29 +40,29 @@ namespace Gameplay.Tools.Services
                 .AddTo(Disposables);
         }
 
-        private void EndDrag(ICard card)
+        private void EndDrag(IIngredientCard ingredientCard)
         {
             foreach (var tool in _tools)
             {
-                if (IsOverlapping(tool, card))
-                {
-                    Debug.LogError("Detect Tool");
-                }
+                if (!IsOverlapping(tool, ingredientCard)) continue;
+
+                _onDetectTool?.OnNext((tool, ingredientCard));
+                break;
             }
         }
 
-        private void AddTool(ITool newTool)
+        private void AddTool(IToolCard newToolCard)
         {
-            if (!_tools.Contains(newTool))
+            if (!_tools.Contains(newToolCard))
             {
-                _tools.Add(newTool);
+                _tools.Add(newToolCard);
             }
         }
 
 
-        private bool IsOverlapping(ITool tool, ICard card)
+        private bool IsOverlapping(IToolCard toolCard, IIngredientCard ingredientCard)
         {
-            return tool.Collider.bounds.Intersects(card.Collider.bounds);
+            return toolCard.Collider.bounds.Intersects(ingredientCard.Collider.bounds);
         }
     }
 }
