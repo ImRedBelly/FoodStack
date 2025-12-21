@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Gameplay.Cards.Interfaces;
 
-namespace Services.Cards
+namespace Gameplay.Cards.Services
 {
     public class CardStack
     {

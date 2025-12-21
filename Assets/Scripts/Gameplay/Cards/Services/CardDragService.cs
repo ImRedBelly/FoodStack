@@ -1,11 +1,10 @@
 ﻿using System;
 using Core;
-using Gameplay.Cards;
 using Gameplay.Cards.Interfaces;
 using UniRx;
 using UnityEngine;
 
-namespace Services.Cards
+namespace Gameplay.Cards.Services
 {
     public sealed class CardDragService : DisposableClass
     {

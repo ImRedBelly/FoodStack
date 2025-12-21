@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Services.Cards
+namespace Gameplay.Cards.Services
 {
     public class CardStackMoveService
     {

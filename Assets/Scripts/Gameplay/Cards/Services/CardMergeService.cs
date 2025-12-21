@@ -6,7 +6,7 @@ using Gameplay.Cards.Interfaces;
 using Support;
 using UniRx;
 
-namespace Services.Cards
+namespace Gameplay.Cards.Services
 {
     public class CardMergeService : DisposableClass
     {
