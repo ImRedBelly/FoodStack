@@ -28,6 +28,7 @@ namespace Gameplay.Cards.Factory
             base.OnInit();
 
             _onCardCreated.AddTo(Disposables);
+            _onCardRemoved.AddTo(Disposables);
         }
 
         public void CreateIngredient(IngredientConfig config, Vector3 position)
@@ -39,10 +40,10 @@ namespace Gameplay.Cards.Factory
             _onCardCreated?.OnNext(card);
         }
 
-        public void RemoveIngredient(GameObject objectToRemove)
+        public void RemoveIngredient(IIngredientCard ingredientCard)
         {
-            Object.Instantiate(objectToRemove);
-            _onCardCreated?.OnNext(objectToRemove.GetComponent<IngredientCard>());
+            _onCardRemoved?.OnNext(ingredientCard);
+            Object.Destroy(ingredientCard.Transform.gameObject);
         }
     }
 }

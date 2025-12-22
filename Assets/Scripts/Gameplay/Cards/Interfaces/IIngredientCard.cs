@@ -1,9 +1,10 @@
-﻿using Gameplay.Cards.Configs;
+﻿using System;
+using Gameplay.Cards.Configs;
 using UnityEngine;
 
 namespace Gameplay.Cards.Interfaces
 {
-    public interface IIngredientCard
+    public interface IIngredientCard : IDisposable
     {
         Transform Transform { get; }
         Transform Container { get; }

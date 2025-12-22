@@ -168,6 +168,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 94c31a528eda9da4aba65d8cf10db2ec, type: 2}
   - {fileID: 11400000, guid: 50c9acf77dba91949a1efe566fffb111, type: 2}
   - {fileID: 11400000, guid: e5a15839b2e54d941b54eb2ce6c52caf, type: 2}
+  - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
   _panConfig: {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
 --- !u!4 &316752952
 Transform:

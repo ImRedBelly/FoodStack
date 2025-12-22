@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Core;
 using DG.Tweening;
 using Gameplay.Cards.Configs;
@@ -11,6 +10,7 @@ using Gameplay.Tools.Interfaces;
 using Support;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Gameplay.Tools.Services
 {
@@ -21,6 +21,7 @@ namespace Gameplay.Tools.Services
         private readonly CardFactory _cardFactory;
 
         private readonly Dictionary<IToolCard, CardStack> _toolToStack = new();
+        private readonly Dictionary<IToolCard, Tween> _activeCreateTasks = new();
 
         public CreateDishService(
             ToolCardsDetectService toolCardsDetectService,
@@ -62,26 +63,60 @@ namespace Gameplay.Tools.Services
         {
             foreach (var kv in _toolToStack)
             {
-                foreach (var recipeConfig in kv.Key.RecipeConfigs)
+                var tool = kv.Key;
+                var stack = kv.Value;
+
+                RecipeConfig matchedRecipe = null;
+
+                foreach (var recipeConfig in tool.RecipeConfigs)
                 {
-                    if (!CanCreateDish(recipeConfig.Ingredients, kv.Value.Cards)) continue;
-                    CreateDishTask(kv.Key, recipeConfig);
-                    break;
+                    if (CanCreateDish(recipeConfig.Ingredients, stack.Cards))
+                    {
+                        matchedRecipe = recipeConfig;
+                        break;
+                    }
                 }
+
+                if (matchedRecipe == null)
+                {
+                    CancelCreateTask(tool);
+                    continue;
+                }
+
+                if (_activeCreateTasks.ContainsKey(tool))
+                    continue;
+
+                CreateDishTask(tool, matchedRecipe, stack.Cards);
             }
         }
 
-        private void CreateDishTask(IToolCard toolCard, RecipeConfig recipeConfig)
+        private void CreateDishTask(IToolCard toolCard, RecipeConfig recipeConfig, List<IIngredientCard> cards)
         {
+            CancelCreateTask(toolCard);
+
             toolCard.SetStateSlider(true);
-            DOVirtual
+
+            var tween = DOVirtual
                 .Float(0, 1, recipeConfig.CreateTime, toolCard.SetProgress)
                 .OnComplete(() =>
                 {
+                    _toolToStack.Remove(toolCard);
                     toolCard.SetStateSlider(false);
+                    _activeCreateTasks.Remove(toolCard);
                     _cardFactory.CreateIngredient(recipeConfig.Result, Vector3.zero);
-                    Debug.LogError("CreateDish: " + recipeConfig.Name);
+                    
+                    foreach (var card in cards)
+                    {
+                        _cardFactory.RemoveIngredient(card);
+                    }
+                })
+                .OnKill(() =>
+                {
+                    toolCard.SetStateSlider(false);
+                    _activeCreateTasks.Remove(toolCard);
                 });
+
+            _activeCreateTasks[toolCard] = tween;
         }
 
         private static bool CanCreateDish(IngredientConfig[] ingredients, IReadOnlyList<IIngredientCard> cards)
@@ -89,7 +124,38 @@ namespace Gameplay.Tools.Services
             if (ingredients == null || cards == null) return false;
             if (ingredients.Length != cards.Count) return false;
 
-            return !ingredients.Where((t, i) => t != cards[i].IngredientConfig).Any();
+            Dictionary<IngredientConfig, int> cachedIngredients = new();
+            
+            foreach (var ingredient in ingredients)
+            {
+                if (cachedIngredients.TryGetValue(ingredient, out var count))
+                    cachedIngredients[ingredient] = count + 1;
+                else
+                    cachedIngredients[ingredient] = 1;
+            }
+
+            foreach (var card in cards)
+            {
+                var config = card.IngredientConfig;
+                if (!cachedIngredients.TryGetValue(config, out var count))
+                    return false;
+
+                if (count == 1)
+                    cachedIngredients.Remove(config);
+                else
+                    cachedIngredients[config] = count - 1;
+            }
+
+            return true;
+        }
+
+        private void CancelCreateTask(IToolCard toolCard)
+        {
+            if (_activeCreateTasks.TryGetValue(toolCard, out var tween))
+            {
+                tween.Kill();
+                _activeCreateTasks.Remove(toolCard);
+            }
         }
     }
 }

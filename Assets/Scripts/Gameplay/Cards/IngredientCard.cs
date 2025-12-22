@@ -33,6 +33,10 @@ namespace Gameplay.Cards
             _viewHandler.Initialize(ActiveModel.IngredientConfig.Sprite, Constants.DefaultSortingOrder);
         }
 
+        public void Dispose()
+        {
+            Disposables?.Dispose();
+        }
 
         public virtual void OnDragStart()
         {

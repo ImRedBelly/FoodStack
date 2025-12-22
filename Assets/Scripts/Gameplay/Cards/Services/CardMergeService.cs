@@ -28,8 +28,13 @@ namespace Gameplay.Cards.Services
         protected override void OnInit()
         {
             base.OnInit();
+            
             _cardFactory.OnCardCreated
                 .SafeSubscribe(AddCard)
+                .AddTo(Disposables);
+            
+            _cardFactory.OnCardRemoved
+                .SafeSubscribe(RemoveCard)
                 .AddTo(Disposables);
 
             _dragService.OnStartDrag
@@ -50,6 +55,14 @@ namespace Gameplay.Cards.Services
             if (!_cards.Contains(newIngredientCard))
             {
                 _cards.Add(newIngredientCard);
+            }
+        }
+
+        private void RemoveCard(IIngredientCard ingredientCard)
+        {
+            if (_cards.Contains(ingredientCard))
+            {
+                _cards.Remove(ingredientCard);
             }
         }
 

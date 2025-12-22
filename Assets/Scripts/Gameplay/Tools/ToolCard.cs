@@ -33,6 +33,11 @@ namespace Gameplay.Tools
             _toolViewHandler.Initialize(ActiveModel.ToolConfig.Sprite, Constants.DefaultSortingOrder);
         }
 
+        public void Dispose()
+        {
+            Disposables?.Dispose();
+        }
+
         public void SetStateEligibleFrame(bool state)
         {
             _toolViewHandler.SetStateEligibleFrame(state);
