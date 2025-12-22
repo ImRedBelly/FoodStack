@@ -53,7 +53,7 @@ namespace GameLoop.Roots
         private void InitWindows()
         {
             var playConfirmWindow =
-                ActiveModel.WindowResolver.GetPlayConfirmWindowModel(ActiveModel.OnGameAction, false);
+                ActiveModel.WindowResolver.GetPlayConfirmWindowModel(ActiveModel.OnGameAction);
 
             _quitButton
                 .OnClickAsObservable()
