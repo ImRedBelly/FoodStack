@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace Gameplay.Cards.Services
+namespace Gameplay.Cards.Systems
 {
-    public class CardStackMoveService
+    public class CardStackMoveSystem
     {
         public void UpdateWorldPositions(CardStack stacks)
         {

@@ -4,31 +4,31 @@ using DG.Tweening;
 using Gameplay.Cards.Configs;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
-using Gameplay.Cards.Services;
+using Gameplay.Cards.Systems;
 using Gameplay.Recipes.Configs;
 using Gameplay.Tools.Interfaces;
 using Support;
 using UniRx;
 using UnityEngine;
 
-namespace Gameplay.Tools.Services
+namespace Gameplay.Tools.Systems
 {
     public class CreateDishService : DisposableClass
     {
-        private readonly ToolCardsDetectService _toolCardsDetectService;
-        private readonly CardStackService _cardStackService;
+        private readonly CardCollisionSystem _cardCollisionSystem;
+        private readonly CardStackSystem _cardStackSystem;
         private readonly CardFactory _cardFactory;
 
         private readonly Dictionary<IToolCard, CardStack> _toolToStack = new();
         private readonly Dictionary<IToolCard, Tween> _activeCreateTasks = new();
 
         public CreateDishService(
-            ToolCardsDetectService toolCardsDetectService,
-            CardStackService cardStackService, 
+            CardCollisionSystem cardCollisionSystem,
+            CardStackSystem cardStackSystem, 
             CardFactory cardFactory)
         {
-            _toolCardsDetectService = toolCardsDetectService;
-            _cardStackService = cardStackService;
+            _cardCollisionSystem = cardCollisionSystem;
+            _cardStackSystem = cardStackSystem;
             _cardFactory = cardFactory;
         }
 
@@ -36,18 +36,18 @@ namespace Gameplay.Tools.Services
         {
             base.OnInit();
 
-            _toolCardsDetectService.OnDetectTool
+            _cardCollisionSystem.OnCardCollisionWithTool
                 .SafeSubscribe(DetectTool)
                 .AddTo(Disposables);
 
-            _cardStackService.OnUpdateStacks
+            _cardStackSystem.OnUpdateStacks
                 .SafeSubscribe(UpdateStacks)
                 .AddTo(Disposables);
         }
 
         private void DetectTool((IToolCard tool, IIngredientCard card) data)
         {
-            var stack = _cardStackService.GetStack(data.card);
+            var stack = _cardStackSystem.GetStack(data.card);
             if (stack == null) return;
 
             _toolToStack[data.tool] = stack;

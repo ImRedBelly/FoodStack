@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using Gameplay.Cards.Interfaces;
 using UniRx;
 
-namespace Gameplay.Cards.Services
+namespace Gameplay.Cards.Systems
 {
     public class CardStack
     {
         public readonly List<IIngredientCard> Cards = new();
     }
 
-    public class CardStackService
+    public class CardStackSystem
     {
         public IObservable<Unit> OnUpdateStacks => _onUpdateStacks;
         private readonly Subject<Unit> _onUpdateStacks = new();
 
 
-        private readonly CardStackMoveService _cardStackMoveService;
+        private readonly CardStackMoveSystem _cardStackMoveSystem;
 
         private readonly List<CardStack> _stacks = new();
         private readonly Dictionary<IIngredientCard, CardStack> _cardToStack = new();
@@ -24,9 +24,9 @@ namespace Gameplay.Cards.Services
         private CardStack _lastSourceStack;
         private List<IIngredientCard> _lastDetachedCards;
 
-        public CardStackService(CardStackMoveService cardStackMoveService)
+        public CardStackSystem(CardStackMoveSystem cardStackMoveSystem)
         {
-            _cardStackMoveService = cardStackMoveService;
+            _cardStackMoveSystem = cardStackMoveSystem;
         }
 
 
@@ -50,7 +50,7 @@ namespace Gameplay.Cards.Services
 
             sourceStack.Cards.Clear();
             _stacks.Remove(sourceStack);
-            _cardStackMoveService.UpdateWorldPositions(targetStack);
+            _cardStackMoveSystem.UpdateWorldPositions(targetStack);
             _onUpdateStacks?.OnNext(Unit.Default);
         }
 
@@ -70,7 +70,7 @@ namespace Gameplay.Cards.Services
             if (stack.Cards.Count == 0)
                 _stacks.Remove(stack);
             else
-                _cardStackMoveService.UpdateWorldPositions(stack);
+                _cardStackMoveSystem.UpdateWorldPositions(stack);
 
             var newStack = new CardStack();
             foreach (var c in _lastDetachedCards)
@@ -102,7 +102,7 @@ namespace Gameplay.Cards.Services
             if (current.Cards.Count == 0)
                 _stacks.Remove(current);
 
-            _cardStackMoveService.UpdateWorldPositions(_lastSourceStack);
+            _cardStackMoveSystem.UpdateWorldPositions(_lastSourceStack);
 
             _lastSourceStack = null;
             _lastDetachedCards = null;

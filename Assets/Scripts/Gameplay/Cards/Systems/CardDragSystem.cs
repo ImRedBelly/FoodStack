@@ -4,9 +4,9 @@ using Gameplay.Cards.Interfaces;
 using UniRx;
 using UnityEngine;
 
-namespace Gameplay.Cards.Services
+namespace Gameplay.Cards.Systems
 {
-    public sealed class CardDragService : DisposableClass
+    public sealed class CardDragSystem : DisposableClass
     {
         public IObservable<IIngredientCard> OnStartDrag => _onStartDrag;
         public IObservable<IIngredientCard> OnEndDrag => _onEndDrag;
@@ -16,8 +16,8 @@ namespace Gameplay.Cards.Services
 
         private readonly Camera _camera;
         private readonly LayerMask _cardLayer;
-        private readonly CardStackService _cardStackService;
-        private readonly CardStackMoveService _cardStackMoveService;
+        private readonly CardStackSystem _cardStackSystem;
+        private readonly CardStackMoveSystem _cardStackMoveSystem;
 
         private IIngredientCard _currentIngredientCard;
 
@@ -26,12 +26,12 @@ namespace Gameplay.Cards.Services
         private IDisposable _dragDisposable;
 
 
-        public CardDragService(Camera camera, LayerMask cardLayer, CardStackService cardStackService, CardStackMoveService cardStackMoveService)
+        public CardDragSystem(Camera camera, LayerMask cardLayer, CardStackSystem cardStackSystem, CardStackMoveSystem cardStackMoveSystem)
         {
             _camera = camera;
             _cardLayer = cardLayer;
-            _cardStackService = cardStackService;
-            _cardStackMoveService = cardStackMoveService;
+            _cardStackSystem = cardStackSystem;
+            _cardStackMoveSystem = cardStackMoveSystem;
         }
 
         protected override void OnInit()
@@ -117,8 +117,8 @@ namespace Gameplay.Cards.Services
 
             var basePos = worldPos + _offsetClick + offset;
 
-            var stack = _cardStackService.GetStack(_currentIngredientCard);
-            _cardStackMoveService.UpdateWorldPositions(stack, basePos, lerpSpeed);
+            var stack = _cardStackSystem.GetStack(_currentIngredientCard);
+            _cardStackMoveSystem.UpdateWorldPositions(stack, basePos, lerpSpeed);
         }
     }
 }

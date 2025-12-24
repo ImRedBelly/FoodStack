@@ -2,13 +2,13 @@ using Core;
 using Gameplay.Cards;
 using Gameplay.Cards.Configs;
 using Gameplay.Cards.Factory;
-using Gameplay.Cards.Services;
+using Gameplay.Cards.Systems;
 using Gameplay.Recipes.Configs;
 using Gameplay.Recipes.Services;
 using Gameplay.Tools;
 using Gameplay.Tools.Configs;
 using Gameplay.Tools.Factory;
-using Gameplay.Tools.Services;
+using Gameplay.Tools.Systems;
 using Support;
 using UniRx;
 using UnityEngine;
@@ -35,20 +35,29 @@ namespace GameLoop.Roots
 
 
         private RecipesStorage _recipesStorage;
-        private CardDragService _cardDragService;
-        private CardStackService _cardStackService;
-        private CardStackMoveService _cardStackMoveService;
+
+        private CardDragSystem _cardDragSystem;
+        private CardCollisionSystem _cardCollisionSystem;
+        private CardStackSystem _cardStackSystem;
+        private CardStackMoveSystem _cardStackMoveSystem;
+
         private CardFactory _cardFactory;
+        private ToolFactory _toolFactory;
 
         protected override void OnInit()
         {
             base.OnInit();
-
             InitWindows();
+            InitFactories();
+
             InitRecipesServices();
             InitCardsServices();
             InitToolsServices();
+
+            CreateStartCards();
+            CreateStartTools();
         }
+
 
         private void InitWindows()
         {
@@ -61,6 +70,20 @@ namespace GameLoop.Roots
                 .AddTo(Disposables);
         }
 
+        private void InitFactories()
+        {
+            _cardFactory = new CardFactory(ingredientCardPrefab);
+            _cardFactory
+                .Init()
+                .AddTo(Disposables);
+
+            _toolFactory = new ToolFactory(toolCardPrefab);
+            _toolFactory
+                .Init()
+                .AddTo(Disposables);
+        }
+
+
         private void InitRecipesServices()
         {
             _recipesStorage = new RecipesStorage(_recipeConfigs);
@@ -68,23 +91,56 @@ namespace GameLoop.Roots
 
         private void InitCardsServices()
         {
-            _cardStackMoveService = new CardStackMoveService();
-            _cardStackService = new CardStackService(_cardStackMoveService);
+            _cardStackMoveSystem = new CardStackMoveSystem();
+            _cardStackSystem = new CardStackSystem(_cardStackMoveSystem);
 
-            _cardDragService = new CardDragService(_camera, _cardLayer, _cardStackService, _cardStackMoveService);
-            _cardDragService
+            _cardDragSystem = new CardDragSystem(_camera, _cardLayer, _cardStackSystem, _cardStackMoveSystem);
+            _cardDragSystem
                 .Init()
                 .AddTo(Disposables);
 
-            _cardFactory = new CardFactory(ingredientCardPrefab);
-            _cardFactory
+            _cardCollisionSystem = new CardCollisionSystem(_cardFactory, _toolFactory, _cardDragSystem);
+            _cardCollisionSystem
                 .Init()
                 .AddTo(Disposables);
 
-            new CardMergeService(_cardFactory, _cardDragService, _cardStackService)
+            new CardMergeSystem(_cardCollisionSystem, _cardDragSystem, _cardStackSystem)
                 .Init()
                 .AddTo(Disposables);
-            
+
+            new CardSortingOrderSystem(_cardFactory)
+                .Init()
+                .AddTo(Disposables);
+
+            new CardEligibleFrameStateSystem(_cardFactory, _toolFactory, _cardDragSystem, _cardStackSystem)
+                .Init()
+                .AddTo(Disposables);
+
+            CardPlacementSystem cardPlacementSystem = new CardPlacementSystem(_cardFactory, _toolFactory, _cardCollisionSystem,
+                _cardStackMoveSystem, _cardStackSystem);
+            cardPlacementSystem
+                .Init()
+                .AddTo(Disposables);
+        }
+
+
+        private void InitToolsServices()
+        {
+            CreateDishService createDishService =
+                new CreateDishService(_cardCollisionSystem, _cardStackSystem, _cardFactory);
+            createDishService
+                .Init()
+                .AddTo(Disposables);
+
+            SetupStackPositionInToolSystem setupStackPositionInToolSystem =
+                new SetupStackPositionInToolSystem(_cardCollisionSystem, _cardStackSystem, _cardStackMoveSystem);
+            setupStackPositionInToolSystem
+                .Init()
+                .AddTo(Disposables);
+        }
+
+        private void CreateStartCards()
+        {
             int columns = 4;
             float cellSize = 1.2f;
 
@@ -111,32 +167,9 @@ namespace GameLoop.Roots
             }
         }
 
-        private void InitToolsServices()
+        private void CreateStartTools()
         {
-            ToolFactory toolFactory = new ToolFactory(toolCardPrefab);
-            toolFactory
-                .Init()
-                .AddTo(Disposables);
-
-
-            ToolCardsDetectService toolCardsDetectService = new ToolCardsDetectService(toolFactory, _cardDragService);
-            toolCardsDetectService
-                .Init()
-                .AddTo(Disposables);
-
-            CreateDishService createDishService =
-                new CreateDishService(toolCardsDetectService, _cardStackService, _cardFactory);
-            createDishService
-                .Init()
-                .AddTo(Disposables);
-
-            SetupStackPositionInToolService setupStackPositionInToolService =
-                new SetupStackPositionInToolService(toolCardsDetectService, _cardStackService, _cardStackMoveService);
-            setupStackPositionInToolService
-                .Init()
-                .AddTo(Disposables);
-
-            toolFactory.CreateTool(_panConfig, Vector3.up * 2);
+            _toolFactory.CreateTool(_panConfig, Vector3.up * 2);
         }
     }
 }
