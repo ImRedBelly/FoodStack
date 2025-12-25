@@ -10,6 +10,7 @@ namespace Gameplay.Cards.Handlers
         [SerializeField] private SpriteRenderer _viewCard;
         [SerializeField] private SpriteRenderer _shadowCard;
         [SerializeField] private SpriteRenderer _eligibleFrame;
+        [SerializeField] private GameObject _flameObject;
 
         public void Initialize(Sprite sprite, int sortingOrder)
         {
@@ -18,6 +19,7 @@ namespace Gameplay.Cards.Handlers
             SetSortingOrder(sortingOrder);
             SetStateShadow(false);
             SetStateEligibleFrame(false);
+            SetStateFlame(false);
         }
 
         public void SetSortingOrder(int sortingOrder)
@@ -38,6 +40,11 @@ namespace Gameplay.Cards.Handlers
         public void SetStateEligibleFrame(bool active)
         {
             _eligibleFrame.gameObject.SetActive(active);
+        }
+
+        public void SetStateFlame(bool active)
+        {
+            _flameObject.SetActive(active);
         }
     }
 }

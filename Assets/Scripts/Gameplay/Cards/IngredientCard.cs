@@ -55,6 +55,11 @@ namespace Gameplay.Cards
             _viewHandler.SetStateEligibleFrame(state);
         }
 
+        public void SetStateFlame(bool state)
+        {
+            _viewHandler.SetStateFlame(state);
+        }
+
         public void UpdateSortingOrder()
         {
             _viewHandler.SetSortingOrder((int)((transform.position.y * -10) + 50));

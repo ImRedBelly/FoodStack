@@ -13,7 +13,8 @@ namespace Gameplay.Cards.Interfaces
         
         void OnDragStart();
         void OnDragEnd();
-        void SetStateEligibleFrame(bool state);
         void UpdateSortingOrder();
+        void SetStateEligibleFrame(bool state);
+        void SetStateFlame(bool state);
     }
 }

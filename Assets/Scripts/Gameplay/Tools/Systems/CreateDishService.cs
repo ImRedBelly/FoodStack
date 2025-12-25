@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core;
 using DG.Tweening;
 using Gameplay.Cards.Configs;
@@ -24,7 +25,7 @@ namespace Gameplay.Tools.Systems
 
         public CreateDishService(
             CardCollisionSystem cardCollisionSystem,
-            CardStackSystem cardStackSystem, 
+            CardStackSystem cardStackSystem,
             CardFactory cardFactory)
         {
             _cardCollisionSystem = cardCollisionSystem;
@@ -94,17 +95,22 @@ namespace Gameplay.Tools.Systems
         {
             CancelCreateTask(toolCard);
 
+            var lastCard = cards.Last();
             toolCard.SetStateSlider(true);
+            lastCard.SetStateFlame(true);
 
             var tween = DOVirtual
                 .Float(0, 1, recipeConfig.CreateTime, toolCard.SetProgress)
                 .OnComplete(() =>
                 {
                     _toolToStack.Remove(toolCard);
+
                     toolCard.SetStateSlider(false);
+                    lastCard.SetStateFlame(false);
+
                     _activeCreateTasks.Remove(toolCard);
                     _cardFactory.CreateIngredient(recipeConfig.Result, Vector3.zero);
-                    
+
                     foreach (var card in cards)
                     {
                         _cardFactory.RemoveIngredient(card);
@@ -113,6 +119,7 @@ namespace Gameplay.Tools.Systems
                 .OnKill(() =>
                 {
                     toolCard.SetStateSlider(false);
+                    lastCard.SetStateFlame(false);
                     _activeCreateTasks.Remove(toolCard);
                 });
 
@@ -125,7 +132,7 @@ namespace Gameplay.Tools.Systems
             if (ingredients.Length != cards.Count) return false;
 
             Dictionary<IngredientConfig, int> cachedIngredients = new();
-            
+
             foreach (var ingredient in ingredients)
             {
                 if (cachedIngredients.TryGetValue(ingredient, out var count))
