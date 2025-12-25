@@ -99,7 +99,12 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            _cardCollisionSystem = new CardCollisionSystem(_cardFactory, _toolFactory, _cardDragSystem);
+            _cardCollisionSystem = new CardCollisionSystem(
+                _cardFactory, 
+                _toolFactory, 
+                _cardDragSystem, 
+                _cardStackSystem);
+            
             _cardCollisionSystem
                 .Init()
                 .AddTo(Disposables);
@@ -116,8 +121,12 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            CardPlacementSystem cardPlacementSystem = new CardPlacementSystem(_cardFactory, _toolFactory, _cardCollisionSystem,
-                _cardStackMoveSystem, _cardStackSystem);
+            CardPlacementSystem cardPlacementSystem = new CardPlacementSystem(
+                _cardFactory,
+                _cardCollisionSystem,
+                _cardStackSystem,
+                _cardStackMoveSystem);
+            
             cardPlacementSystem
                 .Init()
                 .AddTo(Disposables);

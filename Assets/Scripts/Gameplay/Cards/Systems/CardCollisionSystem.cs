@@ -24,18 +24,22 @@ namespace Gameplay.Cards.Systems
         private readonly CardFactory _cardFactory;
         private readonly ToolFactory _toolFactory;
         private readonly CardDragSystem _dragSystem;
+        private readonly CardStackSystem _cardStackSystem;
 
         private readonly List<IIngredientCard> _cards = new();
         private readonly List<IToolCard> _tools = new();
 
 
-        public CardCollisionSystem(CardFactory cardFactory, ToolFactory toolFactory, CardDragSystem dragSystem)
+        public CardCollisionSystem(
+            CardFactory cardFactory,
+            ToolFactory toolFactory,
+            CardDragSystem dragSystem,
+            CardStackSystem cardStackSystem)
         {
             _cardFactory = cardFactory;
             _toolFactory = toolFactory;
-
             _dragSystem = dragSystem;
-            ;
+            _cardStackSystem = cardStackSystem;
         }
 
         protected override void OnInit()
@@ -98,9 +102,11 @@ namespace Gameplay.Cards.Systems
                 }
             }
 
+            var dragStack = _cardStackSystem.GetStack(draggedIngredientCard);
             foreach (var card in _cards)
             {
                 if (draggedIngredientCard == card) continue;
+                if (dragStack.Cards.Contains(card)) continue;
                 if (IsOverlapping(draggedIngredientCard, card))
                 {
                     _onCardCollisionWithCard.OnNext((draggedIngredientCard, card));

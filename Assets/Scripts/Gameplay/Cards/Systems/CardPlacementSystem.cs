@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using Core;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
-using Gameplay.Tools.Factory;
-using Gameplay.Tools.Interfaces;
 using Support;
 using UniRx;
 using UnityEngine;
@@ -13,22 +11,22 @@ namespace Gameplay.Cards.Systems
     public class CardPlacementSystem : DisposableClass
     {
         private readonly CardFactory _cardFactory;
-        private readonly ToolFactory _toolFactory;
         private readonly CardCollisionSystem _cardCollisionSystem;
-        private readonly CardStackMoveSystem _cardStackMoveSystem;
         private readonly CardStackSystem _cardStackSystem;
+        private readonly CardStackMoveSystem _cardStackMoveSystem;
 
         private readonly List<IIngredientCard> _cards = new();
-        private readonly List<IToolCard> _tools = new();
 
-        public CardPlacementSystem(CardFactory cardFactory, ToolFactory toolFactory, CardCollisionSystem cardCollisionSystem,
-            CardStackMoveSystem cardStackMoveSystem, CardStackSystem cardStackSystem)
+        public CardPlacementSystem(
+            CardFactory cardFactory,
+            CardCollisionSystem cardCollisionSystem,
+            CardStackSystem cardStackSystem,
+            CardStackMoveSystem cardStackMoveSystem)
         {
             _cardFactory = cardFactory;
-            _toolFactory = toolFactory;
             _cardCollisionSystem = cardCollisionSystem;
-            _cardStackMoveSystem = cardStackMoveSystem;
             _cardStackSystem = cardStackSystem;
+            _cardStackMoveSystem = cardStackMoveSystem;
         }
 
         protected override void OnInit()
@@ -41,10 +39,6 @@ namespace Gameplay.Cards.Systems
 
             _cardFactory.OnCardRemoved
                 .SafeSubscribe(RemoveCard)
-                .AddTo(Disposables);
-
-            _toolFactory.OnCardCreated
-                .SafeSubscribe(AddTool)
                 .AddTo(Disposables);
 
             _cardCollisionSystem.OnCardDropWithoutMerge
@@ -68,86 +62,85 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void AddTool(IToolCard newToolCard)
-        {
-            if (!_tools.Contains(newToolCard))
-            {
-                _tools.Add(newToolCard);
-            }
-        }
-
         private void CardDropWithoutMerge(IIngredientCard draggedIngredientCard)
         {
-            var draggedCollider = draggedIngredientCard.Collider;
-            if (draggedCollider == null)
-                return;
-
+            var dragStack = _cardStackSystem.GetStack(draggedIngredientCard);
             foreach (var otherCard in _cards)
             {
-                if (otherCard == draggedIngredientCard)
-                    continue;
+                if (otherCard == draggedIngredientCard) continue;
+                if (dragStack.Cards.Contains(otherCard)) continue;
 
-                var otherCollider = otherCard.Collider;
-                if (otherCollider == null)
-                    continue;
-
-                if (draggedCollider.bounds.Intersects(otherCollider.bounds))
+                if (IsIntersecting(draggedIngredientCard, otherCard))
                 {
-                    MoveToNearestFreePosition(draggedIngredientCard);
-                    break;
+                    Vector3 targetPosition = FindFreePosition(draggedIngredientCard, otherCard);
+
+                    var otherCardStack = _cardStackSystem.GetStack(otherCard);
+                    _cardStackMoveSystem.UpdateWorldPositions(otherCardStack, otherCard, targetPosition, Constants.MaxDragSpeed);
                 }
             }
         }
 
-        private void MoveToNearestFreePosition(IIngredientCard card)
+        private Vector3 FindFreePosition(
+            IIngredientCard draggedCard,
+            IIngredientCard otherCard)
         {
-            var originalPosition = card.Transform.position;
-            var step = 0.5f;
-            var maxRadius = 10;
+            var origin = otherCard.Transform.position;
+            var bounds = otherCard.Collider.bounds;
 
-            for (int radius = 1; radius <= maxRadius; radius++)
+            float step = 0.1f;
+            int maxSteps = 50;
+
+            Vector3 bestPosition = origin;
+            float bestDistance = float.MaxValue;
+
+            for (int x = -maxSteps; x <= maxSteps; x++)
             {
-                for (int x = -radius; x <= radius; x++)
+                for (int y = -maxSteps; y <= maxSteps; y++)
                 {
-                    for (int y = -radius; y <= radius; y++)
+                    if (x == 0 && y == 0)
+                        continue;
+
+                    var offset = new Vector3(x * step, y * step, 0);
+                    var candidate = origin + offset;
+
+                    if (!IsIntersectingAtPosition(draggedCard, candidate, bounds))
                     {
-                        var offset = new Vector3(x * step, y * step, 0);
-                        var candidatePosition = originalPosition + offset;
-
-                        card.Transform.position = candidatePosition;
-
-                        if (!IsIntersecting(card))
+                        float distance = offset.sqrMagnitude;
+                        if (distance < bestDistance)
                         {
-                            return;
+                            bestDistance = distance;
+                            bestPosition = candidate;
                         }
                     }
                 }
             }
 
-            
-            _cardStackMoveSystem.UpdateWorldPositions(_cardStackSystem.GetStack(card), originalPosition, Constants.MaxDragSpeed);
-            //card.Transform.position = originalPosition;
+            //TODO check min max values from camera aspect
+            return bestPosition;
         }
 
-        private bool IsIntersecting(IIngredientCard card)
+        private bool IsIntersecting(IIngredientCard draggedIngredientCard, IIngredientCard otherCard)
         {
-            var collider = card.Collider;
-            if (collider == null)
-                return false;
+            return draggedIngredientCard.Collider.bounds.Intersects(otherCard.Collider.bounds);
+        }
 
-            foreach (var otherCard in _cards)
+        private bool IsIntersectingAtPosition(
+            IIngredientCard draggedCard,
+            Vector3 position,
+            Bounds bounds)
+        {
+            var size = bounds.size;
+            var center = position;
+
+            var hits = Physics2D.OverlapBoxAll(center, size, 0f);
+
+            foreach (var hit in hits)
             {
-                if (otherCard == card)
+                if (hit == null)
                     continue;
 
-                var otherCollider = otherCard.Collider;
-                if (otherCollider == null)
-                    continue;
-
-                if (collider.bounds.Intersects(otherCollider.bounds))
-                {
+                if (draggedCard.Collider == hit)
                     return true;
-                }
             }
 
             return false;
