@@ -10,4 +10,7 @@ public class Constants
     public const int DragSortingOrder = 100;
     
     public const float MinCollisionDistance = 0.5f;
+    
+    
+    public const float MaxSliderValue = 0.675f;
 }

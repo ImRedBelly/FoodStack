@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 316c072e9aa64f1a91dacd75a0437d94, type: 3}
+  m_Name: Level 2
+  m_EditorClassIdentifier: 
+  _levelData:
+  - ToolCards:
+    - {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
+    IngredientCards:
+    - {fileID: 11400000, guid: b0dc045589a27f34a97bb3b4f5c2bb44, type: 2}
+    - {fileID: 11400000, guid: 50c9acf77dba91949a1efe566fffb111, type: 2}
+    - {fileID: 11400000, guid: e5a15839b2e54d941b54eb2ce6c52caf, type: 2}
+    - {fileID: 11400000, guid: ec838ee8855394344b653c19cdc5c895, type: 2}
+    OrderQueue:
+    - ClientConfig: {fileID: 11400000, guid: 2f7933bf01acf4339a79d2e53e2e35a1, type: 2}
+      IngredientConfig: {fileID: 11400000, guid: 9fe36f86009ce4a56b1215a09d1f2edb, type: 2}
+    - ClientConfig: {fileID: 11400000, guid: af4a5cfe77f3e42f7bb52418d1e1f76d, type: 2}
+      IngredientConfig: {fileID: 11400000, guid: 9fe36f86009ce4a56b1215a09d1f2edb, type: 2}
+    LevelTime: 999
+  _levelRepeatData: 0

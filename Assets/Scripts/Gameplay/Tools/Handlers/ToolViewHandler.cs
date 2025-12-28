@@ -1,29 +1,19 @@
 ﻿using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace Gameplay.Tools.Handlers
 {
     public class ToolViewHandler : MonoBehaviour
     {
-        [SerializeField] private SortingGroup _sortingGroup;
         [SerializeField] private SpriteRenderer _viewCard;
         [SerializeField] private SpriteRenderer _viewSlider;
         [SerializeField] private SpriteRenderer _eligibleFrame;
 
-        private const float MaxSliderValue = 0.675f;
-        
-        public void Initialize(Sprite sprite, int sortingOrder)
+        public void Initialize(Sprite sprite)
         {
             _viewCard.sprite = sprite;
 
-            SetSortingOrder(sortingOrder);
             SetStateEligibleFrame(false);
             SetStateSlider(false);
-        }
-
-        public void SetSortingOrder(int sortingOrder)
-        {
-            _sortingGroup.sortingOrder = sortingOrder;
         }
 
         public void SetStateEligibleFrame(bool active)
@@ -38,7 +28,7 @@ namespace Gameplay.Tools.Handlers
 
         public void SetProgress(float progress)
         {
-            _viewSlider.size = new Vector2(MaxSliderValue * progress, _viewSlider.size.y);
+            _viewSlider.size = new Vector2(Constants.MaxSliderValue * progress, _viewSlider.size.y);
         }
     }
 }

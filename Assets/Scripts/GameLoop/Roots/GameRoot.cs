@@ -1,15 +1,15 @@
 using Core;
 using Gameplay.Cards;
-using Gameplay.Cards.Configs;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Systems;
 using Gameplay.Clients;
-using Gameplay.Clients.Configs;
 using Gameplay.Clients.Factory;
-using Gameplay.Recipes.Configs;
-using Gameplay.Recipes.Services;
+using Gameplay.Clients.Services;
+using Gameplay.Level.Configs;
+using Gameplay.OrderButton;
+using Gameplay.OrderButton.Factory;
+using Gameplay.OrderButton.Services;
 using Gameplay.Tools;
-using Gameplay.Tools.Configs;
 using Gameplay.Tools.Factory;
 using Gameplay.Tools.Systems;
 using Support;
@@ -23,23 +23,17 @@ namespace GameLoop.Roots
     {
         [SerializeField] private Camera _camera;
         [SerializeField] private LayerMask _cardLayer;
+        [Space] [SerializeField] private Button _quitButton;
 
         [Space] [Header("Prefabs")] [SerializeField]
         private IngredientCard ingredientCardPrefab;
 
         [SerializeField] private ToolCard toolCardPrefab;
         [SerializeField] private ClientCard clientCardPrefab;
-        [Space] [SerializeField] private RecipeConfig[] _recipeConfigs;
-        [Space] [SerializeField] private Button _quitButton;
+        [SerializeField] private OrderButton orderButtonPrefab;
 
         [Space] [Header("Debug Data")] [SerializeField]
-        private IngredientConfig[] _startCards;
-
-        [SerializeField] private ToolConfig _panConfig;
-        [SerializeField] private ClientConfig[] _clientConfigs;
-
-
-        private RecipesStorage _recipesStorage;
+        private LevelConfig _levelConfig;
 
         private CardDragSystem _cardDragSystem;
         private CardCollisionSystem _cardCollisionSystem;
@@ -49,6 +43,8 @@ namespace GameLoop.Roots
         private CardFactory _cardFactory;
         private ToolFactory _toolFactory;
         private ClientFactory _clientFactory;
+        private OrderButtonFactory _orderButtonFactory;
+        private OrderButtonSelectSystem _orderButtonSelectSystem;
 
         protected override void OnInit()
         {
@@ -56,14 +52,20 @@ namespace GameLoop.Roots
             InitWindows();
             InitFactories();
 
-            InitRecipesServices();
-            InitCardsServices();
-            InitToolsServices();
+
+            InitOrderButtonsSystems();
+            
+            
+            CreateOrderButtons();
+            
+            InitCardsSystems();
+            InitToolsSystems();
+            InitClientsSystems();
 
             CreateStartCards();
             CreateStartTools();
-            CreateStartClients();
         }
+
 
         private void InitWindows()
         {
@@ -92,15 +94,22 @@ namespace GameLoop.Roots
             _clientFactory
                 .Init()
                 .AddTo(Disposables);
+
+            _orderButtonFactory = new OrderButtonFactory(orderButtonPrefab);
+            _clientFactory
+                .Init()
+                .AddTo(Disposables);
         }
 
-
-        private void InitRecipesServices()
+        private void InitOrderButtonsSystems()
         {
-            _recipesStorage = new RecipesStorage(_recipeConfigs);
+            _orderButtonSelectSystem = new OrderButtonSelectSystem(_orderButtonFactory);
+            _orderButtonSelectSystem
+                .Init()
+                .AddTo(Disposables);
         }
 
-        private void InitCardsServices()
+        private void InitCardsSystems()
         {
             _cardStackMoveSystem = new CardStackMoveSystem();
             _cardStackSystem = new CardStackSystem(_cardStackMoveSystem);
@@ -113,6 +122,7 @@ namespace GameLoop.Roots
             _cardCollisionSystem = new CardCollisionSystem(
                 _cardFactory,
                 _toolFactory,
+                _clientFactory,
                 _cardDragSystem,
                 _cardStackSystem);
 
@@ -143,8 +153,7 @@ namespace GameLoop.Roots
                 .AddTo(Disposables);
         }
 
-
-        private void InitToolsServices()
+        private void InitToolsSystems()
         {
             CreateDishService createDishService =
                 new CreateDishService(_cardCollisionSystem, _cardStackSystem, _cardFactory);
@@ -159,12 +168,38 @@ namespace GameLoop.Roots
                 .AddTo(Disposables);
         }
 
+        private void InitClientsSystems()
+        {
+            ClientServiceSystem clientServiceSystem =
+                new ClientServiceSystem(_clientFactory, _cardFactory, _cardCollisionSystem);
+            clientServiceSystem
+                .Init()
+                .AddTo(Disposables);
+
+            ClientOrderSystem clientOrderSystem = new ClientOrderSystem(_levelConfig.GetLevelData(SaveUtility.Level),
+                _clientFactory, clientServiceSystem, _orderButtonSelectSystem);
+            clientOrderSystem
+                .Init()
+                .AddTo(Disposables);
+        }
+
+
+        private void CreateOrderButtons()
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                _orderButtonFactory.CreateOrderButton(i);
+            }
+        }
+
         private void CreateStartCards()
         {
             int columns = 4;
             float cellSize = 1.2f;
 
-            int rows = Mathf.CeilToInt((float)_startCards.Length / columns);
+            var startCards = _levelConfig.GetLevelData(SaveUtility.Level).IngredientCards;
+
+            int rows = Mathf.CeilToInt((float)startCards.Length / columns);
 
             Vector3 offset = new Vector3(
                 (columns - 1) * cellSize * 0.5f,
@@ -172,7 +207,7 @@ namespace GameLoop.Roots
                 0f
             );
 
-            for (int i = 0; i < _startCards.Length; i++)
+            for (int i = 0; i < startCards.Length; i++)
             {
                 int x = i % columns;
                 int y = i / columns;
@@ -183,21 +218,16 @@ namespace GameLoop.Roots
                     0f
                 );
 
-                _cardFactory.CreateIngredient(_startCards[i], position);
+                _cardFactory.CreateIngredient(startCards[i], position);
             }
         }
 
         private void CreateStartTools()
         {
-            _toolFactory.CreateTool(_panConfig, Vector3.up * 2);
-        }
-
-
-        private void CreateStartClients()
-        {
-            for (int i = 0; i < _clientConfigs.Length; i++)
+            var tools = _levelConfig.GetLevelData(SaveUtility.Level).ToolCards;
+            foreach (var tool in tools)
             {
-                _clientFactory.CreateClient(_clientConfigs[i], new Vector3(i == 0 ? -1 : 1, 3.67f, 0f));
+                _toolFactory.CreateTool(tool, Vector3.up * 2);
             }
         }
     }

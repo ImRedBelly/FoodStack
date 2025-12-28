@@ -1,6 +1,8 @@
 using System;
 using Core;
+using Gameplay.Cards.Configs;
 using Gameplay.Clients.Configs;
+using Gameplay.Clients.Interfaces;
 using UniRx;
 using UnityEngine;
 
@@ -8,11 +10,11 @@ namespace Gameplay.Clients.Factory
 {
     public class ClientFactory : DisposableClass
     {
-        public IObservable<ClientCard> OnCardCreated => _onClientCreated;
-        public IObservable<ClientCard> OnCardRemoved => _onClientRemoved;
+        public IObservable<(IClientCard, IngredientConfig)> OnClientCreated => _onClientCreated;
+        public IObservable<IClientCard> OnClientRemoved => _onClientRemoved;
 
-        private readonly Subject<ClientCard> _onClientCreated = new();
-        private readonly Subject<ClientCard> _onClientRemoved = new();
+        private readonly Subject<(IClientCard, IngredientConfig)> _onClientCreated = new();
+        private readonly Subject<IClientCard> _onClientRemoved = new();
 
         private readonly ClientCard _clientCardPrefab;
 
@@ -29,19 +31,22 @@ namespace Gameplay.Clients.Factory
             _onClientRemoved.AddTo(Disposables);
         }
 
-        public void CreateClient(ClientConfig config, Vector3 position)
+        public IClientCard CreateClient(ClientConfig config, IngredientConfig ingredientConfig, Vector3 position, Transform parent)
         {
-            var card = UnityEngine.Object.Instantiate(_clientCardPrefab, position, Quaternion.identity);
+            var card = UnityEngine.Object.Instantiate(_clientCardPrefab, parent);
+            card.Transform.localPosition = position;
+            
             card.name = config.Name;
             card.Init(new ClientCard.Model(config));
 
-            _onClientCreated?.OnNext(card);
+            _onClientCreated?.OnNext((card, ingredientConfig));
+            return card;
         }
 
-        public void RemoveClient(ClientCard clientCard)
+        public void RemoveClient(IClientCard clientCard)
         {
             _onClientRemoved?.OnNext(clientCard);
-            UnityEngine.Object.Destroy(clientCard.gameObject);
+            UnityEngine.Object.Destroy(clientCard.Transform.gameObject);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Gameplay.Tools
         {
             base.OnInit();
 
-            _toolViewHandler.Initialize(ActiveModel.ToolConfig.Sprite, Constants.DefaultSortingOrder);
+            _toolViewHandler.Initialize(ActiveModel.ToolConfig.Sprite);
         }
 
         public void Dispose()
