@@ -3,6 +3,9 @@ using Gameplay.Cards;
 using Gameplay.Cards.Configs;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Systems;
+using Gameplay.Clients;
+using Gameplay.Clients.Configs;
+using Gameplay.Clients.Factory;
 using Gameplay.Recipes.Configs;
 using Gameplay.Recipes.Services;
 using Gameplay.Tools;
@@ -25,6 +28,7 @@ namespace GameLoop.Roots
         private IngredientCard ingredientCardPrefab;
 
         [SerializeField] private ToolCard toolCardPrefab;
+        [SerializeField] private ClientCard clientCardPrefab;
         [Space] [SerializeField] private RecipeConfig[] _recipeConfigs;
         [Space] [SerializeField] private Button _quitButton;
 
@@ -32,6 +36,7 @@ namespace GameLoop.Roots
         private IngredientConfig[] _startCards;
 
         [SerializeField] private ToolConfig _panConfig;
+        [SerializeField] private ClientConfig[] _clientConfigs;
 
 
         private RecipesStorage _recipesStorage;
@@ -43,6 +48,7 @@ namespace GameLoop.Roots
 
         private CardFactory _cardFactory;
         private ToolFactory _toolFactory;
+        private ClientFactory _clientFactory;
 
         protected override void OnInit()
         {
@@ -56,8 +62,8 @@ namespace GameLoop.Roots
 
             CreateStartCards();
             CreateStartTools();
+            CreateStartClients();
         }
-
 
         private void InitWindows()
         {
@@ -81,6 +87,11 @@ namespace GameLoop.Roots
             _toolFactory
                 .Init()
                 .AddTo(Disposables);
+
+            _clientFactory = new ClientFactory(clientCardPrefab);
+            _clientFactory
+                .Init()
+                .AddTo(Disposables);
         }
 
 
@@ -100,11 +111,11 @@ namespace GameLoop.Roots
                 .AddTo(Disposables);
 
             _cardCollisionSystem = new CardCollisionSystem(
-                _cardFactory, 
-                _toolFactory, 
-                _cardDragSystem, 
+                _cardFactory,
+                _toolFactory,
+                _cardDragSystem,
                 _cardStackSystem);
-            
+
             _cardCollisionSystem
                 .Init()
                 .AddTo(Disposables);
@@ -126,7 +137,7 @@ namespace GameLoop.Roots
                 _cardCollisionSystem,
                 _cardStackSystem,
                 _cardStackMoveSystem);
-            
+
             cardPlacementSystem
                 .Init()
                 .AddTo(Disposables);
@@ -179,6 +190,15 @@ namespace GameLoop.Roots
         private void CreateStartTools()
         {
             _toolFactory.CreateTool(_panConfig, Vector3.up * 2);
+        }
+
+
+        private void CreateStartClients()
+        {
+            for (int i = 0; i < _clientConfigs.Length; i++)
+            {
+                _clientFactory.CreateClient(_clientConfigs[i], new Vector3(i == 0 ? -1 : 1, 3.67f, 0f));
+            }
         }
     }
 }
