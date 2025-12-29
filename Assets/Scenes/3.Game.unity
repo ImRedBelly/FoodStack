@@ -160,7 +160,7 @@ MonoBehaviour:
   toolCardPrefab: {fileID: 4282725370430460823, guid: 0e75b786d063f4c69bf082a151e4038c, type: 3}
   clientCardPrefab: {fileID: 7033583315055903008, guid: bac565fc065b147d2b0cff73fb745340, type: 3}
   orderButtonPrefab: {fileID: 1758640531195232588, guid: 38e28ef39c4ff2b48ba2db2430393cd8, type: 3}
-  _levelConfig: {fileID: 11400000, guid: 1b70ac89e85df99499d0c6501f272beb, type: 2}
+  _levelsConfig: {fileID: 11400000, guid: c5c5dba39e01841cb921b60dc961f0ae, type: 2}
 --- !u!4 &316752952
 Transform:
   m_ObjectHideFlags: 0

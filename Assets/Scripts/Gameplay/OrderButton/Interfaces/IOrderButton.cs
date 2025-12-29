@@ -6,7 +6,8 @@ namespace Gameplay.OrderButton.Interfaces
     {
         Transform Transform { get; }
         Transform ClientPoint { get; }
-        Collider2D Collider { get; }
+        Collider2D ColliderClient { get; }
+        Collider2D ColliderButton { get; }
 
         public void UpdateOrderSprite(Sprite sprite);
         public void ShowClient();

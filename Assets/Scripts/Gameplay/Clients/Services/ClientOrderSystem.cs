@@ -63,12 +63,16 @@ namespace Gameplay.Clients.Services
         private void CreateClient()
         {
             if (_levelData.OrderQueue.Length <= _currentClientIndex) return;
-            
+
             var orderButton = _orderButtonSelectSystem.GetOrderButton();
+
+            if (orderButton == null) return;
+
             var clientCard = _clientFactory.CreateClient(_levelData.OrderQueue[_currentClientIndex].ClientConfig,
-                _levelData.OrderQueue[_currentClientIndex].IngredientConfig, Vector3.up * 0.5f,
+                _levelData.OrderQueue[_currentClientIndex].RecipeConfig.Result, Vector3.up * 0.5f,
                 orderButton.ClientPoint);
 
+            orderButton.UpdateOrderSprite(_levelData.OrderQueue[_currentClientIndex].RecipeConfig.InfoIcon);
             _clientButtons.TryAdd(clientCard, orderButton);
             _currentClientIndex++;
         }

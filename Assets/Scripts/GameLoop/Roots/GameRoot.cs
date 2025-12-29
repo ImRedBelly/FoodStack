@@ -1,3 +1,4 @@
+using Configs;
 using Core;
 using Gameplay.Cards;
 using Gameplay.Cards.Factory;
@@ -5,7 +6,6 @@ using Gameplay.Cards.Systems;
 using Gameplay.Clients;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Services;
-using Gameplay.Level.Configs;
 using Gameplay.OrderButton;
 using Gameplay.OrderButton.Factory;
 using Gameplay.OrderButton.Services;
@@ -23,18 +23,18 @@ namespace GameLoop.Roots
     {
         [SerializeField] private Camera _camera;
         [SerializeField] private LayerMask _cardLayer;
-        [Space] [SerializeField] private Button _quitButton;
-
-        [Space] [Header("Prefabs")] [SerializeField]
-        private IngredientCard ingredientCardPrefab;
-
+        [Space] 
+        [SerializeField] private Button _quitButton;
+        [Space] 
+        [Header("Prefabs")]
+        [SerializeField] private IngredientCard ingredientCardPrefab;
         [SerializeField] private ToolCard toolCardPrefab;
         [SerializeField] private ClientCard clientCardPrefab;
         [SerializeField] private OrderButton orderButtonPrefab;
-
-        [Space] [Header("Debug Data")] [SerializeField]
-        private LevelConfig _levelConfig;
-
+        [Space]
+        [Header("Debug Data")] 
+        [SerializeField] private LevelsConfig _levelsConfig;
+        
         private CardDragSystem _cardDragSystem;
         private CardCollisionSystem _cardCollisionSystem;
         private CardStackSystem _cardStackSystem;
@@ -176,7 +176,7 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            ClientOrderSystem clientOrderSystem = new ClientOrderSystem(_levelConfig.GetLevelData(SaveUtility.Level),
+            ClientOrderSystem clientOrderSystem = new ClientOrderSystem(_levelsConfig.GetLevelData(SaveUtility.Level),
                 _clientFactory, clientServiceSystem, _orderButtonSelectSystem);
             clientOrderSystem
                 .Init()
@@ -197,7 +197,7 @@ namespace GameLoop.Roots
             int columns = 4;
             float cellSize = 1.2f;
 
-            var startCards = _levelConfig.GetLevelData(SaveUtility.Level).IngredientCards;
+            var startCards = _levelsConfig.GetLevelData(SaveUtility.Level).IngredientCards;
 
             int rows = Mathf.CeilToInt((float)startCards.Length / columns);
 
@@ -224,7 +224,7 @@ namespace GameLoop.Roots
 
         private void CreateStartTools()
         {
-            var tools = _levelConfig.GetLevelData(SaveUtility.Level).ToolCards;
+            var tools = _levelsConfig.GetLevelData(SaveUtility.Level).ToolCards;
             foreach (var tool in tools)
             {
                 _toolFactory.CreateTool(tool, Vector3.up * 2);

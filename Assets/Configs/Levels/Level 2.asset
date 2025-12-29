@@ -12,18 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 316c072e9aa64f1a91dacd75a0437d94, type: 3}
   m_Name: Level 2
   m_EditorClassIdentifier: 
-  _levelData:
-  - ToolCards:
+  <LevelData>k__BackingField:
+    ToolCards:
     - {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
     IngredientCards:
-    - {fileID: 11400000, guid: b0dc045589a27f34a97bb3b4f5c2bb44, type: 2}
-    - {fileID: 11400000, guid: 50c9acf77dba91949a1efe566fffb111, type: 2}
+    - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
+    - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
     - {fileID: 11400000, guid: e5a15839b2e54d941b54eb2ce6c52caf, type: 2}
-    - {fileID: 11400000, guid: ec838ee8855394344b653c19cdc5c895, type: 2}
+    - {fileID: 11400000, guid: a71bb69b67a8bc242b52543be1c99f6e, type: 2}
     OrderQueue:
-    - ClientConfig: {fileID: 11400000, guid: 2f7933bf01acf4339a79d2e53e2e35a1, type: 2}
-      IngredientConfig: {fileID: 11400000, guid: 9fe36f86009ce4a56b1215a09d1f2edb, type: 2}
     - ClientConfig: {fileID: 11400000, guid: af4a5cfe77f3e42f7bb52418d1e1f76d, type: 2}
-      IngredientConfig: {fileID: 11400000, guid: 9fe36f86009ce4a56b1215a09d1f2edb, type: 2}
-    LevelTime: 999
-  _levelRepeatData: 0
+      RecipeConfig: {fileID: 11400000, guid: 37212f132c55ade46bcee60f9cebf3bf, type: 2}
+    - ClientConfig: {fileID: 11400000, guid: 0dad542ea024a7a4c8e6f4e9e9e5d8ea, type: 2}
+      RecipeConfig: {fileID: 11400000, guid: e22f07d4b660e4a63b1d268f834f67ac, type: 2}
+    - ClientConfig: {fileID: 11400000, guid: 2f7933bf01acf4339a79d2e53e2e35a1, type: 2}
+      RecipeConfig: {fileID: 11400000, guid: 6e42e246e30674a42a08a53ed76d2d8b, type: 2}
+    LevelTime: 0

@@ -35,9 +35,14 @@ namespace Gameplay.OrderButton.Services
 
         public IOrderButton GetOrderButton()
         {
-            var kv = _orderButtonStates.First(x => x.Value == false);
-            _orderButtonStates[kv.Key] = true;
-            return kv.Key;
+            var kv = _orderButtonStates.FirstOrDefault(x => x.Value == false);
+            if (kv.Key != null)
+            {
+                _orderButtonStates[kv.Key] = true;
+                return kv.Key;
+            }
+
+            return null;
         }
 
         public void ReturnOrderButton(IOrderButton orderButton)

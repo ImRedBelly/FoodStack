@@ -8,7 +8,8 @@ namespace Gameplay.OrderButton
     {
         public Transform Transform => transform;
         public Transform ClientPoint => _clientPoint;
-        public Collider2D Collider => _collider2D;
+        public Collider2D ColliderClient => _collider2D;
+        public Collider2D ColliderButton => _collider2D;
 
         [SerializeField] private OrderButtonHandlerView _viewHandler;
         [SerializeField] private Transform _clientPoint;
