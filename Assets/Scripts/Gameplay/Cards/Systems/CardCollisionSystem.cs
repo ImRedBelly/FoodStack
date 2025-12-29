@@ -127,24 +127,6 @@ namespace Gameplay.Cards.Systems
 
         private void EndDrag(IIngredientCard draggedIngredientCard)
         {
-            foreach (var tool in _tools)
-            {
-                if (IsOverlapping(draggedIngredientCard, tool))
-                {
-                    _onCardCollisionWithTool.OnNext((tool, draggedIngredientCard));
-                    return;
-                }
-            }
-
-            foreach (var client in _clients)
-            {
-                if (IsOverlapping(draggedIngredientCard, client))
-                {
-                    _onCardCollisionWithClient.OnNext((client, draggedIngredientCard));
-                    return;
-                }
-            }
-
             var dragStack = _cardStackSystem.GetStack(draggedIngredientCard);
             foreach (var card in _cards)
             {
@@ -153,7 +135,23 @@ namespace Gameplay.Cards.Systems
                 if (IsOverlapping(draggedIngredientCard, card))
                 {
                     _onCardCollisionWithCard.OnNext((draggedIngredientCard, card));
-                    return;
+                }
+            }
+
+            foreach (var tool in _tools)
+            {
+                if (IsOverlapping(draggedIngredientCard, tool))
+                {
+                    _onCardCollisionWithTool.OnNext((tool, draggedIngredientCard));
+                }
+            }
+
+            foreach (var client in _clients)
+            {
+                if (IsOverlapping(draggedIngredientCard, client))
+                {
+                    _onCardCollisionWithClient.OnNext((client, draggedIngredientCard));
+                    break;
                 }
             }
 

@@ -14,6 +14,18 @@ using UnityEngine;
 
 namespace Gameplay.Tools.Systems
 {
+    public struct TweenData
+    {
+        public readonly RecipeConfig Recipe;
+        public readonly Tween Tween;
+
+        public TweenData(RecipeConfig recipeConfig, Tweener tween)
+        {
+            Recipe = recipeConfig;
+            Tween = tween;
+        }
+    }
+
     public class CreateDishService : DisposableClass
     {
         private readonly CardCollisionSystem _cardCollisionSystem;
@@ -21,7 +33,7 @@ namespace Gameplay.Tools.Systems
         private readonly CardFactory _cardFactory;
 
         private readonly Dictionary<IToolCard, CardStack> _toolToStack = new();
-        private readonly Dictionary<IToolCard, Tween> _activeCreateTasks = new();
+        private readonly Dictionary<IToolCard, TweenData> _activeCreateTasks = new();
 
         public CreateDishService(
             CardCollisionSystem cardCollisionSystem,
@@ -84,7 +96,7 @@ namespace Gameplay.Tools.Systems
                     continue;
                 }
 
-                if (_activeCreateTasks.ContainsKey(tool))
+                if (_activeCreateTasks.TryGetValue(tool, out var data) && data.Recipe == matchedRecipe)
                     continue;
 
                 CreateDishTask(tool, matchedRecipe, stack.Cards);
@@ -123,7 +135,7 @@ namespace Gameplay.Tools.Systems
                     _activeCreateTasks.Remove(toolCard);
                 });
 
-            _activeCreateTasks[toolCard] = tween;
+            _activeCreateTasks[toolCard] = new TweenData(recipeConfig, tween);
         }
 
         private static bool CanCreateDish(IngredientConfig[] ingredients, IReadOnlyList<IIngredientCard> cards)
@@ -158,9 +170,9 @@ namespace Gameplay.Tools.Systems
 
         private void CancelCreateTask(IToolCard toolCard)
         {
-            if (_activeCreateTasks.TryGetValue(toolCard, out var tween))
+            if (_activeCreateTasks.TryGetValue(toolCard, out var data))
             {
-                tween.Kill();
+                data.Tween.Kill();
                 _activeCreateTasks.Remove(toolCard);
             }
         }
