@@ -16,6 +16,7 @@ namespace Gameplay.Cards.Systems
         private readonly CardStackMoveSystem _cardStackMoveSystem;
 
         private readonly List<IIngredientCard> _cards = new();
+        private readonly Rect _placementZone = new(-2.4f, -2.7f, 4.8f, 4.9f);
 
         public CardPlacementSystem(
             CardFactory cardFactory,
@@ -65,6 +66,19 @@ namespace Gameplay.Cards.Systems
         private void CardDropWithoutMerge(IIngredientCard draggedIngredientCard)
         {
             var dragStack = _cardStackSystem.GetStack(draggedIngredientCard);
+            var draggedBounds = draggedIngredientCard.Collider.bounds;
+            if (!IsWithinZone(draggedBounds.center))
+            {
+                var clampedPosition = ClampToZone(draggedBounds.center, dragStack.Cards.Count);
+                var draggedStack = _cardStackSystem.GetStack(draggedIngredientCard);
+                _cardStackMoveSystem.UpdateWorldPositions(
+                    draggedStack,
+                    draggedIngredientCard,
+                    clampedPosition,
+                    Constants.MaxDragSpeed);
+                return;
+            }
+
             foreach (var otherCard in _cards)
             {
                 if (otherCard == draggedIngredientCard) continue;
@@ -72,9 +86,11 @@ namespace Gameplay.Cards.Systems
 
                 if (IsIntersecting(draggedIngredientCard, otherCard))
                 {
-                    Vector3 targetPosition = FindFreePosition(draggedIngredientCard, otherCard);
-
                     var otherCardStack = _cardStackSystem.GetStack(otherCard);
+
+                    Vector3 targetPosition = FindFreePosition(draggedIngredientCard, otherCard);
+                    targetPosition = ClampToZone(targetPosition, otherCardStack.Cards.Count);
+                    
                     _cardStackMoveSystem.UpdateWorldPositions(otherCardStack, otherCard, targetPosition, Constants.MaxDragSpeed);
                 }
             }
@@ -115,7 +131,6 @@ namespace Gameplay.Cards.Systems
                 }
             }
 
-            //TODO check min max values from camera aspect
             return bestPosition;
         }
 
@@ -144,6 +159,20 @@ namespace Gameplay.Cards.Systems
             }
 
             return false;
+        }
+
+        private bool IsWithinZone(Vector3 position)
+        {
+            return _placementZone.Contains(new Vector2(position.x, position.y));
+        }
+
+        private Vector3 ClampToZone(Vector3 position, int countCardsInStack)
+        {
+            float offsetYMin = (countCardsInStack - 1) * 0.2f;
+
+            float x = Mathf.Clamp(position.x, _placementZone.xMin, _placementZone.xMax);
+            float y = Mathf.Clamp(position.y, _placementZone.yMin + offsetYMin, _placementZone.yMax);
+            return new Vector3(x, y, 0);
         }
     }
 }
