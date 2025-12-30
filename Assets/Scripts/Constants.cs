@@ -13,4 +13,6 @@ public class Constants
     
     
     public const float MaxSliderValue = 0.675f;
+    public const float TimeAnimationClient = 0.5f;
+    public const float TimeServeClient = 2f;
 }

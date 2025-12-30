@@ -10,7 +10,9 @@ namespace Gameplay.OrderButton.Interfaces
         Collider2D ColliderButton { get; }
 
         public void UpdateOrderSprite(Sprite sprite);
-        public void ShowClient();
-        public void HideClient();
+        public void ShowClient(bool immediately);
+        public void HideClient(bool immediately);
+        public void SetStateSlider(bool active);
+        public void SetProgress(float progress);
     }
 }

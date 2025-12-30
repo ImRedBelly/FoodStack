@@ -20,14 +20,24 @@ namespace Gameplay.OrderButton
             _viewHandler.UpdateOrderSprite(sprite);
         }
 
-        public void ShowClient()
+        public void ShowClient(bool immediately)
         {
-            _viewHandler.ShowClient();
+            _viewHandler.ShowClient(immediately);
         }
 
-        public void HideClient()
+        public void HideClient(bool immediately)
         {
-            _viewHandler.HideClient();
+            _viewHandler.HideClient(immediately);
+        }
+
+        public void SetStateSlider(bool active)
+        {
+            _viewHandler.SetStateSlider(active);
+        }
+
+        public void SetProgress(float progress)
+        {
+            _viewHandler.SetProgress(progress);
         }
     }
 }

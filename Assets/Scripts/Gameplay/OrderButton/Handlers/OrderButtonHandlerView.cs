@@ -11,20 +11,22 @@ namespace Gameplay.OrderButton.Handlers
 
         public void UpdateOrderSprite(Sprite sprite)
         {
+            _viewOrder.enabled = sprite != null;
             _viewOrder.sprite = sprite;
         }
 
-        public void ShowClient()
+        public void ShowClient(bool immediately)
         {
             _clientPoint.DOKill();
-            _clientPoint.DOScale(Vector3.one, 0.5f).SetEase(Ease.InBack);
+            _clientPoint.DOScale(Vector3.one, immediately ? 0 : Constants.TimeAnimationClient).From(Vector3.zero).SetEase(Ease.OutBack);
         }
 
-        public void HideClient()
+        public void HideClient(bool immediately)
         {
             _clientPoint.DOKill();
-            _clientPoint.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+            _clientPoint.DOScale(Vector3.zero, immediately ? 0 : Constants.TimeAnimationClient).From(Vector3.one).SetEase(Ease.InBack);
         }
+
         public void SetStateSlider(bool active)
         {
             _viewSlider.transform.parent.gameObject.SetActive(active);

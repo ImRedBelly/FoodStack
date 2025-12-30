@@ -7,6 +7,13 @@ using UnityEngine;
 
 namespace Gameplay.Level.Configs
 {
+    public enum DifficultyType
+    {
+        Default = 0,
+        Hard = 1,
+        SuperHard = 2
+    }
+
     [Serializable]
     public struct LevelData
     {
@@ -14,6 +21,7 @@ namespace Gameplay.Level.Configs
         public IngredientConfig[] IngredientCards;
         public OrderQueue[] OrderQueue;
         public float LevelTime;
+        public DifficultyType DifficultyType;
     }
 
     [Serializable]

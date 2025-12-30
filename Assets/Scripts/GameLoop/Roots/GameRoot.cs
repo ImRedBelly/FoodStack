@@ -1,5 +1,6 @@
 using Configs;
 using Core;
+using Cysharp.Threading.Tasks;
 using Gameplay.Cards;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Systems;
@@ -45,6 +46,7 @@ namespace GameLoop.Roots
         private ClientFactory _clientFactory;
         private OrderButtonFactory _orderButtonFactory;
         private OrderButtonSelectSystem _orderButtonSelectSystem;
+        private ClientOrderSystem _clientOrderSystem;
 
         protected override void OnInit()
         {
@@ -54,18 +56,19 @@ namespace GameLoop.Roots
 
 
             InitOrderButtonsSystems();
-            
-            
+
+
             CreateOrderButtons();
-            
+
             InitCardsSystems();
             InitToolsSystems();
             InitClientsSystems();
 
             CreateStartCards();
             CreateStartTools();
-        }
 
+            InitGame();
+        }
 
         private void InitWindows()
         {
@@ -170,15 +173,18 @@ namespace GameLoop.Roots
 
         private void InitClientsSystems()
         {
-            ClientServiceSystem clientServiceSystem =
-                new ClientServiceSystem(_clientFactory, _cardFactory, _cardCollisionSystem);
+            ClientTriggerServiceSystem clientTriggerServiceSystem = new ClientTriggerServiceSystem(_clientFactory, _cardFactory, _cardCollisionSystem);
+            clientTriggerServiceSystem
+                .Init()
+                .AddTo(Disposables);
+                
+            ClientServiceSystem clientServiceSystem = new ClientServiceSystem(clientTriggerServiceSystem, _clientFactory);
             clientServiceSystem
                 .Init()
                 .AddTo(Disposables);
 
-            ClientOrderSystem clientOrderSystem = new ClientOrderSystem(_levelsConfig.GetLevelData(SaveUtility.Level),
-                _clientFactory, clientServiceSystem, _orderButtonSelectSystem);
-            clientOrderSystem
+            _clientOrderSystem = new ClientOrderSystem(_levelsConfig.GetLevelData(SaveUtility.Level), _clientFactory, clientTriggerServiceSystem, clientServiceSystem, _orderButtonSelectSystem);
+            _clientOrderSystem
                 .Init()
                 .AddTo(Disposables);
         }
@@ -228,6 +234,29 @@ namespace GameLoop.Roots
             foreach (var tool in tools)
             {
                 _toolFactory.CreateTool(tool, Vector3.up * 2);
+            }
+        }
+
+
+        private async void InitGame()
+        {
+            await ShowGameDifficulty();
+            InitClients();
+        }
+
+        private UniTask ShowGameDifficulty()
+        {
+            var difficultyType = _levelsConfig.GetLevelData(SaveUtility.Level).DifficultyType;
+            //Debug.LogError("Difficulty: " + difficultyType);
+            return UniTask.WaitForSeconds(2);
+        }
+        
+        private async void InitClients()
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                _clientOrderSystem.CreateClient(null);
+                await UniTask.WaitForSeconds(Constants.TimeAnimationClient);
             }
         }
     }
