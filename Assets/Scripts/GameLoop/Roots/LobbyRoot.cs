@@ -13,12 +13,14 @@ namespace GameLoop.Roots
         public class Model
         {
             public readonly Action OnGameAction;
+            public readonly Action OnReload;
             public readonly WindowsService WindowsService;
             public readonly WindowResolver WindowResolver;
 
-            public Model(Action onGameAction, WindowsService windowsService, WindowResolver windowResolver)
+            public Model(Action onGameAction, Action onReload, WindowsService windowsService, WindowResolver windowResolver)
             {
                 OnGameAction = onGameAction;
+                OnReload = onReload;
                 WindowsService = windowsService;
                 WindowResolver = windowResolver;
             }

@@ -18,13 +18,19 @@ namespace Gameplay.OrderButton.Handlers
         public void ShowClient(bool immediately)
         {
             _clientPoint.DOKill();
-            _clientPoint.DOScale(Vector3.one, immediately ? 0 : Constants.TimeAnimationClient).From(Vector3.zero).SetEase(Ease.OutBack);
+            _clientPoint.DOScale(Vector3.one, immediately ? 0 : Constants.TimeAnimationClient)
+                .SetLink(_clientPoint.gameObject, LinkBehaviour.KillOnDisable)
+                .From(Vector3.zero)
+                .SetEase(Ease.OutBack);
         }
 
         public void HideClient(bool immediately)
         {
             _clientPoint.DOKill();
-            _clientPoint.DOScale(Vector3.zero, immediately ? 0 : Constants.TimeAnimationClient).From(Vector3.one).SetEase(Ease.InBack);
+            _clientPoint.DOScale(Vector3.zero, immediately ? 0 : Constants.TimeAnimationClient)
+                .SetLink(_clientPoint.gameObject, LinkBehaviour.KillOnDisable)
+                .From(Vector3.one)
+                .SetEase(Ease.InBack);
         }
 
         public void SetStateSlider(bool active)

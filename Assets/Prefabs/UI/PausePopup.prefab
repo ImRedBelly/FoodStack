@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 7541471522802642866}
   - component: {fileID: 1191067871434104804}
   m_Layer: 5
-  m_Name: ButtonQuit
+  m_Name: ButtonUpgrade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -112,7 +112,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 114.1271, y: 110.1917}
+  m_SizeDelta: {x: 146.9757, y: 141.9076}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4367793792568575569
 CanvasRenderer:
@@ -142,9 +142,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 69ab8be5710292b40a67d3d7cfb8e999, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f623d4888bcba6c4898ec6b0fcfb11d1, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -755,4 +755,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _canvas: {fileID: 2348444751931509904}
-  _button: {fileID: 1191067871434104804}
+  _buttonReload: {fileID: 648192914115190884}
+  _buttonResume: {fileID: 4824938919119850847}
+  _buttonUpgrade: {fileID: 1191067871434104804}

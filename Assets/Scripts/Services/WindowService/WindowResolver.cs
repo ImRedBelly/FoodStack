@@ -12,9 +12,9 @@ namespace Services.WindowService
             _windowsService = windowsService;
         }
 
-        public PausePopup.Model GetPlayConfirmWindowModel(Action onClick)
+        public PausePopup.Model GetPausePopupModel(Action onClickReload, Action onClickUpgrade)
         {
-            return new(onClick, _windowsService);
+            return new(onClickReload, onClickUpgrade, _windowsService);
         }
     }
 }

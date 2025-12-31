@@ -28,7 +28,7 @@ namespace Gameplay.OrderButton.Factory
 
         public void CreateOrderButton(int index)
         {
-            var orderButton = UnityEngine.Object.Instantiate(_orderButtonPrefab, new Vector3(index == 0 ? -1 : 1, 2.9f, 0), Quaternion.identity);
+            var orderButton = UnityEngine.Object.Instantiate(_orderButtonPrefab, new Vector3(index == 0 ? -1.255f : 1.255f, 2.928f, 0), Quaternion.identity);
             orderButton.HideClient(true);
             orderButton.UpdateOrderSprite(null);
             

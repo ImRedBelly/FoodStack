@@ -48,7 +48,7 @@ namespace GameLoop.States
             var gameRoot = SceneExtensions.LoadSceneRoot<GameRoot>();
 
             gameRoot
-                .Init(new LobbyRoot.Model(OnExit, _windowsService, _windowResolver))
+                .Init(new LobbyRoot.Model(OnExit, OnReload,_windowsService, _windowResolver))
                 .AddTo(subscriptions);
 
             return subscriptions;
@@ -57,6 +57,11 @@ namespace GameLoop.States
         private void OnExit()
         {
             _gameMachine.ChangeState<LobbyState>();
+        }
+
+        private void OnReload()
+        {
+            _gameMachine.ChangeState<GameState>();
         }
     }
 }

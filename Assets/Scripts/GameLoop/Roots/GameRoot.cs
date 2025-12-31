@@ -1,3 +1,4 @@
+using System;
 using Configs;
 using Core;
 using Cysharp.Threading.Tasks;
@@ -24,18 +25,19 @@ namespace GameLoop.Roots
     {
         [SerializeField] private Camera _camera;
         [SerializeField] private LayerMask _cardLayer;
-        [Space] 
-        [SerializeField] private Button _quitButton;
-        [Space] 
-        [Header("Prefabs")]
-        [SerializeField] private IngredientCard ingredientCardPrefab;
+        [Space] [SerializeField] private Button _quitButton;
+        [SerializeField] private Button _pauseButton;
+
+        [Space] [Header("Prefabs")] [SerializeField]
+        private IngredientCard ingredientCardPrefab;
+
         [SerializeField] private ToolCard toolCardPrefab;
         [SerializeField] private ClientCard clientCardPrefab;
         [SerializeField] private OrderButton orderButtonPrefab;
-        [Space]
-        [Header("Debug Data")] 
-        [SerializeField] private LevelsConfig _levelsConfig;
-        
+
+        [Space] [Header("Debug Data")] [SerializeField]
+        private LevelsConfig _levelsConfig;
+
         private CardDragSystem _cardDragSystem;
         private CardCollisionSystem _cardCollisionSystem;
         private CardStackSystem _cardStackSystem;
@@ -72,12 +74,16 @@ namespace GameLoop.Roots
 
         private void InitWindows()
         {
-            var playConfirmWindow =
-                ActiveModel.WindowResolver.GetPlayConfirmWindowModel(ActiveModel.OnGameAction);
+            var pausePopupModel = ActiveModel.WindowResolver.GetPausePopupModel(ActiveModel.OnReload, () => { });
+
+            _pauseButton
+                .OnClickAsObservable()
+                .SafeSubscribe(_ => ActiveModel.WindowsService.Open(pausePopupModel, false))
+                .AddTo(Disposables);
 
             _quitButton
                 .OnClickAsObservable()
-                .SafeSubscribe(_ => ActiveModel.WindowsService.Open(playConfirmWindow, false))
+                .SafeSubscribe(_ => ActiveModel.OnGameAction?.Invoke())
                 .AddTo(Disposables);
         }
 
@@ -173,17 +179,20 @@ namespace GameLoop.Roots
 
         private void InitClientsSystems()
         {
-            ClientTriggerServiceSystem clientTriggerServiceSystem = new ClientTriggerServiceSystem(_clientFactory, _cardFactory, _cardCollisionSystem);
+            ClientTriggerServiceSystem clientTriggerServiceSystem =
+                new ClientTriggerServiceSystem(_clientFactory, _cardFactory, _cardCollisionSystem);
             clientTriggerServiceSystem
                 .Init()
                 .AddTo(Disposables);
-                
-            ClientServiceSystem clientServiceSystem = new ClientServiceSystem(clientTriggerServiceSystem, _clientFactory);
+
+            ClientServiceSystem clientServiceSystem =
+                new ClientServiceSystem(clientTriggerServiceSystem, _clientFactory);
             clientServiceSystem
                 .Init()
                 .AddTo(Disposables);
 
-            _clientOrderSystem = new ClientOrderSystem(_levelsConfig.GetLevelData(SaveUtility.Level), _clientFactory, clientTriggerServiceSystem, clientServiceSystem, _orderButtonSelectSystem);
+            _clientOrderSystem = new ClientOrderSystem(_levelsConfig.GetLevelData(SaveUtility.Level), _clientFactory,
+                clientTriggerServiceSystem, clientServiceSystem, _orderButtonSelectSystem);
             _clientOrderSystem
                 .Init()
                 .AddTo(Disposables);
@@ -250,14 +259,14 @@ namespace GameLoop.Roots
             //Debug.LogError("Difficulty: " + difficultyType);
             return UniTask.WaitForSeconds(2);
         }
-        
-        private async void InitClients()
+
+        private void InitClients()
         {
-            for (int i = 0; i < 2; i++)
-            {
-                _clientOrderSystem.CreateClient(null);
-                await UniTask.WaitForSeconds(Constants.TimeAnimationClient);
-            }
+            Observable
+                .Interval(TimeSpan.FromSeconds(Constants.TimeAnimationClient))
+                .Take(2)
+                .Subscribe(_ => { _clientOrderSystem.CreateClient(null); })
+                .AddTo(Disposables);
         }
     }
 }

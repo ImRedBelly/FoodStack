@@ -79,15 +79,16 @@ namespace Support
                 }
 
                 var disposable = new CompositeDisposable();
-                var activeScene = SceneManager.GetActiveScene().name;
 
-                if (activeScene == sceneName)
-                {
-                    Debug.Log($"[LoadScene] Scene '{sceneName}' is already active.");
-                    subject.OnNext(Unit.Default);
-                    subject.OnCompleted();
-                    return Disposable.Empty;
-                }
+                //TODO disable for reload scene
+                //var activeScene = SceneManager.GetActiveScene().name;
+                // if (activeScene == sceneName)
+                // {
+                //     Debug.Log($"[LoadScene] Scene '{sceneName}' is already active.");
+                //     subject.OnNext(Unit.Default);
+                //     subject.OnCompleted();
+                //     return Disposable.Empty;
+                // }
 
                 void Handler(AsyncOperation operation)
                 {

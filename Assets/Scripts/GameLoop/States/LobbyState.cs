@@ -11,7 +11,7 @@ namespace GameLoop.States
         private readonly GameMachine _gameMachine;
         private readonly WindowsService _windowsService;
         private readonly WindowResolver _windowResolver;
-        
+
         private readonly CompositeDisposable _rootDisposable = new();
 
         private const string StateSceneName = "2.Lobby";
@@ -48,7 +48,7 @@ namespace GameLoop.States
             var lobbyRoot = SceneExtensions.LoadSceneRoot<LobbyRoot>();
 
             lobbyRoot
-                .Init(new LobbyRoot.Model(OnGameStartRequested, _windowsService, _windowResolver))
+                .Init(new LobbyRoot.Model(OnGameStartRequested, null, _windowsService, _windowResolver))
                 .AddTo(subscriptions);
 
             return subscriptions;
