@@ -10,7 +10,7 @@ namespace Gameplay.Cards.Systems
     public class CardSortingOrderSystem : DisposableClass
     {
         private readonly CardFactory _cardFactory;
-        private readonly List<IIngredientCard> _cards = new();
+        private readonly List<ICard> _cards = new();
 
         public CardSortingOrderSystem(CardFactory cardFactory)
         {
@@ -34,19 +34,19 @@ namespace Gameplay.Cards.Systems
                 .AddTo(Disposables);
         }
 
-        private void AddCard(IIngredientCard newIngredientCard)
+        private void AddCard(ICard newCard)
         {
-            if (!_cards.Contains(newIngredientCard))
+            if (!_cards.Contains(newCard))
             {
-                _cards.Add(newIngredientCard);
+                _cards.Add(newCard);
             }
         }
 
-        private void RemoveCard(IIngredientCard ingredientCard)
+        private void RemoveCard(ICard card)
         {
-            if (_cards.Contains(ingredientCard))
+            if (_cards.Contains(card))
             {
-                _cards.Remove(ingredientCard);
+                _cards.Remove(card);
             }
         }
 

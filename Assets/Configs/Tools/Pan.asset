@@ -9,12 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7fa3b28b24d4b549c9f5c2f6a6cce92, type: 3}
+  m_Script: {fileID: 11500000, guid: c5315a78aa244cd5a81bd69199f677fe, type: 3}
   m_Name: Pan
   m_EditorClassIdentifier: 
   <Name>k__BackingField: Pan
   <Sprite>k__BackingField: {fileID: 21300000, guid: 4e9c4fc47b159ce4d9c6ceeda1aeb8a7, type: 3}
-  <Recipes>k__BackingField:
-  - {fileID: 11400000, guid: e22f07d4b660e4a63b1d268f834f67ac, type: 2}
-  - {fileID: 11400000, guid: 37212f132c55ade46bcee60f9cebf3bf, type: 2}
-  - {fileID: 11400000, guid: 6e42e246e30674a42a08a53ed76d2d8b, type: 2}
+  <CanDrag>k__BackingField: 0

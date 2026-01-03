@@ -15,7 +15,7 @@ namespace Gameplay.Cards.Systems
         private readonly CardStackSystem _cardStackSystem;
         private readonly CardStackMoveSystem _cardStackMoveSystem;
 
-        private readonly List<IIngredientCard> _cards = new();
+        private readonly List<ICard> _cards = new();
         private readonly Rect _placementZone = new(-2.4f, -2.7f, 4.8f, 4.9f);
 
         public CardPlacementSystem(
@@ -47,7 +47,7 @@ namespace Gameplay.Cards.Systems
                 .AddTo(Disposables);
         }
 
-        private void AddCard(IIngredientCard newIngredientCard)
+        private void AddCard(ICard newIngredientCard)
         {
             if (!_cards.Contains(newIngredientCard))
             {
@@ -55,7 +55,7 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void RemoveCard(IIngredientCard newIngredientCard)
+        private void RemoveCard(ICard newIngredientCard)
         {
             if (_cards.Contains(newIngredientCard))
             {
@@ -63,7 +63,7 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void CardDropWithoutMerge(IIngredientCard draggedIngredientCard)
+        private void CardDropWithoutMerge(ICard draggedIngredientCard)
         {
             var dragStack = _cardStackSystem.GetStack(draggedIngredientCard);
             var draggedBounds = draggedIngredientCard.Collider.bounds;
@@ -97,8 +97,8 @@ namespace Gameplay.Cards.Systems
         }
 
         private Vector3 FindFreePosition(
-            IIngredientCard draggedCard,
-            IIngredientCard otherCard)
+            ICard draggedCard,
+            ICard otherCard)
         {
             var origin = otherCard.Transform.position;
             var bounds = otherCard.Collider.bounds;
@@ -134,13 +134,13 @@ namespace Gameplay.Cards.Systems
             return bestPosition;
         }
 
-        private bool IsIntersecting(IIngredientCard draggedIngredientCard, IIngredientCard otherCard)
+        private bool IsIntersecting(ICard draggedIngredientCard, ICard otherCard)
         {
             return draggedIngredientCard.Collider.bounds.Intersects(otherCard.Collider.bounds);
         }
 
         private bool IsIntersectingAtPosition(
-            IIngredientCard draggedCard,
+            ICard draggedCard,
             Vector3 position,
             Bounds bounds)
         {

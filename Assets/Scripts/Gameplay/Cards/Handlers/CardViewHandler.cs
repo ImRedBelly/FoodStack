@@ -9,6 +9,7 @@ namespace Gameplay.Cards.Handlers
         [SerializeField] private SortingGroup _sortingGroup;
         [SerializeField] private SpriteRenderer _viewCard;
         [SerializeField] private SpriteRenderer _shadowCard;
+        [SerializeField] private SpriteRenderer _viewSlider;
         [SerializeField] private SpriteRenderer _eligibleFrame;
         [SerializeField] private GameObject _flameObject;
 
@@ -20,6 +21,7 @@ namespace Gameplay.Cards.Handlers
             SetStateShadow(false);
             SetStateEligibleFrame(false);
             SetStateFlame(false);
+            SetStateSlider(false);
         }
 
         public void SetSortingOrder(int sortingOrder)
@@ -30,7 +32,7 @@ namespace Gameplay.Cards.Handlers
         public void SetStateShadow(bool active)
         {
             _shadowCard.gameObject.SetActive(active);
-            
+
             _shadowCard.transform
                 .DOLocalMove(Constants.CardDragOffset * -1, 0.1f)
                 .From(Vector3.zero)
@@ -45,6 +47,16 @@ namespace Gameplay.Cards.Handlers
         public void SetStateFlame(bool active)
         {
             _flameObject.SetActive(active);
+        }
+
+        public void SetStateSlider(bool active)
+        {
+            _viewSlider.transform.parent.gameObject.SetActive(active);
+        }
+
+        public void SetProgress(float progress)
+        {
+            _viewSlider.size = new Vector2(Constants.MaxSliderValue * progress, _viewSlider.size.y);
         }
     }
 }

@@ -10,17 +10,20 @@ namespace Gameplay.Cards.Factory
 {
     public class CardFactory : DisposableClass
     {
-        public IObservable<IIngredientCard> OnCardCreated => _onCardCreated;
-        public IObservable<IIngredientCard> OnCardRemoved => _onCardRemoved;
+        public IObservable<ICard> OnCardCreated => _onCardCreated;
+        public IObservable<ICard> OnCardRemoved => _onCardRemoved;
+        public IObservable<ICard> OnToolCreated => _onToolCreated;
 
-        private readonly Subject<IIngredientCard> _onCardCreated = new();
-        private readonly Subject<IIngredientCard> _onCardRemoved = new();
+        private readonly Subject<ICard> _onCardCreated = new();
+        private readonly Subject<ICard> _onCardRemoved = new();
+        private readonly Subject<ICard> _onToolCreated = new();
 
-        private readonly IngredientCard _ingredientCardPrefab;
+        private readonly Card _cardPrefab;
 
-        public CardFactory(IngredientCard ingredientCardPrefab)
+
+        public CardFactory(Card cardPrefab)
         {
-            _ingredientCardPrefab = ingredientCardPrefab;
+            _cardPrefab = cardPrefab;
         }
 
         protected override void OnInit()
@@ -29,21 +32,30 @@ namespace Gameplay.Cards.Factory
 
             _onCardCreated.AddTo(Disposables);
             _onCardRemoved.AddTo(Disposables);
+            _onToolCreated.AddTo(Disposables);
         }
 
-        public void CreateIngredient(IngredientConfig config, Vector3 position)
+        public void CreateIngredient(CardConfig config, Vector3 position)
         {
-            var card = Object.Instantiate(_ingredientCardPrefab, position, Quaternion.identity);
+            var card = Object.Instantiate(_cardPrefab, position, Quaternion.identity);
             card.name = config.Name;
-            card.Init(new IngredientCard.Model(config));
+            card.Init(new Card.Model(config));
 
             _onCardCreated?.OnNext(card);
         }
 
-        public void RemoveIngredient(IIngredientCard ingredientCard)
+        public void RemoveIngredient(ICard card)
         {
-            _onCardRemoved?.OnNext(ingredientCard);
-            Object.Destroy(ingredientCard.Transform.gameObject);
+            _onCardRemoved?.OnNext(card);
+            Object.Destroy(card.Transform.gameObject);
+        }
+
+        public void CreateTool(CardConfig config, Vector3 position)
+        {
+            var tool = Object.Instantiate(_cardPrefab, position, Quaternion.identity);
+            tool.name = config.Name;
+            tool.Init(new Card.Model(config));
+            _onToolCreated?.OnNext(tool);
         }
     }
 }

@@ -10,10 +10,10 @@ namespace Gameplay.Clients.Factory
 {
     public class ClientFactory : DisposableClass
     {
-        public IObservable<(IClientCard, IngredientConfig)> OnClientCreated => _onClientCreated;
+        public IObservable<(IClientCard, CardConfig)> OnClientCreated => _onClientCreated;
         public IObservable<IClientCard> OnClientRemoved => _onClientRemoved;
 
-        private readonly Subject<(IClientCard, IngredientConfig)> _onClientCreated = new();
+        private readonly Subject<(IClientCard, CardConfig)> _onClientCreated = new();
         private readonly Subject<IClientCard> _onClientRemoved = new();
 
         private readonly ClientCard _clientCardPrefab;
@@ -31,7 +31,7 @@ namespace Gameplay.Clients.Factory
             _onClientRemoved.AddTo(Disposables);
         }
 
-        public IClientCard CreateClient(ClientConfig config, IngredientConfig ingredientConfig, Vector3 position, Transform parent)
+        public IClientCard CreateClient(ClientConfig config, CardConfig cardConfig, Vector3 position, Transform parent)
         {
             var card = UnityEngine.Object.Instantiate(_clientCardPrefab, parent);
             card.Transform.localPosition = position;
@@ -39,7 +39,7 @@ namespace Gameplay.Clients.Factory
             card.name = config.Name;
             card.Init(new ClientCard.Model(config));
 
-            _onClientCreated?.OnNext((card, ingredientConfig));
+            _onClientCreated?.OnNext((card, cardConfig));
             return card;
         }
 

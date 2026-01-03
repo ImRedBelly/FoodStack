@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Gameplay.Tools.Handlers
+namespace Gameplay.Cards.Handlers
 {
     public class ToolViewHandler : MonoBehaviour
     {

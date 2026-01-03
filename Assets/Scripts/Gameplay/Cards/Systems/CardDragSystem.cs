@@ -8,18 +8,18 @@ namespace Gameplay.Cards.Systems
 {
     public sealed class CardDragSystem : DisposableClass
     {
-        public IObservable<IIngredientCard> OnStartDrag => _onStartDrag;
-        public IObservable<IIngredientCard> OnEndDrag => _onEndDrag;
+        public IObservable<ICard> OnStartDrag => _onStartDrag;
+        public IObservable<ICard> OnEndDrag => _onEndDrag;
 
-        private readonly Subject<IIngredientCard> _onStartDrag = new();
-        private readonly Subject<IIngredientCard> _onEndDrag = new();
+        private readonly Subject<ICard> _onStartDrag = new();
+        private readonly Subject<ICard> _onEndDrag = new();
 
         private readonly Camera _camera;
         private readonly LayerMask _cardLayer;
         private readonly CardStackSystem _cardStackSystem;
         private readonly CardStackMoveSystem _cardStackMoveSystem;
 
-        private IIngredientCard _currentIngredientCard;
+        private ICard _currentIngredientCard;
 
         private Vector3 _offsetDrag;
         private Vector3 _offsetClick;
@@ -62,7 +62,7 @@ namespace Gameplay.Cards.Systems
             float minPositionY = float.MaxValue;
             foreach (var hit in allCards)
             {
-                if (hit.collider.TryGetComponent<IIngredientCard>(out var card))
+                if (hit.collider.TryGetComponent<ICard>(out var card) && card.CanDrag())
                 {
                     if (hit.collider.transform.position.y < minPositionY)
                     {
@@ -79,7 +79,7 @@ namespace Gameplay.Cards.Systems
             _offsetClick = _currentIngredientCard.Transform.position - worldPos;
             _offsetClick.z = 0;
 
-            _onStartDrag?.OnNext(_currentIngredientCard.Transform.GetComponent<IngredientCard>());
+            _onStartDrag?.OnNext(_currentIngredientCard);
             _dragDisposable = Observable.EveryUpdate().Subscribe(_ => UpdateDrag());
         }
 

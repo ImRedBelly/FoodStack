@@ -11,9 +11,8 @@ using Gameplay.Clients.Services;
 using Gameplay.OrderButton;
 using Gameplay.OrderButton.Factory;
 using Gameplay.OrderButton.Services;
-using Gameplay.Tools;
-using Gameplay.Tools.Factory;
-using Gameplay.Tools.Systems;
+using Gameplay.Recipes.Configs;
+using Gameplay.Recipes.Services;
 using Support;
 using UniRx;
 using UnityEngine;
@@ -25,26 +24,29 @@ namespace GameLoop.Roots
     {
         [SerializeField] private Camera _camera;
         [SerializeField] private LayerMask _cardLayer;
-        [Space] [SerializeField] private Button _quitButton;
+        [Space]
+        [SerializeField] private Button _quitButton;
         [SerializeField] private Button _pauseButton;
 
-        [Space] [Header("Prefabs")] [SerializeField]
-        private IngredientCard ingredientCardPrefab;
-
-        [SerializeField] private ToolCard toolCardPrefab;
+        [Space] [Header("Prefabs")]
+        [SerializeField] private Card _cardPrefab;
         [SerializeField] private ClientCard clientCardPrefab;
         [SerializeField] private OrderButton orderButtonPrefab;
 
-        [Space] [Header("Debug Data")] [SerializeField]
-        private LevelsConfig _levelsConfig;
+        [Space] [Header("Data")]
+        [SerializeField] private RecipeConfig[] _recipeConfigs;
+        
+        [Space] [Header("Debug Data")]
+        [SerializeField] private LevelsConfig _levelsConfig;
 
+        private RecipesStorage _recipesStorage;
+        
         private CardDragSystem _cardDragSystem;
         private CardCollisionSystem _cardCollisionSystem;
         private CardStackSystem _cardStackSystem;
         private CardStackMoveSystem _cardStackMoveSystem;
 
         private CardFactory _cardFactory;
-        private ToolFactory _toolFactory;
         private ClientFactory _clientFactory;
         private OrderButtonFactory _orderButtonFactory;
         private OrderButtonSelectSystem _orderButtonSelectSystem;
@@ -58,7 +60,7 @@ namespace GameLoop.Roots
 
 
             InitOrderButtonsSystems();
-
+            InitRecipesServices();
 
             CreateOrderButtons();
 
@@ -89,13 +91,8 @@ namespace GameLoop.Roots
 
         private void InitFactories()
         {
-            _cardFactory = new CardFactory(ingredientCardPrefab);
+            _cardFactory = new CardFactory(_cardPrefab);
             _cardFactory
-                .Init()
-                .AddTo(Disposables);
-
-            _toolFactory = new ToolFactory(toolCardPrefab);
-            _toolFactory
                 .Init()
                 .AddTo(Disposables);
 
@@ -117,6 +114,12 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
         }
+        
+        private void InitRecipesServices()
+        {
+            _recipesStorage = new RecipesStorage(_recipeConfigs);
+        }
+
 
         private void InitCardsSystems()
         {
@@ -130,7 +133,6 @@ namespace GameLoop.Roots
 
             _cardCollisionSystem = new CardCollisionSystem(
                 _cardFactory,
-                _toolFactory,
                 _clientFactory,
                 _cardDragSystem,
                 _cardStackSystem);
@@ -147,7 +149,7 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            new CardEligibleFrameStateSystem(_cardFactory, _toolFactory, _cardDragSystem, _cardStackSystem)
+            new CardEligibleFrameStateSystem(_cardFactory, _cardDragSystem, _cardStackSystem)
                 .Init()
                 .AddTo(Disposables);
 
@@ -165,7 +167,7 @@ namespace GameLoop.Roots
         private void InitToolsSystems()
         {
             CreateDishService createDishService =
-                new CreateDishService(_cardCollisionSystem, _cardStackSystem, _cardFactory);
+                new CreateDishService(_cardCollisionSystem, _cardStackSystem, _cardFactory, _recipesStorage);
             createDishService
                 .Init()
                 .AddTo(Disposables);
@@ -242,7 +244,7 @@ namespace GameLoop.Roots
             var tools = _levelsConfig.GetLevelData(SaveUtility.Level).ToolCards;
             foreach (var tool in tools)
             {
-                _toolFactory.CreateTool(tool, Vector3.up * 2);
+                _cardFactory.CreateTool(tool, Vector3.up * 2);
             }
         }
 

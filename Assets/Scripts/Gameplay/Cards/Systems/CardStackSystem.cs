@@ -7,7 +7,7 @@ namespace Gameplay.Cards.Systems
 {
     public class CardStack
     {
-        public readonly List<IIngredientCard> Cards = new();
+        public readonly List<ICard> Cards = new();
     }
 
     public class CardStackSystem
@@ -19,10 +19,10 @@ namespace Gameplay.Cards.Systems
         private readonly CardStackMoveSystem _cardStackMoveSystem;
 
         private readonly List<CardStack> _stacks = new();
-        private readonly Dictionary<IIngredientCard, CardStack> _cardToStack = new();
+        private readonly Dictionary<ICard, CardStack> _cardToStack = new();
 
         private CardStack _lastSourceStack;
-        private List<IIngredientCard> _lastDetachedCards;
+        private List<ICard> _lastDetachedCards;
 
         public CardStackSystem(CardStackMoveSystem cardStackMoveSystem)
         {
@@ -30,14 +30,14 @@ namespace Gameplay.Cards.Systems
         }
 
 
-        public CardStack GetStack(IIngredientCard ingredientCard)
+        public CardStack GetStack(ICard card)
         {
-            return _cardToStack.TryGetValue(ingredientCard, out CardStack stack) ? stack : CreateStack(ingredientCard);
+            return _cardToStack.TryGetValue(card, out CardStack stack) ? stack : CreateStack(card);
         }
 
-        public void MergeStacks(IIngredientCard draggedIngredientCard, CardStack targetStack)
+        public void MergeStacks(ICard draggedCard, CardStack targetStack)
         {
-            var sourceStack = GetStack(draggedIngredientCard);
+            var sourceStack = GetStack(draggedCard);
 
             if (sourceStack == targetStack)
                 return;
@@ -54,11 +54,11 @@ namespace Gameplay.Cards.Systems
             _onUpdateStacks?.OnNext(Unit.Default);
         }
 
-        public void DetachSubStack(IIngredientCard ingredientCard)
+        public void DetachSubStack(ICard card)
         {
-            var stack = GetStack(ingredientCard);
+            var stack = GetStack(card);
 
-            int index = stack.Cards.IndexOf(ingredientCard);
+            int index = stack.Cards.IndexOf(card);
             if (index < 0)
                 return;
 
@@ -83,7 +83,7 @@ namespace Gameplay.Cards.Systems
             _onUpdateStacks?.OnNext(Unit.Default);
         }
 
-        public void RestoreDetachedStack(IIngredientCard root)
+        public void RestoreDetachedStack(ICard root)
         {
             if (_lastSourceStack == null || _lastDetachedCards == null)
                 return;
@@ -110,13 +110,13 @@ namespace Gameplay.Cards.Systems
             _onUpdateStacks?.OnNext(Unit.Default);
         }
 
-        private CardStack CreateStack(IIngredientCard ingredientCard)
+        private CardStack CreateStack(ICard card)
         {
             CardStack stack = new CardStack();
-            stack.Cards.Add(ingredientCard);
+            stack.Cards.Add(card);
 
             _stacks.Add(stack);
-            _cardToStack[ingredientCard] = stack;
+            _cardToStack[card] = stack;
 
             return stack;
         }

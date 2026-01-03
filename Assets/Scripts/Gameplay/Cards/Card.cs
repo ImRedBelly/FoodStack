@@ -6,22 +6,22 @@ using UnityEngine;
 
 namespace Gameplay.Cards
 {
-    public class IngredientCard : DisposableBehaviour<IngredientCard.Model>, IIngredientCard
+    public class Card : DisposableBehaviour<Card.Model>, ICard
     {
         public class Model
         {
-            public readonly IngredientConfig IngredientConfig;
+            public readonly CardConfig Config;
 
-            public Model(IngredientConfig ingredientConfig)
+            public Model(CardConfig config)
             {
-                IngredientConfig = ingredientConfig;
+                Config = config;
             }
         }
 
         public Transform Transform => transform;
         public Transform Container => _container;
         public Collider2D Collider => _collider2D;
-        public IngredientConfig IngredientConfig => ActiveModel.IngredientConfig;
+        public CardConfig CardConfig => ActiveModel.Config;
 
         [SerializeField] private Transform _container;
         [SerializeField] private Collider2D _collider2D;
@@ -30,7 +30,7 @@ namespace Gameplay.Cards
         protected override void OnInit()
         {
             base.OnInit();
-            _viewHandler.Initialize(ActiveModel.IngredientConfig.Sprite, Constants.DefaultSortingOrder);
+            _viewHandler.Initialize(ActiveModel.Config.Sprite, Constants.DefaultSortingOrder);
         }
 
         public void Dispose()
@@ -42,6 +42,11 @@ namespace Gameplay.Cards
         {
             _viewHandler.SetSortingOrder(Constants.DragSortingOrder);
             _viewHandler.SetStateShadow(true);
+        }
+
+        public bool CanDrag()
+        {
+            return ActiveModel.Config.CanDrag;
         }
 
         public virtual void OnDragEnd()
@@ -58,6 +63,16 @@ namespace Gameplay.Cards
         public void SetStateFlame(bool state)
         {
             _viewHandler.SetStateFlame(state);
+        }
+
+        public void SetStateSlider(bool state)
+        {
+            _viewHandler.SetStateSlider(state);
+        }
+
+        public void SetProgress(float progress)
+        {
+            _viewHandler.SetProgress(progress);
         }
 
         public void UpdateSortingOrder()

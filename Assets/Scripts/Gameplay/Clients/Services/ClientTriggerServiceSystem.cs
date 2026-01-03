@@ -22,7 +22,7 @@ namespace Gameplay.Clients.Services
         private readonly CardFactory _cardFactory;
         private readonly CardCollisionSystem _cardCollisionSystem;
 
-        private readonly Dictionary<IClientCard, IngredientConfig> _clients = new();
+        private readonly Dictionary<IClientCard, CardConfig> _clients = new();
 
         public ClientTriggerServiceSystem(
             ClientFactory clientFactory,
@@ -53,7 +53,7 @@ namespace Gameplay.Clients.Services
                 .AddTo(Disposables);
         }
 
-        private void AddClient((IClientCard client, IngredientConfig target) data)
+        private void AddClient((IClientCard client, CardConfig target) data)
         {
             _clients[data.client] = data.target;
         }
@@ -64,11 +64,11 @@ namespace Gameplay.Clients.Services
         }
 
 
-        private void CollisionWithClient((IClientCard clientCard, IIngredientCard ingredientCard) data)
+        private void CollisionWithClient((IClientCard clientCard, ICard ingredientCard) data)
         {
             if (_clients.TryGetValue(data.clientCard, out var target))
             {
-                if (target == data.ingredientCard.IngredientConfig)
+                if (target == data.ingredientCard.CardConfig)
                 {
                     _cardFactory.RemoveIngredient(data.ingredientCard);
                     _onClientTriggerService?.OnNext(data.clientCard);

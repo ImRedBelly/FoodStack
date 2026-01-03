@@ -27,7 +27,7 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        public void UpdateWorldPositions(CardStack stacks, IIngredientCard card, Vector3 basePos, float lerpSpeed)
+        public void UpdateWorldPositions(CardStack stacks, ICard card, Vector3 basePos, float lerpSpeed)
         {
             for (int i = 0; i < stacks.Cards.Count; i++)
             {

@@ -7,8 +7,6 @@ using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Interfaces;
-using Gameplay.Tools.Factory;
-using Gameplay.Tools.Interfaces;
 using Support;
 using UniRx;
 
@@ -16,36 +14,33 @@ namespace Gameplay.Cards.Systems
 {
     public class CardCollisionSystem : DisposableClass
     {
-        public IObservable<(IIngredientCard, IIngredientCard)> OnCardCollisionWithCard => _onCardCollisionWithCard;
-        public IObservable<(IToolCard, IIngredientCard)> OnCardCollisionWithTool => _onCardCollisionWithTool;
-        public IObservable<(IClientCard, IIngredientCard)> OnCardCollisionWithClient => _onCardCollisionWithClient;
-        public IObservable<IIngredientCard> OnCardDropWithoutMerge => _onCardDropWithoutMerge;
+        public IObservable<(ICard, ICard)> OnCardCollisionWithCard => _onCardCollisionWithCard;
+        public IObservable<(ICard, ICard)> OnCardCollisionWithTool => _onCardCollisionWithTool;
+        public IObservable<(IClientCard, ICard)> OnCardCollisionWithClient => _onCardCollisionWithClient;
+        public IObservable<ICard> OnCardDropWithoutMerge => _onCardDropWithoutMerge;
 
-        private readonly Subject<(IIngredientCard, IIngredientCard)> _onCardCollisionWithCard = new();
-        private readonly Subject<(IToolCard, IIngredientCard)> _onCardCollisionWithTool = new();
-        private readonly Subject<(IClientCard, IIngredientCard)> _onCardCollisionWithClient = new();
-        private readonly Subject<IIngredientCard> _onCardDropWithoutMerge = new();
+        private readonly Subject<(ICard, ICard)> _onCardCollisionWithCard = new();
+        private readonly Subject<(ICard, ICard)> _onCardCollisionWithTool = new();
+        private readonly Subject<(IClientCard, ICard)> _onCardCollisionWithClient = new();
+        private readonly Subject<ICard> _onCardDropWithoutMerge = new();
 
         private readonly CardFactory _cardFactory;
-        private readonly ToolFactory _toolFactory;
         private readonly ClientFactory _clientFactory;
         private readonly CardDragSystem _dragSystem;
         private readonly CardStackSystem _cardStackSystem;
 
-        private readonly List<IIngredientCard> _cards = new();
-        private readonly List<IToolCard> _tools = new();
+        private readonly List<ICard> _cards = new();
+        private readonly List<ICard> _tools = new();
         private readonly List<IClientCard> _clients = new();
 
 
         public CardCollisionSystem(
             CardFactory cardFactory,
-            ToolFactory toolFactory,
             ClientFactory clientFactory,
             CardDragSystem dragSystem,
             CardStackSystem cardStackSystem)
         {
             _cardFactory = cardFactory;
-            _toolFactory = toolFactory;
             _clientFactory = clientFactory;
             _dragSystem = dragSystem;
             _cardStackSystem = cardStackSystem;
@@ -76,7 +71,7 @@ namespace Gameplay.Cards.Systems
                 .SafeSubscribe(RemoveClient)
                 .AddTo(Disposables);
 
-            _toolFactory.OnCardCreated
+            _cardFactory.OnToolCreated
                 .SafeSubscribe(AddTool)
                 .AddTo(Disposables);
 
@@ -85,23 +80,23 @@ namespace Gameplay.Cards.Systems
                 .AddTo(Disposables);
         }
 
-        private void AddCard(IIngredientCard newIngredientCard)
+        private void AddCard(ICard newCard)
         {
-            if (!_cards.Contains(newIngredientCard))
+            if (!_cards.Contains(newCard))
             {
-                _cards.Add(newIngredientCard);
+                _cards.Add(newCard);
             }
         }
 
-        private void RemoveCard(IIngredientCard ingredientCard)
+        private void RemoveCard(ICard card)
         {
-            if (_cards.Contains(ingredientCard))
+            if (_cards.Contains(card))
             {
-                _cards.Remove(ingredientCard);
+                _cards.Remove(card);
             }
         }
 
-        private void AddClient((IClientCard newClientCard, IngredientConfig ingredientConfig) data)
+        private void AddClient((IClientCard newClientCard, CardConfig ingredientConfig) data)
         {
             if (!_clients.Contains(data.newClientCard))
             {
@@ -117,7 +112,7 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void AddTool(IToolCard newToolCard)
+        private void AddTool(ICard newToolCard)
         {
             if (!_tools.Contains(newToolCard))
             {
@@ -125,7 +120,7 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void EndDrag(IIngredientCard draggedIngredientCard)
+        private void EndDrag(ICard draggedIngredientCard)
         {
             var dragStack = _cardStackSystem.GetStack(draggedIngredientCard);
             foreach (var card in _cards)
@@ -158,7 +153,7 @@ namespace Gameplay.Cards.Systems
             _onCardDropWithoutMerge?.OnNext(draggedIngredientCard);
         }
 
-        private bool IsOverlapping(IIngredientCard draggedIngredientCard, IIngredientCard otherCard)
+        private bool IsOverlapping(ICard draggedIngredientCard, ICard otherCard)
         {
             var draggedBounds = draggedIngredientCard.Collider.bounds;
             var otherBounds = otherCard.Collider.bounds;
@@ -169,18 +164,7 @@ namespace Gameplay.Cards.Systems
             return distance < Constants.MinCollisionDistance;
         }
 
-        private bool IsOverlapping(IIngredientCard draggedIngredientCard, IToolCard toolCard)
-        {
-            var draggedBounds = draggedIngredientCard.Collider.bounds;
-            var toolBounds = toolCard.Collider.bounds;
-
-            if (!toolBounds.Intersects(draggedBounds)) return false;
-
-            var distance = Vector3.Distance(draggedBounds.center, toolBounds.center);
-            return distance < Constants.MinCollisionDistance;
-        }
-
-        private bool IsOverlapping(IIngredientCard draggedIngredientCard, IClientCard clientCard)
+        private bool IsOverlapping(ICard draggedIngredientCard, IClientCard clientCard)
         {
             var draggedBounds = draggedIngredientCard.Collider.bounds;
             var toolBounds = clientCard.Collider.bounds;

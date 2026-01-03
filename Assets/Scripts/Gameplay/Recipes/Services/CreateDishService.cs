@@ -7,12 +7,11 @@ using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
 using Gameplay.Cards.Systems;
 using Gameplay.Recipes.Configs;
-using Gameplay.Tools.Interfaces;
 using Support;
 using UniRx;
 using UnityEngine;
 
-namespace Gameplay.Tools.Systems
+namespace Gameplay.Recipes.Services
 {
     public struct TweenData
     {
@@ -31,18 +30,21 @@ namespace Gameplay.Tools.Systems
         private readonly CardCollisionSystem _cardCollisionSystem;
         private readonly CardStackSystem _cardStackSystem;
         private readonly CardFactory _cardFactory;
+        private readonly RecipesStorage _recipesStorage;
 
-        private readonly Dictionary<IToolCard, CardStack> _toolToStack = new();
-        private readonly Dictionary<IToolCard, TweenData> _activeCreateTasks = new();
+        private readonly Dictionary<ICard, CardStack> _toolToStack = new();
+        private readonly Dictionary<ICard, TweenData> _activeCreateTasks = new();
 
         public CreateDishService(
             CardCollisionSystem cardCollisionSystem,
             CardStackSystem cardStackSystem,
-            CardFactory cardFactory)
+            CardFactory cardFactory,
+            RecipesStorage recipesStorage)
         {
             _cardCollisionSystem = cardCollisionSystem;
             _cardStackSystem = cardStackSystem;
             _cardFactory = cardFactory;
+            _recipesStorage = recipesStorage;
         }
 
         protected override void OnInit()
@@ -58,7 +60,7 @@ namespace Gameplay.Tools.Systems
                 .AddTo(Disposables);
         }
 
-        private void DetectTool((IToolCard tool, IIngredientCard card) data)
+        private void DetectTool((ICard tool, ICard card) data)
         {
             var stack = _cardStackSystem.GetStack(data.card);
             if (stack == null) return;
@@ -81,7 +83,7 @@ namespace Gameplay.Tools.Systems
 
                 RecipeConfig matchedRecipe = null;
 
-                foreach (var recipeConfig in tool.RecipeConfigs)
+                foreach (var recipeConfig in _recipesStorage.RecipeConfigs)
                 {
                     if (CanCreateDish(recipeConfig.Ingredients, stack.Cards))
                     {
@@ -103,7 +105,7 @@ namespace Gameplay.Tools.Systems
             }
         }
 
-        private void CreateDishTask(IToolCard toolCard, RecipeConfig recipeConfig, List<IIngredientCard> cards)
+        private void CreateDishTask(ICard toolCard, RecipeConfig recipeConfig, List<ICard> cards)
         {
             CancelCreateTask(toolCard);
 
@@ -138,12 +140,12 @@ namespace Gameplay.Tools.Systems
             _activeCreateTasks[toolCard] = new TweenData(recipeConfig, tween);
         }
 
-        private static bool CanCreateDish(IngredientConfig[] ingredients, IReadOnlyList<IIngredientCard> cards)
+        private static bool CanCreateDish(CardConfig[] ingredients, IReadOnlyList<ICard> cards)
         {
             if (ingredients == null || cards == null) return false;
             if (ingredients.Length != cards.Count) return false;
 
-            Dictionary<IngredientConfig, int> cachedIngredients = new();
+            Dictionary<CardConfig, int> cachedIngredients = new();
 
             foreach (var ingredient in ingredients)
             {
@@ -155,7 +157,7 @@ namespace Gameplay.Tools.Systems
 
             foreach (var card in cards)
             {
-                var config = card.IngredientConfig;
+                var config = card.CardConfig;
                 if (!cachedIngredients.TryGetValue(config, out var count))
                     return false;
 
@@ -168,7 +170,7 @@ namespace Gameplay.Tools.Systems
             return true;
         }
 
-        private void CancelCreateTask(IToolCard toolCard)
+        private void CancelCreateTask(ICard toolCard)
         {
             if (_activeCreateTasks.TryGetValue(toolCard, out var data))
             {

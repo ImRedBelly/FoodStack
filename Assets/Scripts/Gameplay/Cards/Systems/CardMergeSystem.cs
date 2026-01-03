@@ -38,14 +38,14 @@ namespace Gameplay.Cards.Systems
                 .AddTo(Disposables);
         }
 
-        private void StartDrag(IIngredientCard draggedIngredientCard)
+        private void StartDrag(ICard draggedIngredientCard)
         {
             _dragOriginStack = _cardStackSystem.GetStack(draggedIngredientCard);
             _cardStackSystem.DetachSubStack(draggedIngredientCard);
         }
 
 
-        private void EndDrag((IIngredientCard draggedIngredientCard, IIngredientCard targetIngredientCard) data)
+        private void EndDrag((ICard draggedIngredientCard, ICard targetIngredientCard) data)
         {
             bool merged = TryMerge(data.draggedIngredientCard, data.targetIngredientCard);
 
@@ -57,7 +57,7 @@ namespace Gameplay.Cards.Systems
             _dragOriginStack = null;
         }
 
-        private bool DroppedOnOriginStack(IIngredientCard draggedIngredientCard)
+        private bool DroppedOnOriginStack(ICard draggedIngredientCard)
         {
             if (_dragOriginStack == null)
                 return false;
@@ -72,23 +72,23 @@ namespace Gameplay.Cards.Systems
         }
 
 
-        private bool TryMerge(IIngredientCard draggedIngredientCard, IIngredientCard targetIngredientCard)
+        private bool TryMerge(ICard draggedCard, ICard targetCard)
         {
-            if (targetIngredientCard == draggedIngredientCard) return false;
+            if (targetCard == draggedCard) return false;
 
-            var targetStack = _cardStackSystem.GetStack(targetIngredientCard);
+            var targetStack = _cardStackSystem.GetStack(targetCard);
 
-            _cardStackSystem.MergeStacks(draggedIngredientCard, targetStack);
+            _cardStackSystem.MergeStacks(draggedCard, targetStack);
             return true;
         }
 
-        private bool IsOverlapping(IIngredientCard draggedIngredientCard, IIngredientCard other)
+        private bool IsOverlapping(ICard draggedCard, ICard other)
         {
-            var draggedStack = _cardStackSystem.GetStack(draggedIngredientCard);
+            var draggedStack = _cardStackSystem.GetStack(draggedCard);
             if (draggedStack != null && draggedStack == _cardStackSystem.GetStack(other))
                 return false;
 
-            return draggedIngredientCard.Collider.bounds.Intersects(other.Collider.bounds);
+            return draggedCard.Collider.bounds.Intersects(other.Collider.bounds);
         }
     }
 }

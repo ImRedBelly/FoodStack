@@ -1,20 +1,23 @@
-﻿using System;
-using Gameplay.Cards.Configs;
+﻿using Gameplay.Cards.Configs;
 using UnityEngine;
 
 namespace Gameplay.Cards.Interfaces
 {
-    public interface IIngredientCard : IDisposable
+    public interface ICard
     {
         Transform Transform { get; }
         Transform Container { get; }
         Collider2D Collider { get; }
-        IngredientConfig IngredientConfig { get; }
-        
-        void OnDragStart();
+        CardConfig CardConfig { get; }
+
         void OnDragEnd();
+        void OnDragStart();
+        bool CanDrag();
+
         void UpdateSortingOrder();
         void SetStateEligibleFrame(bool state);
         void SetStateFlame(bool state);
+        void SetStateSlider(bool state);
+        void SetProgress(float progress);
     }
 }

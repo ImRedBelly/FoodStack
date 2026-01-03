@@ -1,12 +1,10 @@
 ﻿using Core;
 using Gameplay.Cards.Interfaces;
-using Gameplay.Cards.Systems;
-using Gameplay.Tools.Interfaces;
 using Support;
 using UniRx;
 using UnityEngine;
 
-namespace Gameplay.Tools.Systems
+namespace Gameplay.Cards.Systems
 {
     public class SetupStackPositionInToolSystem : DisposableClass
     {
@@ -27,13 +25,13 @@ namespace Gameplay.Tools.Systems
         protected override void OnInit()
         {
             base.OnInit();
-
+            
             _cardCollisionSystem.OnCardCollisionWithTool
                 .SafeSubscribe(DetectTool)
                 .AddTo(Disposables);
         }
 
-        private void DetectTool((IToolCard tool, IIngredientCard card) data)
+        private void DetectTool((ICard tool, ICard card) data)
         {
             var stack = _cardStackSystem.GetStack(data.card);
             if (stack == null) return;

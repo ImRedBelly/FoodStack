@@ -2,7 +2,6 @@
 using Gameplay.Cards.Configs;
 using Gameplay.Clients.Configs;
 using Gameplay.Recipes.Configs;
-using Gameplay.Tools.Configs;
 using UnityEngine;
 
 namespace Gameplay.Level.Configs
@@ -17,8 +16,8 @@ namespace Gameplay.Level.Configs
     [Serializable]
     public struct LevelData
     {
-        public ToolConfig[] ToolCards;
-        public IngredientConfig[] IngredientCards;
+        public CardConfig[] ToolCards;
+        public CardConfig[] IngredientCards;
         public OrderQueue[] OrderQueue;
         public float LevelTime;
         public DifficultyType DifficultyType;
