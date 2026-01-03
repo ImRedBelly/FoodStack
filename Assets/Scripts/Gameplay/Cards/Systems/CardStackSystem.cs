@@ -80,6 +80,7 @@ namespace Gameplay.Cards.Systems
             }
 
             _stacks.Add(newStack);
+
             _onUpdateStacks?.OnNext(Unit.Default);
         }
 

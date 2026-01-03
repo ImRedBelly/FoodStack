@@ -235,7 +235,7 @@ namespace GameLoop.Roots
                     0f
                 );
 
-                _cardFactory.CreateIngredient(startCards[i], position);
+                _cardFactory.CreateCard(startCards[i], position);
             }
         }
 
@@ -244,7 +244,7 @@ namespace GameLoop.Roots
             var tools = _levelsConfig.GetLevelData(SaveUtility.Level).ToolCards;
             foreach (var tool in tools)
             {
-                _cardFactory.CreateTool(tool, Vector3.up * 2);
+                _cardFactory.CreateCard(tool, Vector3.up * 2);
             }
         }
 

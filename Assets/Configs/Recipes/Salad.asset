@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: befc3375c3914d8ba33e7729bb1dab64, type: 3}
-  m_Name: FriedSausage
+  m_Name: Salad
   m_EditorClassIdentifier: 
-  <Name>k__BackingField: FriedSausage
+  <Name>k__BackingField: Salad
   <CreateTime>k__BackingField: 2
-  <InfoIcon>k__BackingField: {fileID: 21300000, guid: 76d677096ad50de42b6d7955f5a13787, type: 3}
-  <WithBurn>k__BackingField: 1
+  <InfoIcon>k__BackingField: {fileID: 21300000, guid: 56552f33fbe4239408957f959464e814, type: 3}
+  <WithBurn>k__BackingField: 0
   <Ingredients>k__BackingField:
-  - {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
-  - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
-  <Result>k__BackingField: {fileID: 11400000, guid: 9fe36f86009ce4a56b1215a09d1f2edb, type: 2}
+  - {fileID: 11400000, guid: 11004bcac69820c44a491b7ef326fa52, type: 2}
+  - {fileID: 11400000, guid: ec838ee8855394344b653c19cdc5c895, type: 2}
+  <Result>k__BackingField: {fileID: 11400000, guid: a8c4d536c4a62da4dbac4118410f015d, type: 2}

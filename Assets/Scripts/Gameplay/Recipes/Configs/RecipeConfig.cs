@@ -9,7 +9,8 @@ namespace Gameplay.Recipes.Configs
         [field: SerializeField] public string Name { get; private set; }
         [field: SerializeField] public float CreateTime { get; private set; } = 2;
         [field: SerializeField] public Sprite InfoIcon { get; private set; }
-        [field: Space] 
+        [field: SerializeField] public bool WithBurn { get; private set; } = true;
+        [field: Space]
         [field: SerializeField] public CardConfig[] Ingredients { get; private set; }
         [field: SerializeField] public CardConfig Result { get; private set; }
 

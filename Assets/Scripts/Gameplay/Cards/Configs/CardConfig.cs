@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Gameplay.Cards.Types;
+using UnityEngine;
 
 namespace Gameplay.Cards.Configs
 {
@@ -7,6 +8,6 @@ namespace Gameplay.Cards.Configs
     {
         [field: SerializeField] public string Name { get; private set; }
         [field: SerializeField] public Sprite Sprite { get; private set; }
-        [field: SerializeField] public bool CanDrag { get; private set; } = true;
+        [field: SerializeField] public CardType CardType { get; private set; }
     }
 }

@@ -62,7 +62,7 @@ namespace Gameplay.Cards.Systems
             float minPositionY = float.MaxValue;
             foreach (var hit in allCards)
             {
-                if (hit.collider.TryGetComponent<ICard>(out var card) && card.CanDrag())
+                if (hit.collider.TryGetComponent<ICard>(out var card))
                 {
                     if (hit.collider.transform.position.y < minPositionY)
                     {

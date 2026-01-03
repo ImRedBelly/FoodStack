@@ -1,10 +1,12 @@
 ﻿using Gameplay.Cards.Configs;
+using Gameplay.Cards.Types;
 using UnityEngine;
 
 namespace Gameplay.Cards.Interfaces
 {
     public interface ICard
     {
+        CardType CardType { get; }
         Transform Transform { get; }
         Transform Container { get; }
         Collider2D Collider { get; }
@@ -12,7 +14,6 @@ namespace Gameplay.Cards.Interfaces
 
         void OnDragEnd();
         void OnDragStart();
-        bool CanDrag();
 
         void UpdateSortingOrder();
         void SetStateEligibleFrame(bool state);

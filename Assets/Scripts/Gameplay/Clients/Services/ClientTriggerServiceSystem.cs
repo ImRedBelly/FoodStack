@@ -70,7 +70,7 @@ namespace Gameplay.Clients.Services
             {
                 if (target == data.ingredientCard.CardConfig)
                 {
-                    _cardFactory.RemoveIngredient(data.ingredientCard);
+                    _cardFactory.RemoveCard(data.ingredientCard);
                     _onClientTriggerService?.OnNext(data.clientCard);
                 }
             }

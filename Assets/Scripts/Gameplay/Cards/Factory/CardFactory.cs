@@ -12,11 +12,9 @@ namespace Gameplay.Cards.Factory
     {
         public IObservable<ICard> OnCardCreated => _onCardCreated;
         public IObservable<ICard> OnCardRemoved => _onCardRemoved;
-        public IObservable<ICard> OnToolCreated => _onToolCreated;
 
         private readonly Subject<ICard> _onCardCreated = new();
         private readonly Subject<ICard> _onCardRemoved = new();
-        private readonly Subject<ICard> _onToolCreated = new();
 
         private readonly Card _cardPrefab;
 
@@ -32,10 +30,9 @@ namespace Gameplay.Cards.Factory
 
             _onCardCreated.AddTo(Disposables);
             _onCardRemoved.AddTo(Disposables);
-            _onToolCreated.AddTo(Disposables);
         }
 
-        public void CreateIngredient(CardConfig config, Vector3 position)
+        public void CreateCard(CardConfig config, Vector3 position)
         {
             var card = Object.Instantiate(_cardPrefab, position, Quaternion.identity);
             card.name = config.Name;
@@ -44,18 +41,10 @@ namespace Gameplay.Cards.Factory
             _onCardCreated?.OnNext(card);
         }
 
-        public void RemoveIngredient(ICard card)
+        public void RemoveCard(ICard card)
         {
             _onCardRemoved?.OnNext(card);
             Object.Destroy(card.Transform.gameObject);
-        }
-
-        public void CreateTool(CardConfig config, Vector3 position)
-        {
-            var tool = Object.Instantiate(_cardPrefab, position, Quaternion.identity);
-            tool.name = config.Name;
-            tool.Init(new Card.Model(config));
-            _onToolCreated?.OnNext(tool);
         }
     }
 }

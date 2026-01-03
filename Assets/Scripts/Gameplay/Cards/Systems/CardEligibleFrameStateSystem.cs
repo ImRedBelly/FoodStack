@@ -15,9 +15,9 @@ namespace Gameplay.Cards.Systems
         private readonly CardStackSystem _cardStackSystem;
 
         private readonly List<ICard> _cards = new();
-        private readonly List<ICard> _tools = new();
 
-        public CardEligibleFrameStateSystem(CardFactory cardFactory, CardDragSystem dragSystem, CardStackSystem cardStackSystem)
+        public CardEligibleFrameStateSystem(CardFactory cardFactory, CardDragSystem dragSystem,
+            CardStackSystem cardStackSystem)
         {
             _cardFactory = cardFactory;
             _dragSystem = dragSystem;
@@ -34,10 +34,6 @@ namespace Gameplay.Cards.Systems
 
             _cardFactory.OnCardRemoved
                 .SafeSubscribe(RemoveCard)
-                .AddTo(Disposables);
-
-            _cardFactory.OnToolCreated
-                .SafeSubscribe(AddTool)
                 .AddTo(Disposables);
 
             _dragSystem.OnEndDrag
@@ -66,21 +62,10 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void AddTool(ICard newToolCard)
-        {
-            if (!_tools.Contains(newToolCard))
-            {
-                _tools.Add(newToolCard);
-            }
-        }
-
         private void StartDrag(ICard draggedIngredientCard)
         {
             foreach (var card in _cards)
                 card.SetStateEligibleFrame(TryActivateEligibleFrame(draggedIngredientCard, card));
-
-            foreach (var tool in _tools)
-                tool.SetStateEligibleFrame(true);
         }
 
 
@@ -88,9 +73,6 @@ namespace Gameplay.Cards.Systems
         {
             foreach (var card in _cards)
                 card.SetStateEligibleFrame(false);
-
-            foreach (var tool in _tools)
-                tool.SetStateEligibleFrame(false);
         }
 
         private bool TryActivateEligibleFrame(ICard draggedIngredientCard, ICard targetIngredientCard)

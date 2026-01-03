@@ -15,12 +15,10 @@ namespace Gameplay.Cards.Systems
     public class CardCollisionSystem : DisposableClass
     {
         public IObservable<(ICard, ICard)> OnCardCollisionWithCard => _onCardCollisionWithCard;
-        public IObservable<(ICard, ICard)> OnCardCollisionWithTool => _onCardCollisionWithTool;
         public IObservable<(IClientCard, ICard)> OnCardCollisionWithClient => _onCardCollisionWithClient;
         public IObservable<ICard> OnCardDropWithoutMerge => _onCardDropWithoutMerge;
 
         private readonly Subject<(ICard, ICard)> _onCardCollisionWithCard = new();
-        private readonly Subject<(ICard, ICard)> _onCardCollisionWithTool = new();
         private readonly Subject<(IClientCard, ICard)> _onCardCollisionWithClient = new();
         private readonly Subject<ICard> _onCardDropWithoutMerge = new();
 
@@ -30,7 +28,6 @@ namespace Gameplay.Cards.Systems
         private readonly CardStackSystem _cardStackSystem;
 
         private readonly List<ICard> _cards = new();
-        private readonly List<ICard> _tools = new();
         private readonly List<IClientCard> _clients = new();
 
 
@@ -51,7 +48,6 @@ namespace Gameplay.Cards.Systems
             base.OnInit();
 
             _onCardCollisionWithCard.AddTo(Disposables);
-            _onCardCollisionWithTool.AddTo(Disposables);
             _onCardCollisionWithClient.AddTo(Disposables);
             _onCardDropWithoutMerge.AddTo(Disposables);
 
@@ -69,10 +65,6 @@ namespace Gameplay.Cards.Systems
 
             _clientFactory.OnClientRemoved
                 .SafeSubscribe(RemoveClient)
-                .AddTo(Disposables);
-
-            _cardFactory.OnToolCreated
-                .SafeSubscribe(AddTool)
                 .AddTo(Disposables);
 
             _dragSystem.OnEndDrag
@@ -112,14 +104,6 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void AddTool(ICard newToolCard)
-        {
-            if (!_tools.Contains(newToolCard))
-            {
-                _tools.Add(newToolCard);
-            }
-        }
-
         private void EndDrag(ICard draggedIngredientCard)
         {
             var dragStack = _cardStackSystem.GetStack(draggedIngredientCard);
@@ -130,14 +114,6 @@ namespace Gameplay.Cards.Systems
                 if (IsOverlapping(draggedIngredientCard, card))
                 {
                     _onCardCollisionWithCard.OnNext((draggedIngredientCard, card));
-                }
-            }
-
-            foreach (var tool in _tools)
-            {
-                if (IsOverlapping(draggedIngredientCard, tool))
-                {
-                    _onCardCollisionWithTool.OnNext((tool, draggedIngredientCard));
                 }
             }
 

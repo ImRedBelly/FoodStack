@@ -63,17 +63,17 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void CardDropWithoutMerge(ICard draggedIngredientCard)
+        private void CardDropWithoutMerge(ICard draggedCard)
         {
-            var dragStack = _cardStackSystem.GetStack(draggedIngredientCard);
-            var draggedBounds = draggedIngredientCard.Collider.bounds;
+            var dragStack = _cardStackSystem.GetStack(draggedCard);
+            var draggedBounds = draggedCard.Collider.bounds;
             if (!IsWithinZone(draggedBounds.center))
             {
                 var clampedPosition = ClampToZone(draggedBounds.center, dragStack.Cards.Count);
-                var draggedStack = _cardStackSystem.GetStack(draggedIngredientCard);
+                var draggedStack = _cardStackSystem.GetStack(draggedCard);
                 _cardStackMoveSystem.UpdateWorldPositions(
                     draggedStack,
-                    draggedIngredientCard,
+                    draggedCard,
                     clampedPosition,
                     Constants.MaxDragSpeed);
                 return;
@@ -81,14 +81,14 @@ namespace Gameplay.Cards.Systems
 
             foreach (var otherCard in _cards)
             {
-                if (otherCard == draggedIngredientCard) continue;
+                if (otherCard == draggedCard) continue;
                 if (dragStack.Cards.Contains(otherCard)) continue;
 
-                if (IsIntersecting(draggedIngredientCard, otherCard))
+                if (IsIntersecting(draggedCard, otherCard))
                 {
                     var otherCardStack = _cardStackSystem.GetStack(otherCard);
 
-                    Vector3 targetPosition = FindFreePosition(draggedIngredientCard, otherCard);
+                    Vector3 targetPosition = FindFreePosition(draggedCard, otherCard);
                     targetPosition = ClampToZone(targetPosition, otherCardStack.Cards.Count);
                     
                     _cardStackMoveSystem.UpdateWorldPositions(otherCardStack, otherCard, targetPosition, Constants.MaxDragSpeed);

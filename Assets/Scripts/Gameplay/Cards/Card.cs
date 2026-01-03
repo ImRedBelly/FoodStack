@@ -2,6 +2,7 @@ using Core;
 using Gameplay.Cards.Configs;
 using Gameplay.Cards.Handlers;
 using Gameplay.Cards.Interfaces;
+using Gameplay.Cards.Types;
 using UnityEngine;
 
 namespace Gameplay.Cards
@@ -18,6 +19,7 @@ namespace Gameplay.Cards
             }
         }
 
+        public CardType CardType => ActiveModel.Config.CardType;
         public Transform Transform => transform;
         public Transform Container => _container;
         public Collider2D Collider => _collider2D;
@@ -42,11 +44,6 @@ namespace Gameplay.Cards
         {
             _viewHandler.SetSortingOrder(Constants.DragSortingOrder);
             _viewHandler.SetStateShadow(true);
-        }
-
-        public bool CanDrag()
-        {
-            return ActiveModel.Config.CanDrag;
         }
 
         public virtual void OnDragEnd()

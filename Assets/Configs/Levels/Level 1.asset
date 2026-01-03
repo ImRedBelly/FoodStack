@@ -21,6 +21,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: e5a15839b2e54d941b54eb2ce6c52caf, type: 2}
     - {fileID: 11400000, guid: a71bb69b67a8bc242b52543be1c99f6e, type: 2}
     - {fileID: 11400000, guid: 50c9acf77dba91949a1efe566fffb111, type: 2}
+    - {fileID: 11400000, guid: ec838ee8855394344b653c19cdc5c895, type: 2}
+    - {fileID: 11400000, guid: 11004bcac69820c44a491b7ef326fa52, type: 2}
     OrderQueue:
     - ClientConfig: {fileID: 11400000, guid: af4a5cfe77f3e42f7bb52418d1e1f76d, type: 2}
       RecipeConfig: {fileID: 11400000, guid: 37212f132c55ade46bcee60f9cebf3bf, type: 2}

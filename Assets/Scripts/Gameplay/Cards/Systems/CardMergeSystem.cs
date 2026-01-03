@@ -28,7 +28,6 @@ namespace Gameplay.Cards.Systems
         {
             base.OnInit();
 
-
             _cardCollisionSystem.OnCardCollisionWithCard
                 .SafeSubscribe(EndDrag)
                 .AddTo(Disposables);
@@ -43,28 +42,27 @@ namespace Gameplay.Cards.Systems
             _dragOriginStack = _cardStackSystem.GetStack(draggedIngredientCard);
             _cardStackSystem.DetachSubStack(draggedIngredientCard);
         }
-
-
-        private void EndDrag((ICard draggedIngredientCard, ICard targetIngredientCard) data)
+        
+        private void EndDrag((ICard draggedCard, ICard targetCard) data)
         {
-            bool merged = TryMerge(data.draggedIngredientCard, data.targetIngredientCard);
+            bool merged = TryMerge(data.draggedCard, data.targetCard);
 
-            if (!merged && DroppedOnOriginStack(data.draggedIngredientCard))
+            if (!merged && DroppedOnOriginStack(data.draggedCard))
             {
-                _cardStackSystem.RestoreDetachedStack(data.draggedIngredientCard);
+                _cardStackSystem.RestoreDetachedStack(data.draggedCard);
             }
 
             _dragOriginStack = null;
         }
 
-        private bool DroppedOnOriginStack(ICard draggedIngredientCard)
+        private bool DroppedOnOriginStack(ICard draggedCard)
         {
             if (_dragOriginStack == null)
                 return false;
 
             foreach (var card in _dragOriginStack.Cards)
             {
-                if (IsOverlapping(draggedIngredientCard, card))
+                if (IsOverlapping(draggedCard, card))
                     return true;
             }
 

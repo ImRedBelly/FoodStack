@@ -6,6 +6,7 @@ using Gameplay.Cards.Configs;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
 using Gameplay.Cards.Systems;
+using Gameplay.Cards.Types;
 using Gameplay.Recipes.Configs;
 using Support;
 using UniRx;
@@ -51,7 +52,7 @@ namespace Gameplay.Recipes.Services
         {
             base.OnInit();
 
-            _cardCollisionSystem.OnCardCollisionWithTool
+            _cardCollisionSystem.OnCardCollisionWithCard
                 .SafeSubscribe(DetectTool)
                 .AddTo(Disposables);
 
@@ -109,30 +110,41 @@ namespace Gameplay.Recipes.Services
         {
             CancelCreateTask(toolCard);
 
+            var firstCard = cards.First();
             var lastCard = cards.Last();
-            toolCard.SetStateSlider(true);
-            lastCard.SetStateFlame(true);
+            firstCard.SetStateSlider(true);
+            lastCard.SetStateFlame(recipeConfig.WithBurn);
 
             var tween = DOVirtual
-                .Float(0, 1, recipeConfig.CreateTime, toolCard.SetProgress)
+                .Float(0, 1, recipeConfig.CreateTime, firstCard.SetProgress)
                 .OnComplete(() =>
                 {
                     _toolToStack.Remove(toolCard);
 
-                    toolCard.SetStateSlider(false);
+                    firstCard.SetStateSlider(false);
                     lastCard.SetStateFlame(false);
 
                     _activeCreateTasks.Remove(toolCard);
-                    _cardFactory.CreateIngredient(recipeConfig.Result, Vector3.zero);
+                    _cardFactory.CreateCard(recipeConfig.Result, Vector3.zero);
 
+                    List<ICard> removeCards = new List<ICard>();
                     foreach (var card in cards)
                     {
-                        _cardFactory.RemoveIngredient(card);
+                        if (card.CardType == CardType.Consumable)
+                        {
+                            removeCards.Add(card);
+                            _cardFactory.RemoveCard(card);
+                        }
+                    }
+
+                    foreach (var card in removeCards)
+                    {
+                        _cardStackSystem.DetachSubStack(card);
                     }
                 })
                 .OnKill(() =>
                 {
-                    toolCard.SetStateSlider(false);
+                    firstCard.SetStateSlider(false);
                     lastCard.SetStateFlame(false);
                     _activeCreateTasks.Remove(toolCard);
                 });

@@ -26,9 +26,9 @@ namespace Gameplay.Cards.Systems
         {
             base.OnInit();
             
-            _cardCollisionSystem.OnCardCollisionWithTool
-                .SafeSubscribe(DetectTool)
-                .AddTo(Disposables);
+            // _cardCollisionSystem.OnCardCollisionWithTool
+            //     .SafeSubscribe(DetectTool)
+            //     .AddTo(Disposables);
         }
 
         private void DetectTool((ICard tool, ICard card) data)
