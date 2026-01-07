@@ -52,6 +52,10 @@ namespace Gameplay.Recipes.Services
         {
             base.OnInit();
 
+            _cardCollisionSystem.OnCardDropWithoutMerge
+                .SafeSubscribe(DropWithoutMerge)
+                .AddTo(Disposables);
+
             _cardCollisionSystem.OnCardCollisionWithCard
                 .SafeSubscribe(DetectTool)
                 .AddTo(Disposables);
@@ -61,12 +65,23 @@ namespace Gameplay.Recipes.Services
                 .AddTo(Disposables);
         }
 
-        private void DetectTool((ICard tool, ICard card) data)
+        private void DropWithoutMerge(ICard card)
         {
-            var stack = _cardStackSystem.GetStack(data.card);
+            var stack = _cardStackSystem.GetStack(card);
             if (stack == null) return;
+            var tool = stack.Cards.First();
 
-            _toolToStack[data.tool] = stack;
+            _toolToStack[tool] = stack;
+            TryCreateDish();
+        }
+
+        private void DetectTool((ICard card1, ICard card2) data)
+        {
+            var stack = _cardStackSystem.GetStack(data.card1);
+            if (stack == null) return;
+            var tool = stack.Cards.First();
+
+            _toolToStack[tool] = stack;
             TryCreateDish();
         }
 
@@ -139,7 +154,7 @@ namespace Gameplay.Recipes.Services
 
                     foreach (var card in removeCards)
                     {
-                        _cardStackSystem.DetachSubStack(card);
+                        _cardStackSystem.RemoveCardFromStack(card);
                     }
                 })
                 .OnKill(() =>

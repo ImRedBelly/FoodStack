@@ -84,6 +84,12 @@ namespace Gameplay.Cards.Systems
             _onUpdateStacks?.OnNext(Unit.Default);
         }
 
+        public void RemoveCardFromStack(ICard card)
+        {
+            var stack = GetStack(card);
+            stack.Cards.Remove(card);
+        }
+
         public void RestoreDetachedStack(ICard root)
         {
             if (_lastSourceStack == null || _lastDetachedCards == null)
