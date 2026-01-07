@@ -11,16 +11,19 @@ namespace Windows
     {
         public class Model
         {
+            public readonly Action OnClickResume;
             public readonly Action OnClickReload;
             public readonly Action OnClickUpgrade;
             public readonly WindowsService WindowsService;
 
 
             public Model(
+                Action onClickResume,
                 Action onClickReload,
                 Action onClickUpgrade,
                 WindowsService windowsService)
             {
+                OnClickResume = onClickResume;
                 OnClickReload = onClickReload;
                 OnClickUpgrade = onClickUpgrade;
                 WindowsService = windowsService;
@@ -45,7 +48,11 @@ namespace Windows
 
             _buttonResume
                 .OnClickAsObservable()
-                .SafeSubscribe(_ => { ActiveModel.WindowsService.Close(); })
+                .SafeSubscribe(_ =>
+                {
+                    ActiveModel.OnClickResume?.Invoke();
+                    ActiveModel.WindowsService.Close();
+                })
                 .AddTo(Disposables);
 
             _buttonUpgrade

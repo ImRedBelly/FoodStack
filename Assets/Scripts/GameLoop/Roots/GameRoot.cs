@@ -8,6 +8,8 @@ using Gameplay.Cards.Systems;
 using Gameplay.Clients;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Services;
+using Gameplay.Level.Handlers;
+using Gameplay.Level.Systems;
 using Gameplay.OrderButton;
 using Gameplay.OrderButton.Factory;
 using Gameplay.OrderButton.Services;
@@ -23,24 +25,30 @@ namespace GameLoop.Roots
     public class GameRoot : DisposableBehaviour<LobbyRoot.Model>
     {
         [SerializeField] private Camera _camera;
+        [SerializeField] private GraphicRaycaster _graphicRaycaster;
         [SerializeField] private LayerMask _cardLayer;
-        [Space]
+        [Space] 
         [SerializeField] private Button _quitButton;
         [SerializeField] private Button _pauseButton;
 
+        [Space] [Header("UI")] 
+        [SerializeField] private DaySliderHandler _daySliderHandler;
+        
         [Space] [Header("Prefabs")]
         [SerializeField] private Card _cardPrefab;
         [SerializeField] private ClientCard clientCardPrefab;
         [SerializeField] private OrderButton orderButtonPrefab;
 
-        [Space] [Header("Data")]
+        [Space] [Header("Data")] 
         [SerializeField] private RecipeConfig[] _recipeConfigs;
-        
-        [Space] [Header("Debug Data")]
+
+        [Space] [Header("Debug Data")] 
         [SerializeField] private LevelsConfig _levelsConfig;
 
         private RecipesStorage _recipesStorage;
-        
+
+        private PauseGameSystem _pauseGameSystem;
+
         private CardDragSystem _cardDragSystem;
         private CardCollisionSystem _cardCollisionSystem;
         private CardStackSystem _cardStackSystem;
@@ -57,6 +65,7 @@ namespace GameLoop.Roots
             base.OnInit();
             InitWindows();
             InitFactories();
+            InitLevelSystems();
 
 
             InitOrderButtonsSystems();
@@ -76,11 +85,17 @@ namespace GameLoop.Roots
 
         private void InitWindows()
         {
-            var pausePopupModel = ActiveModel.WindowResolver.GetPausePopupModel(ActiveModel.OnReload, () => { });
+            var pausePopupModel = ActiveModel.WindowResolver.GetPausePopupModel(
+                () => { _pauseGameSystem.SetStatePause(false); }, 
+                ActiveModel.OnReload, () => { });
 
             _pauseButton
                 .OnClickAsObservable()
-                .SafeSubscribe(_ => ActiveModel.WindowsService.Open(pausePopupModel, false))
+                .SafeSubscribe(_ =>
+                {
+                    _pauseGameSystem.SetStatePause(true);
+                    ActiveModel.WindowsService.Open(pausePopupModel, false);
+                })
                 .AddTo(Disposables);
 
             _quitButton
@@ -114,7 +129,7 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
         }
-        
+
         private void InitRecipesServices()
         {
             _recipesStorage = new RecipesStorage(_recipeConfigs);
@@ -126,7 +141,7 @@ namespace GameLoop.Roots
             _cardStackMoveSystem = new CardStackMoveSystem();
             _cardStackSystem = new CardStackSystem(_cardStackMoveSystem);
 
-            _cardDragSystem = new CardDragSystem(_camera, _cardLayer, _cardStackSystem, _cardStackMoveSystem);
+            _cardDragSystem = new CardDragSystem(_camera, _graphicRaycaster, _cardLayer, _cardStackSystem, _cardStackMoveSystem);
             _cardDragSystem
                 .Init()
                 .AddTo(Disposables);
@@ -167,7 +182,7 @@ namespace GameLoop.Roots
         private void InitToolsSystems()
         {
             CreateDishService createDishService =
-                new CreateDishService(_cardCollisionSystem, _cardStackSystem, _cardFactory, _recipesStorage);
+                new CreateDishService(_cardCollisionSystem, _cardStackSystem, _cardFactory, _recipesStorage, _pauseGameSystem);
             createDishService
                 .Init()
                 .AddTo(Disposables);
@@ -196,6 +211,21 @@ namespace GameLoop.Roots
             _clientOrderSystem = new ClientOrderSystem(_levelsConfig.GetLevelData(SaveUtility.Level), _clientFactory,
                 clientTriggerServiceSystem, clientServiceSystem, _orderButtonSelectSystem);
             _clientOrderSystem
+                .Init()
+                .AddTo(Disposables);
+        }
+
+
+        private void InitLevelSystems()
+        {
+            _pauseGameSystem = new PauseGameSystem();
+            
+            _pauseGameSystem
+                .Init()
+                .AddTo(Disposables);
+            
+            LevelTimerSystem levelTimerSystem = new LevelTimerSystem(_daySliderHandler, _levelsConfig.GetLevelData(SaveUtility.Level).LevelTime, _pauseGameSystem);
+            levelTimerSystem
                 .Init()
                 .AddTo(Disposables);
         }

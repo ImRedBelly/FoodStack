@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core;
 using Gameplay.Cards.Interfaces;
 using UniRx;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Gameplay.Cards.Systems
 {
@@ -25,10 +28,19 @@ namespace Gameplay.Cards.Systems
         private Vector3 _offsetClick;
         private IDisposable _dragDisposable;
 
+        private readonly GraphicRaycaster _graphicRaycaster;
+        private readonly EventSystem _eventSystem;
 
-        public CardDragSystem(Camera camera, LayerMask cardLayer, CardStackSystem cardStackSystem, CardStackMoveSystem cardStackMoveSystem)
+        private readonly List<RaycastResult> _uiRaycastResults = new();
+
+
+        public CardDragSystem(Camera camera, GraphicRaycaster graphicRaycaster,
+            LayerMask cardLayer, CardStackSystem cardStackSystem,
+            CardStackMoveSystem cardStackMoveSystem)
         {
             _camera = camera;
+            _graphicRaycaster = graphicRaycaster;
+            _eventSystem = EventSystem.current;
             _cardLayer = cardLayer;
             _cardStackSystem = cardStackSystem;
             _cardStackMoveSystem = cardStackMoveSystem;
@@ -108,6 +120,9 @@ namespace Gameplay.Cards.Systems
 
         private void UpdateCardPositions(float lerpSpeed, Vector3 offset)
         {
+            if (IsPointerOverUI())
+                return;
+
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
             var plane = new Plane(Vector3.forward, Vector3.zero);
 
@@ -119,6 +134,19 @@ namespace Gameplay.Cards.Systems
 
             var stack = _cardStackSystem.GetStack(_currentIngredientCard);
             _cardStackMoveSystem.UpdateWorldPositions(stack, basePos, lerpSpeed);
+        }
+
+        private bool IsPointerOverUI()
+        {
+            var eventData = new PointerEventData(_eventSystem)
+            {
+                position = Input.mousePosition
+            };
+
+            _uiRaycastResults.Clear();
+            _graphicRaycaster.Raycast(eventData, _uiRaycastResults);
+
+            return _uiRaycastResults.Count > 0;
         }
     }
 }

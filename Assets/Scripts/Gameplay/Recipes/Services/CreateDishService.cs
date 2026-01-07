@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core;
-using DG.Tweening;
 using Gameplay.Cards.Configs;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
 using Gameplay.Cards.Systems;
 using Gameplay.Cards.Types;
+using Gameplay.Level.Systems;
 using Gameplay.Recipes.Configs;
 using Support;
 using UniRx;
@@ -14,15 +15,15 @@ using UnityEngine;
 
 namespace Gameplay.Recipes.Services
 {
-    public struct TweenData
+    public struct CreateTaskData
     {
         public readonly RecipeConfig Recipe;
-        public readonly Tween Tween;
+        public readonly IDisposable Disposable;
 
-        public TweenData(RecipeConfig recipeConfig, Tweener tween)
+        public CreateTaskData(RecipeConfig recipe, IDisposable disposable)
         {
-            Recipe = recipeConfig;
-            Tween = tween;
+            Recipe = recipe;
+            Disposable = disposable;
         }
     }
 
@@ -32,20 +33,25 @@ namespace Gameplay.Recipes.Services
         private readonly CardStackSystem _cardStackSystem;
         private readonly CardFactory _cardFactory;
         private readonly RecipesStorage _recipesStorage;
+        private readonly PauseGameSystem _pauseGameSystem;
 
         private readonly Dictionary<ICard, CardStack> _toolToStack = new();
-        private readonly Dictionary<ICard, TweenData> _activeCreateTasks = new();
+        private readonly Dictionary<ICard, CreateTaskData> _activeCreateTasks = new();
+        
+        private bool _pauseState;
 
         public CreateDishService(
             CardCollisionSystem cardCollisionSystem,
             CardStackSystem cardStackSystem,
             CardFactory cardFactory,
-            RecipesStorage recipesStorage)
+            RecipesStorage recipesStorage,
+            PauseGameSystem pauseGameSystem)
         {
             _cardCollisionSystem = cardCollisionSystem;
             _cardStackSystem = cardStackSystem;
             _cardFactory = cardFactory;
             _recipesStorage = recipesStorage;
+            _pauseGameSystem = pauseGameSystem;
         }
 
         protected override void OnInit()
@@ -62,6 +68,10 @@ namespace Gameplay.Recipes.Services
 
             _cardStackSystem.OnUpdateStacks
                 .SafeSubscribe(UpdateStacks)
+                .AddTo(Disposables);
+
+            _pauseGameSystem.OnPauseGame
+                .SafeSubscribe(PauseGame)
                 .AddTo(Disposables);
         }
 
@@ -88,6 +98,11 @@ namespace Gameplay.Recipes.Services
         private void UpdateStacks(Unit unit)
         {
             TryCreateDish();
+        }
+
+        private void PauseGame(bool pauseState)
+        {
+            _pauseState = pauseState;
         }
 
         private void TryCreateDish()
@@ -127,44 +142,50 @@ namespace Gameplay.Recipes.Services
 
             var firstCard = cards.First();
             var lastCard = cards.Last();
+
             firstCard.SetStateSlider(true);
             lastCard.SetStateFlame(recipeConfig.WithBurn);
 
-            var tween = DOVirtual
-                .Float(0, 1, recipeConfig.CreateTime, firstCard.SetProgress)
-                .OnComplete(() =>
-                {
-                    _toolToStack.Remove(toolCard);
+            float elapsedTime = 0f;
 
-                    firstCard.SetStateSlider(false);
-                    lastCard.SetStateFlame(false);
-
-                    _activeCreateTasks.Remove(toolCard);
-                    _cardFactory.CreateCard(recipeConfig.Result, Vector3.zero);
-
-                    List<ICard> removeCards = new List<ICard>();
-                    foreach (var card in cards)
+            var disposable = Observable
+                .EveryUpdate()
+                .Where(_ => !_pauseState)
+                .TakeWhile(_ => elapsedTime < recipeConfig.CreateTime)
+                .Subscribe(
+                    _ =>
                     {
-                        if (card.CardType == CardType.Consumable)
+                        elapsedTime += Time.deltaTime;
+                        float progress = Mathf.Clamp01(elapsedTime / recipeConfig.CreateTime);
+                        firstCard.SetProgress(progress);
+                    },
+                    () =>
+                    {
+                        _toolToStack.Remove(toolCard);
+
+                        firstCard.SetStateSlider(false);
+                        lastCard.SetStateFlame(false);
+
+                        _activeCreateTasks.Remove(toolCard);
+                        _cardFactory.CreateCard(recipeConfig.Result, Vector3.zero);
+
+                        List<ICard> removeCards = new();
+                        foreach (var card in cards)
                         {
-                            removeCards.Add(card);
-                            _cardFactory.RemoveCard(card);
+                            if (card.CardType == CardType.Consumable)
+                            {
+                                removeCards.Add(card);
+                                _cardFactory.RemoveCard(card);
+                            }
                         }
-                    }
 
-                    foreach (var card in removeCards)
-                    {
-                        _cardStackSystem.RemoveCardFromStack(card);
-                    }
-                })
-                .OnKill(() =>
-                {
-                    firstCard.SetStateSlider(false);
-                    lastCard.SetStateFlame(false);
-                    _activeCreateTasks.Remove(toolCard);
-                });
+                        foreach (var card in removeCards)
+                        {
+                            _cardStackSystem.RemoveCardFromStack(card);
+                        }
+                    });
 
-            _activeCreateTasks[toolCard] = new TweenData(recipeConfig, tween);
+            _activeCreateTasks[toolCard] = new CreateTaskData(recipeConfig, disposable);
         }
 
         private static bool CanCreateDish(CardConfig[] ingredients, IReadOnlyList<ICard> cards)
@@ -201,8 +222,16 @@ namespace Gameplay.Recipes.Services
         {
             if (_activeCreateTasks.TryGetValue(toolCard, out var data))
             {
-                data.Tween.Kill();
+                data.Disposable.Dispose();
+
                 _activeCreateTasks.Remove(toolCard);
+
+                var stack = _cardStackSystem.GetStack(toolCard);
+                if (stack != null)
+                {
+                    stack.Cards.First().SetStateSlider(false);
+                    stack.Cards.Last().SetStateFlame(false);
+                }
             }
         }
     }

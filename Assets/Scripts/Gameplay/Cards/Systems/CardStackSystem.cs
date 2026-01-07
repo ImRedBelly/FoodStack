@@ -29,7 +29,6 @@ namespace Gameplay.Cards.Systems
             _cardStackMoveSystem = cardStackMoveSystem;
         }
 
-
         public CardStack GetStack(ICard card)
         {
             return _cardToStack.TryGetValue(card, out CardStack stack) ? stack : CreateStack(card);

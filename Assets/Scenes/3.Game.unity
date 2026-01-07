@@ -404,7 +404,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -42.599976, y: -42.089966}
+  m_AnchoredPosition: {x: -42.599976, y: -42.089844}
   m_SizeDelta: {x: 60.73, y: 58.64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &201417938
@@ -653,11 +653,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _camera: {fileID: 1556339276}
+  _graphicRaycaster: {fileID: 5765009931093322233}
   _cardLayer:
     serializedVersion: 2
     m_Bits: 8
   _quitButton: {fileID: 332112253}
   _pauseButton: {fileID: 201417938}
+  _daySliderHandler: {fileID: 1339414432}
   _cardPrefab: {fileID: 1544634973983324521, guid: b3b55a921a629794299f02e44e4fa8e3, type: 3}
   clientCardPrefab: {fileID: 7033583315055903008, guid: bac565fc065b147d2b0cff73fb745340, type: 3}
   orderButtonPrefab: {fileID: 1758640531195232588, guid: 38e28ef39c4ff2b48ba2db2430393cd8, type: 3}
@@ -717,7 +719,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 43, y: -42.400024}
+  m_AnchoredPosition: {x: 43, y: -42.399902}
   m_SizeDelta: {x: 60.72998, y: 58.64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &332112253
@@ -1309,7 +1311,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0.33, y: -33.069946}
+  m_AnchoredPosition: {x: -0.33, y: -33.069824}
   m_SizeDelta: {x: 365.5, y: 50.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1339414430
@@ -1321,6 +1323,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1339414431}
+  - component: {fileID: 1339414432}
   m_Layer: 5
   m_Name: DaySlider
   m_TagString: Untagged
@@ -1351,6 +1354,20 @@ RectTransform:
   m_AnchoredPosition: {x: -0.24, y: -71.94}
   m_SizeDelta: {x: 204.39, y: 23.01}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1339414432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339414430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31dbdd4f64a345c6b17b1b89c6af4b06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sliderBlueImage: {fileID: 1912357270}
+  _sliderRedImage: {fileID: 1152047610}
 --- !u!1 &1466801737
 GameObject:
   m_ObjectHideFlags: 0
