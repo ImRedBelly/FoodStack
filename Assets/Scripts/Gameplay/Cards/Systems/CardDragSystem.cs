@@ -124,8 +124,8 @@ namespace Gameplay.Cards.Systems
             {
                 UpdateCardPositions(Constants.MaxDragSpeed, Vector3.zero);
 
-                _onEndDrag?.OnNext(_currentDragObject);
                 _currentDragObject.OnDragEnd();
+                _onEndDrag?.OnNext(_currentDragObject);
                 _currentDragObject = null;
             }
         }

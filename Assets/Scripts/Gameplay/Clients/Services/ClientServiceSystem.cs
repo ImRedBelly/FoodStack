@@ -2,6 +2,7 @@
 using Core;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Interfaces;
+using Gameplay.Level.Handlers;
 using Support;
 using UniRx;
 
@@ -14,12 +15,16 @@ namespace Gameplay.Clients.Services
         private readonly Subject<IClientCard> _onClientService = new();
 
         private readonly ClientFactory _clientFactory;
+        private readonly ServiceSuccessHandler _serviceSuccessHandler;
         private readonly ClientTriggerServiceSystem _clientTriggerServiceSystem;
 
-        public ClientServiceSystem(ClientTriggerServiceSystem clientTriggerServiceSystem, ClientFactory clientFactory)
+        public ClientServiceSystem(ClientTriggerServiceSystem clientTriggerServiceSystem, 
+            ClientFactory clientFactory, 
+            ServiceSuccessHandler serviceSuccessHandler)
         {
             _clientTriggerServiceSystem = clientTriggerServiceSystem;
             _clientFactory = clientFactory;
+            _serviceSuccessHandler = serviceSuccessHandler;
         }
 
         protected override void OnInit()
@@ -39,6 +44,7 @@ namespace Gameplay.Clients.Services
             Observable.Timer(TimeSpan.FromSeconds(Constants.TimeServeClient + Constants.TimeAnimationClient))
                 .SafeSubscribe(_ =>
                 {
+                    _serviceSuccessHandler.ShowSuccess();
                     _clientFactory.RemoveClient(clientCard);
                     _onClientService?.OnNext(clientCard);
                 })

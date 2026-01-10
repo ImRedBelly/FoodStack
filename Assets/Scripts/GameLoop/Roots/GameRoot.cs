@@ -34,6 +34,7 @@ namespace GameLoop.Roots
 
         [Space] [Header("UI")] 
         [SerializeField] private DaySliderHandler _daySliderHandler;
+        [SerializeField] private ServiceSuccessHandler _serviceSuccessHandler;
         [SerializeField] private BuyCardsPackButton[] _buyCardsPackButtons;
 
         [Space] [Header("Prefabs")] 
@@ -202,13 +203,13 @@ namespace GameLoop.Roots
         private void InitClientsSystems()
         {
             ClientTriggerServiceSystem clientTriggerServiceSystem =
-                new ClientTriggerServiceSystem(_clientFactory, _cardFactory, _cardCollisionSystem);
+                new ClientTriggerServiceSystem(_clientFactory, _cardFactory, _cardCollisionSystem, _cardStackSystem);
             clientTriggerServiceSystem
                 .Init()
                 .AddTo(Disposables);
 
             ClientServiceSystem clientServiceSystem =
-                new ClientServiceSystem(clientTriggerServiceSystem, _clientFactory);
+                new ClientServiceSystem(clientTriggerServiceSystem, _clientFactory, _serviceSuccessHandler);
             clientServiceSystem
                 .Init()
                 .AddTo(Disposables);
@@ -300,6 +301,7 @@ namespace GameLoop.Roots
 
         private async void InitGame()
         {
+            _serviceSuccessHandler.Init();
             await ShowGameDifficulty();
             InitClients();
         }

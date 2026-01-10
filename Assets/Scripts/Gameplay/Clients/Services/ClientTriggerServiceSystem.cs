@@ -21,17 +21,19 @@ namespace Gameplay.Clients.Services
         private readonly ClientFactory _clientFactory;
         private readonly CardFactory _cardFactory;
         private readonly CardCollisionSystem _cardCollisionSystem;
+        private readonly CardStackSystem _cardStackSystem;
 
         private readonly Dictionary<IClientCard, CardConfig> _clients = new();
 
         public ClientTriggerServiceSystem(
             ClientFactory clientFactory,
             CardFactory cardFactory,
-            CardCollisionSystem cardCollisionSystem)
+            CardCollisionSystem cardCollisionSystem, CardStackSystem cardStackSystem)
         {
             _clientFactory = clientFactory;
             _cardFactory = cardFactory;
             _cardCollisionSystem = cardCollisionSystem;
+            _cardStackSystem = cardStackSystem;
         }
 
         protected override void OnInit()
@@ -71,6 +73,7 @@ namespace Gameplay.Clients.Services
                 if (target == data.ingredientCard.CardConfig)
                 {
                     _cardFactory.RemoveCard(data.ingredientCard);
+                    _cardStackSystem.RemoveCardFromStack(data.ingredientCard);
                     _onClientTriggerService?.OnNext(data.clientCard);
                 }
             }
