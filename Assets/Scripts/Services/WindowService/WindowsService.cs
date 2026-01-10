@@ -15,8 +15,7 @@ namespace Services.WindowService
 
         [SerializeField] private List<WindowBase> _prefabs;
         [SerializeField] private Transform _anchor;
-
-        private const int EnvironmentOrder = 1;
+        
         private readonly List<WindowBase> _instances = new();
         private readonly Stack<WindowBase> _windowsStack = new();
 
@@ -47,6 +46,11 @@ namespace Services.WindowService
 
         private readonly CompositeDisposable _loadingDisposable = new();
 
+        public void SetupAnchor(Transform windowsAnchor)
+        {
+            _anchor = windowsAnchor;
+        }
+        
         public static void Quit()
         {
 #if UNITY_EDITOR
@@ -72,7 +76,6 @@ namespace Services.WindowService
             }
 
             var currentWindow = GetOrCreateWindow(model.GetType());
-            currentWindow.SetOrder(_windowsStack.Count + EnvironmentOrder);
             currentWindow.Open(model);
 
             _windowsStack.Push(currentWindow);
@@ -133,7 +136,10 @@ namespace Services.WindowService
 
             foreach (var instance in _instances)
             {
-                Destroy(instance.gameObject);
+                if (instance != null)
+                {
+                    Destroy(instance.gameObject);
+                }
             }
 
             _instances.Clear();

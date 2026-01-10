@@ -48,15 +48,7 @@ namespace Services.WindowService
 
     public abstract class WindowBase : MonoBehaviour
     {
-        [SerializeField] private Canvas _canvas;
-
         public abstract Type ModelType { get; }
-
-        public void SetOrder(int order)
-        {
-            _canvas.sortingOrder = order;
-        }
-
         public abstract void Open(object model);
         public abstract void Close();
     }

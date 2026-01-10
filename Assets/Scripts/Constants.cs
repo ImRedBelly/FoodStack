@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Constants
+public static class Constants
 {
     public const float DragSpeed = 75f;
     public const float MaxDragSpeed = 100000f;

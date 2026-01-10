@@ -15,16 +15,19 @@ MonoBehaviour:
   <LevelData>k__BackingField:
     ToolCards:
     - {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
-    - {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
+    - {fileID: 11400000, guid: 3032ee54530da6f4d93ca96f90dc9a02, type: 2}
     IngredientCards:
     - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
     - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
     - {fileID: 11400000, guid: e5a15839b2e54d941b54eb2ce6c52caf, type: 2}
     - {fileID: 11400000, guid: a71bb69b67a8bc242b52543be1c99f6e, type: 2}
     - {fileID: 11400000, guid: 50c9acf77dba91949a1efe566fffb111, type: 2}
-    - {fileID: 11400000, guid: ec838ee8855394344b653c19cdc5c895, type: 2}
-    - {fileID: 11400000, guid: 11004bcac69820c44a491b7ef326fa52, type: 2}
+    - {fileID: 11400000, guid: 94d75014157cd97468673f9cfd3d2b77, type: 2}
+    - {fileID: 11400000, guid: 667d265a229444846ade75f250fba8c3, type: 2}
+    - {fileID: 11400000, guid: c0a0f8e0969d89b4ba8f72f06930c8cd, type: 2}
     OrderQueue:
+    - ClientConfig: {fileID: 11400000, guid: af4a5cfe77f3e42f7bb52418d1e1f76d, type: 2}
+      RecipeConfig: {fileID: 11400000, guid: efb331f9de2340b469c28c77856e8924, type: 2}
     - ClientConfig: {fileID: 11400000, guid: af4a5cfe77f3e42f7bb52418d1e1f76d, type: 2}
       RecipeConfig: {fileID: 11400000, guid: 37212f132c55ade46bcee60f9cebf3bf, type: 2}
     - ClientConfig: {fileID: 11400000, guid: 0dad542ea024a7a4c8e6f4e9e9e5d8ea, type: 2}

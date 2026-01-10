@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: befc3375c3914d8ba33e7729bb1dab64, type: 3}
-  m_Name: Salad
+  m_Name: WaffleBatter
   m_EditorClassIdentifier: 
-  <Name>k__BackingField: Salad
+  <Name>k__BackingField: WaffleBatter
   <CreateTime>k__BackingField: 2
-  <InfoIcon>k__BackingField: {fileID: 21300000, guid: 56552f33fbe4239408957f959464e814, type: 3}
+  <InfoIcon>k__BackingField: {fileID: 21300000, guid: ca91d6aaac2017c4aa862f351d509faf, type: 3}
   <WithBurn>k__BackingField: 0
   <Ingredients>k__BackingField:
-  - {fileID: 11400000, guid: 11004bcac69820c44a491b7ef326fa52, type: 2}
-  - {fileID: 11400000, guid: ec838ee8855394344b653c19cdc5c895, type: 2}
-  <Result>k__BackingField: {fileID: 11400000, guid: a8c4d536c4a62da4dbac4118410f015d, type: 2}
+  - {fileID: 11400000, guid: c0a0f8e0969d89b4ba8f72f06930c8cd, type: 2}
+  - {fileID: 11400000, guid: 667d265a229444846ade75f250fba8c3, type: 2}
+  - {fileID: 11400000, guid: 3032ee54530da6f4d93ca96f90dc9a02, type: 2}
+  <Result>k__BackingField: {fileID: 11400000, guid: adb83778f31798e4a830dcbbd8661b87, type: 2}

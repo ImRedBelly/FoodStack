@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core;
-using Cysharp.Threading.Tasks;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Interfaces;
 using Gameplay.Level.Configs;
 using Gameplay.OrderButton.Interfaces;
-using Gameplay.OrderButton.Services;
+using Gameplay.Recipes.Configs;
 using Support;
 using UniRx;
 using UnityEngine;
 
-namespace Gameplay.Clients.Services
+namespace Gameplay.Clients.Systems
 {
     public class ClientOrderSystem : DisposableClass
     {
+        public IObservable<(IOrderButton, RecipeConfig)> OnUpdateOrderButton => _onUpdateOrderButton;
+
+        private readonly Subject<(IOrderButton, RecipeConfig)> _onUpdateOrderButton = new();
+
         private readonly LevelData _levelData;
         private readonly ClientFactory _clientFactory;
         private readonly ClientTriggerServiceSystem _clientTriggerServiceSystem;
@@ -41,6 +44,8 @@ namespace Gameplay.Clients.Services
         protected override void OnInit()
         {
             base.OnInit();
+
+            _onUpdateOrderButton.AddTo(Disposables);
 
             _clientTriggerServiceSystem.OnClientTriggerService
                 .SafeSubscribe(ClientService)
@@ -87,12 +92,15 @@ namespace Gameplay.Clients.Services
             if (orderButton == null) return;
             orderButton.HideClient(true);
 
+            var recipeConfig = _levelData.OrderQueue[_currentClientIndex].RecipeConfig;
             var clientCard = _clientFactory.CreateClient(_levelData.OrderQueue[_currentClientIndex].ClientConfig,
-                _levelData.OrderQueue[_currentClientIndex].RecipeConfig.Result, Vector3.up * 0.5f,
+                recipeConfig.Result, Vector3.up * 0.5f,
                 orderButton.ClientPoint);
 
-            orderButton.UpdateOrderSprite(_levelData.OrderQueue[_currentClientIndex].RecipeConfig.InfoIcon);
+            orderButton.UpdateOrderSprite(recipeConfig.InfoIcon);
             _clientButtons.TryAdd(clientCard, orderButton);
+            _onUpdateOrderButton?.OnNext((orderButton, recipeConfig));
+
             orderButton.ShowClient(false);
             _currentClientIndex++;
         }

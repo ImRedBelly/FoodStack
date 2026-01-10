@@ -8,13 +8,12 @@ using Gameplay.Cards.Systems;
 using Gameplay.CardsPack;
 using Gameplay.Clients;
 using Gameplay.Clients.Factory;
-using Gameplay.Clients.Services;
+using Gameplay.Clients.Systems;
 using Gameplay.Level.Handlers;
 using Gameplay.Level.Systems;
 using Gameplay.OrderButton;
 using Gameplay.OrderButton.Factory;
 using Gameplay.OrderButton.Services;
-using Gameplay.Recipes.Configs;
 using Gameplay.Recipes.Services;
 using Support;
 using UniRx;
@@ -24,10 +23,13 @@ using UnityEngine.UI;
 namespace GameLoop.Roots
 {
     public class GameRoot : DisposableBehaviour<LobbyRoot.Model>
-    {
+    {  
+        [SerializeField] private Transform _windowsAnchor;
+        [Space]
         [SerializeField] private Camera _camera;
         [SerializeField] private GraphicRaycaster _graphicRaycaster;
         [SerializeField] private LayerMask _cardLayer;
+        [SerializeField] private LayerMask _orderButtonLayer;
         [Space] 
         [SerializeField] private Button _quitButton;
         [SerializeField] private Button _pauseButton;
@@ -44,13 +46,10 @@ namespace GameLoop.Roots
         [SerializeField] private CardPack _cardPackPrefab;
 
         [Space] [Header("Data")] 
-        [SerializeField] private RecipeConfig[] _recipeConfigs;
-
-        [Space] [Header("Debug Data")] 
+        [SerializeField] private RecipesConfig _recipesConfig;
         [SerializeField] private LevelsConfig _levelsConfig;
 
         private RecipesStorage _recipesStorage;
-
         private PauseGameSystem _pauseGameSystem;
 
         private CardDragSystem _cardDragSystem;
@@ -67,22 +66,23 @@ namespace GameLoop.Roots
         protected override void OnInit()
         {
             base.OnInit();
+            
+            ActiveModel.WindowsService.SetupAnchor(_windowsAnchor);
+            
             InitWindows();
             InitFactories();
             InitLevelSystems();
-
-
-            InitOrderButtonsSystems();
+            
             InitRecipesServices();
-
-            CreateOrderButtons();
 
             InitCardsSystems();
             InitToolsSystems();
             InitClientsSystems();
+            InitOrderButtonsSystems();
 
             CreateStartCards();
             CreateStartTools();
+            CreateOrderButtons();
 
             InitGame();
         }
@@ -101,7 +101,7 @@ namespace GameLoop.Roots
                     ActiveModel.WindowsService.Open(pausePopupModel, false);
                 })
                 .AddTo(Disposables);
-
+      
             _quitButton
                 .OnClickAsObservable()
                 .SafeSubscribe(_ => ActiveModel.OnGameAction?.Invoke())
@@ -128,15 +128,27 @@ namespace GameLoop.Roots
 
         private void InitOrderButtonsSystems()
         {
-            _orderButtonSelectSystem = new OrderButtonSelectSystem(_orderButtonFactory);
-            _orderButtonSelectSystem
+           var orderButtonClickSystem = new OrderButtonClickSystem(_camera, _orderButtonLayer, _graphicRaycaster);
+           orderButtonClickSystem
                 .Init()
                 .AddTo(Disposables);
+
+           var openOrderInfoPopupSystem = new OpenOrderInfoPopupSystem(
+               ActiveModel.WindowsService,
+               ActiveModel.WindowResolver,
+               _clientOrderSystem, 
+               orderButtonClickSystem,
+               _pauseGameSystem,
+               _recipesConfig.RecipeConfigs);
+           
+           openOrderInfoPopupSystem
+               .Init()
+               .AddTo(Disposables);
         }
 
         private void InitRecipesServices()
         {
-            _recipesStorage = new RecipesStorage(_recipeConfigs);
+            _recipesStorage = new RecipesStorage(_recipesConfig.RecipeConfigs);
         }
 
 
@@ -202,6 +214,11 @@ namespace GameLoop.Roots
 
         private void InitClientsSystems()
         {
+            _orderButtonSelectSystem = new OrderButtonSelectSystem(_orderButtonFactory);
+            _orderButtonSelectSystem
+                .Init()
+                .AddTo(Disposables);
+            
             ClientTriggerServiceSystem clientTriggerServiceSystem =
                 new ClientTriggerServiceSystem(_clientFactory, _cardFactory, _cardCollisionSystem, _cardStackSystem);
             clientTriggerServiceSystem
@@ -310,7 +327,7 @@ namespace GameLoop.Roots
         {
             var difficultyType = _levelsConfig.GetLevelData(SaveUtility.Level).DifficultyType;
             //Debug.LogError("Difficulty: " + difficultyType);
-            return UniTask.WaitForSeconds(2);
+            return UniTask.WaitForSeconds(1);
         }
 
         private void InitClients()

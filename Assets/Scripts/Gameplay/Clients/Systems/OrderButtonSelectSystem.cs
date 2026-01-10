@@ -6,7 +6,7 @@ using Gameplay.OrderButton.Interfaces;
 using Support;
 using UniRx;
 
-namespace Gameplay.OrderButton.Services
+namespace Gameplay.Clients.Systems
 {
     public class OrderButtonSelectSystem : DisposableClass
     {

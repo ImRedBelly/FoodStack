@@ -6,7 +6,7 @@ using Gameplay.Level.Handlers;
 using Support;
 using UniRx;
 
-namespace Gameplay.Clients.Services
+namespace Gameplay.Clients.Systems
 {
     public class ClientServiceSystem : DisposableClass
     {

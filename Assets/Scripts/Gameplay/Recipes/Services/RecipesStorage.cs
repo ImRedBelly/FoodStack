@@ -8,7 +8,7 @@ namespace Gameplay.Recipes.Services
     {
         public IReadOnlyCollection<RecipeConfig> RecipeConfigs { get; private set; }
 
-        public RecipesStorage(RecipeConfig[] configs)
+        public RecipesStorage(IReadOnlyCollection<RecipeConfig> configs)
         {
             RecipeConfigs = configs;
         }

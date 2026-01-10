@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class SaveUtility
+public static class SaveUtility
 {
     public static int Level
     {
