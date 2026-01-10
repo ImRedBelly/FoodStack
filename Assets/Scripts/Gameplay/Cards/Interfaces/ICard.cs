@@ -1,19 +1,16 @@
 ﻿using Gameplay.Cards.Configs;
 using Gameplay.Cards.Types;
+using Gameplay.Core.Interfaces;
 using UnityEngine;
 
 namespace Gameplay.Cards.Interfaces
 {
-    public interface ICard
+    public interface ICard : IDragObject
     {
         CardType CardType { get; }
-        Transform Transform { get; }
         Transform Container { get; }
         Collider2D Collider { get; }
         CardConfig CardConfig { get; }
-
-        void OnDragEnd();
-        void OnDragStart();
 
         void UpdateSortingOrder();
         void SetStateEligibleFrame(bool state);

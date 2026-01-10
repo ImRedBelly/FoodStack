@@ -12,8 +12,8 @@ namespace Gameplay.Cards.Systems
 
     public class CardStackSystem
     {
-        public IObservable<Unit> OnUpdateStacks => _onUpdateStacks;
-        private readonly Subject<Unit> _onUpdateStacks = new();
+        public IObservable<List<CardStack>> OnUpdateStacks => _onUpdateStacks;
+        private readonly Subject<List<CardStack>> _onUpdateStacks = new();
 
 
         private readonly CardStackMoveSystem _cardStackMoveSystem;
@@ -50,7 +50,7 @@ namespace Gameplay.Cards.Systems
             sourceStack.Cards.Clear();
             _stacks.Remove(sourceStack);
             _cardStackMoveSystem.UpdateWorldPositions(targetStack);
-            _onUpdateStacks?.OnNext(Unit.Default);
+            _onUpdateStacks?.OnNext(_stacks);
         }
 
         public void DetachSubStack(ICard card)
@@ -80,7 +80,7 @@ namespace Gameplay.Cards.Systems
 
             _stacks.Add(newStack);
 
-            _onUpdateStacks?.OnNext(Unit.Default);
+            _onUpdateStacks?.OnNext(_stacks);
         }
 
         public void RemoveCardFromStack(ICard card)
@@ -113,7 +113,7 @@ namespace Gameplay.Cards.Systems
             _lastSourceStack = null;
             _lastDetachedCards = null;
 
-            _onUpdateStacks?.OnNext(Unit.Default);
+            _onUpdateStacks?.OnNext(_stacks);
         }
 
         private CardStack CreateStack(ICard card)

@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Gameplay.Cards;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Systems;
+using Gameplay.CardsPack;
 using Gameplay.Clients;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Services;
@@ -33,11 +34,13 @@ namespace GameLoop.Roots
 
         [Space] [Header("UI")] 
         [SerializeField] private DaySliderHandler _daySliderHandler;
-        
-        [Space] [Header("Prefabs")]
+        [SerializeField] private BuyCardsPackButton[] _buyCardsPackButtons;
+
+        [Space] [Header("Prefabs")] 
         [SerializeField] private Card _cardPrefab;
-        [SerializeField] private ClientCard clientCardPrefab;
-        [SerializeField] private OrderButton orderButtonPrefab;
+        [SerializeField] private ClientCard _clientCardPrefab;
+        [SerializeField] private OrderButton _orderButtonPrefab;
+        [SerializeField] private CardPack _cardPackPrefab;
 
         [Space] [Header("Data")] 
         [SerializeField] private RecipeConfig[] _recipeConfigs;
@@ -86,7 +89,7 @@ namespace GameLoop.Roots
         private void InitWindows()
         {
             var pausePopupModel = ActiveModel.WindowResolver.GetPausePopupModel(
-                () => { _pauseGameSystem.SetStatePause(false); }, 
+                () => { _pauseGameSystem.SetStatePause(false); },
                 ActiveModel.OnReload, () => { });
 
             _pauseButton
@@ -111,12 +114,12 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            _clientFactory = new ClientFactory(clientCardPrefab);
+            _clientFactory = new ClientFactory(_clientCardPrefab);
             _clientFactory
                 .Init()
                 .AddTo(Disposables);
 
-            _orderButtonFactory = new OrderButtonFactory(orderButtonPrefab);
+            _orderButtonFactory = new OrderButtonFactory(_orderButtonPrefab);
             _clientFactory
                 .Init()
                 .AddTo(Disposables);
@@ -141,7 +144,8 @@ namespace GameLoop.Roots
             _cardStackMoveSystem = new CardStackMoveSystem();
             _cardStackSystem = new CardStackSystem(_cardStackMoveSystem);
 
-            _cardDragSystem = new CardDragSystem(_camera, _graphicRaycaster, _cardLayer, _cardStackSystem, _cardStackMoveSystem);
+            _cardDragSystem = new CardDragSystem(_camera, _graphicRaycaster, _cardLayer,
+                _cardFactory, _cardStackSystem, _cardStackMoveSystem);
             _cardDragSystem
                 .Init()
                 .AddTo(Disposables);
@@ -182,7 +186,8 @@ namespace GameLoop.Roots
         private void InitToolsSystems()
         {
             CreateDishService createDishService =
-                new CreateDishService(_cardCollisionSystem, _cardStackSystem, _cardFactory, _recipesStorage, _pauseGameSystem);
+                new CreateDishService(_cardCollisionSystem, _cardStackSystem, _cardFactory, _recipesStorage,
+                    _pauseGameSystem);
             createDishService
                 .Init()
                 .AddTo(Disposables);
@@ -219,12 +224,13 @@ namespace GameLoop.Roots
         private void InitLevelSystems()
         {
             _pauseGameSystem = new PauseGameSystem();
-            
+
             _pauseGameSystem
                 .Init()
                 .AddTo(Disposables);
-            
-            LevelTimerSystem levelTimerSystem = new LevelTimerSystem(_daySliderHandler, _levelsConfig.GetLevelData(SaveUtility.Level).LevelTime, _pauseGameSystem);
+
+            LevelTimerSystem levelTimerSystem = new LevelTimerSystem(_daySliderHandler,
+                _levelsConfig.GetLevelData(SaveUtility.Level).LevelTime, _pauseGameSystem);
             levelTimerSystem
                 .Init()
                 .AddTo(Disposables);
@@ -272,10 +278,23 @@ namespace GameLoop.Roots
         private void CreateStartTools()
         {
             var tools = _levelsConfig.GetLevelData(SaveUtility.Level).ToolCards;
-            foreach (var tool in tools)
+
+            float spacing = 1f;
+            float startY = 2f;
+
+            int count = tools.Length;
+
+            float offsetX = (count - 1) * spacing * 0.5f;
+
+            for (int i = 0; i < count; i++)
             {
-                _cardFactory.CreateCard(tool, Vector3.up * 2);
+                float xPos = i * spacing - offsetX;
+                Vector3 position = new Vector3(xPos, startY, 0f);
+
+                _cardFactory.CreateCard(tools[i], position);
             }
+
+           // Instantiate(_cardPackPrefab, Vector2.zero, Quaternion.identity);
         }
 
 

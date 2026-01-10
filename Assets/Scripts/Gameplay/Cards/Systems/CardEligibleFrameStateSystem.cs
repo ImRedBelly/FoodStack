@@ -3,6 +3,7 @@ using System.Linq;
 using Core;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
+using Gameplay.Core.Interfaces;
 using Support;
 using UniRx;
 
@@ -62,15 +63,17 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void StartDrag(ICard draggedIngredientCard)
+        private void StartDrag(IDragObject dragObject)
         {
+            if (dragObject is not ICard inCard) return;
             foreach (var card in _cards)
-                card.SetStateEligibleFrame(TryActivateEligibleFrame(draggedIngredientCard, card));
+                card.SetStateEligibleFrame(TryActivateEligibleFrame(inCard, card));
         }
 
 
-        private void EndDrag(ICard draggedIngredientCard)
+        private void EndDrag(IDragObject dragObject)
         {
+            if (dragObject is not ICard inCard) return;
             foreach (var card in _cards)
                 card.SetStateEligibleFrame(false);
         }

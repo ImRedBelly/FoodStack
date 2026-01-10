@@ -1,5 +1,6 @@
 ﻿using Core;
 using Gameplay.Cards.Interfaces;
+using Gameplay.Core.Interfaces;
 using Support;
 using UniRx;
 
@@ -37,12 +38,14 @@ namespace Gameplay.Cards.Systems
                 .AddTo(Disposables);
         }
 
-        private void StartDrag(ICard draggedIngredientCard)
+        private void StartDrag(IDragObject dragObject)
         {
-            _dragOriginStack = _cardStackSystem.GetStack(draggedIngredientCard);
-            _cardStackSystem.DetachSubStack(draggedIngredientCard);
+            if (dragObject is not ICard card) return;
+
+            _dragOriginStack = _cardStackSystem.GetStack(card);
+            _cardStackSystem.DetachSubStack(card);
         }
-        
+
         private void EndDrag((ICard draggedCard, ICard targetCard) data)
         {
             bool merged = TryMerge(data.draggedCard, data.targetCard);

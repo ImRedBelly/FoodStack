@@ -37,7 +37,7 @@ namespace Gameplay.Recipes.Services
 
         private readonly Dictionary<ICard, CardStack> _toolToStack = new();
         private readonly Dictionary<ICard, CreateTaskData> _activeCreateTasks = new();
-        
+
         private bool _pauseState;
 
         public CreateDishService(
@@ -58,13 +58,13 @@ namespace Gameplay.Recipes.Services
         {
             base.OnInit();
 
-            _cardCollisionSystem.OnCardDropWithoutMerge
-                .SafeSubscribe(DropWithoutMerge)
-                .AddTo(Disposables);
-
-            _cardCollisionSystem.OnCardCollisionWithCard
-                .SafeSubscribe(DetectTool)
-                .AddTo(Disposables);
+            // _cardCollisionSystem.OnCardDropWithoutMerge
+            //     .SafeSubscribe(DropWithoutMerge)
+            //     .AddTo(Disposables);
+            //
+            // _cardCollisionSystem.OnCardCollisionWithCard
+            //     .SafeSubscribe(DetectTool)
+            //     .AddTo(Disposables);
 
             _cardStackSystem.OnUpdateStacks
                 .SafeSubscribe(UpdateStacks)
@@ -75,28 +75,40 @@ namespace Gameplay.Recipes.Services
                 .AddTo(Disposables);
         }
 
-        private void DropWithoutMerge(ICard card)
+        // private void DropWithoutMerge(ICard card)
+        // {
+        //     var stack = _cardStackSystem.GetStack(card);
+        //     if (stack == null) return;
+        //     var tool = stack.Cards.First();
+        //
+        //     _toolToStack[tool] = stack;
+        //     TryCreateDish();
+        // }
+        //
+        // private void DetectTool((ICard card1, ICard card2) data)
+        // {
+        //     var stack = _cardStackSystem.GetStack(data.card1);
+        //     if (stack == null) return;
+        //     var tool = stack.Cards.First();
+        //
+        //     _toolToStack[tool] = stack;
+        //     TryCreateDish();
+        // }
+
+        private void UpdateStacks(List<CardStack> stacks)
         {
-            var stack = _cardStackSystem.GetStack(card);
-            if (stack == null) return;
-            var tool = stack.Cards.First();
+            foreach (var stack in stacks)
+            {
+                if (stack.Cards.Count <= 1)
+                {
+                    DisableStackFlame(stack);
+                    continue;
+                }
 
-            _toolToStack[tool] = stack;
-            TryCreateDish();
-        }
+                var tool = stack.Cards.First();
+                _toolToStack[tool] = stack;
+            }
 
-        private void DetectTool((ICard card1, ICard card2) data)
-        {
-            var stack = _cardStackSystem.GetStack(data.card1);
-            if (stack == null) return;
-            var tool = stack.Cards.First();
-
-            _toolToStack[tool] = stack;
-            TryCreateDish();
-        }
-
-        private void UpdateStacks(Unit unit)
-        {
             TryCreateDish();
         }
 
@@ -125,6 +137,7 @@ namespace Gameplay.Recipes.Services
 
                 if (matchedRecipe == null)
                 {
+                    DisableStackFlame(stack);
                     CancelCreateTask(tool);
                     continue;
                 }
@@ -132,16 +145,17 @@ namespace Gameplay.Recipes.Services
                 if (_activeCreateTasks.TryGetValue(tool, out var data) && data.Recipe == matchedRecipe)
                     continue;
 
-                CreateDishTask(tool, matchedRecipe, stack.Cards);
+                CreateDishTask(tool, matchedRecipe, stack);
             }
         }
 
-        private void CreateDishTask(ICard toolCard, RecipeConfig recipeConfig, List<ICard> cards)
+        private void CreateDishTask(ICard toolCard, RecipeConfig recipeConfig, CardStack stack)
         {
             CancelCreateTask(toolCard);
+            DisableStackFlame(stack);
 
-            var firstCard = cards.First();
-            var lastCard = cards.Last();
+            var firstCard = stack.Cards.First();
+            var lastCard = stack.Cards.Last();
 
             firstCard.SetStateSlider(true);
             lastCard.SetStateFlame(recipeConfig.WithBurn);
@@ -161,8 +175,6 @@ namespace Gameplay.Recipes.Services
                     },
                     () =>
                     {
-                        _toolToStack.Remove(toolCard);
-
                         firstCard.SetStateSlider(false);
                         lastCard.SetStateFlame(false);
 
@@ -170,7 +182,7 @@ namespace Gameplay.Recipes.Services
                         _cardFactory.CreateCard(recipeConfig.Result, Vector3.zero);
 
                         List<ICard> removeCards = new();
-                        foreach (var card in cards)
+                        foreach (var card in _toolToStack[toolCard].Cards)
                         {
                             if (card.CardType == CardType.Consumable)
                             {
@@ -183,7 +195,11 @@ namespace Gameplay.Recipes.Services
                         {
                             _cardStackSystem.RemoveCardFromStack(card);
                         }
+
+                        _toolToStack.Remove(toolCard);
                     });
+
+            Disposables.Add(disposable);
 
             _activeCreateTasks[toolCard] = new CreateTaskData(recipeConfig, disposable);
         }
@@ -222,6 +238,7 @@ namespace Gameplay.Recipes.Services
         {
             if (_activeCreateTasks.TryGetValue(toolCard, out var data))
             {
+                Disposables.Remove(data.Disposable);
                 data.Disposable.Dispose();
 
                 _activeCreateTasks.Remove(toolCard);
@@ -232,6 +249,14 @@ namespace Gameplay.Recipes.Services
                     stack.Cards.First().SetStateSlider(false);
                     stack.Cards.Last().SetStateFlame(false);
                 }
+            }
+        }
+
+        private static void DisableStackFlame(CardStack stack)
+        {
+            foreach (var card in stack.Cards)
+            {
+                card.SetStateFlame(false);
             }
         }
     }

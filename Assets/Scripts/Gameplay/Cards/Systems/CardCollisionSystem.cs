@@ -7,6 +7,7 @@ using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Interfaces;
+using Gameplay.Core.Interfaces;
 using Support;
 using UniRx;
 
@@ -104,8 +105,14 @@ namespace Gameplay.Cards.Systems
             }
         }
 
-        private void EndDrag(ICard draggedIngredientCard)
+        private void EndDrag(IDragObject dragObject)
         {
+            if (dragObject == null)
+            {
+                return;
+            }
+            if (dragObject is not ICard draggedIngredientCard) return;
+
             var dragStack = _cardStackSystem.GetStack(draggedIngredientCard);
             foreach (var card in _cards)
             {

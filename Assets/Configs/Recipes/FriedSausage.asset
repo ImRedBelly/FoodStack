@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: FriedSausage
   m_EditorClassIdentifier: 
   <Name>k__BackingField: FriedSausage
-  <CreateTime>k__BackingField: 2
+  <CreateTime>k__BackingField: 22222
   <InfoIcon>k__BackingField: {fileID: 21300000, guid: 76d677096ad50de42b6d7955f5a13787, type: 3}
   <WithBurn>k__BackingField: 1
   <Ingredients>k__BackingField:

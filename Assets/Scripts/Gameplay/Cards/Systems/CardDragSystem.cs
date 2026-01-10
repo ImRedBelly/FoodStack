@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core;
+using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
+using Gameplay.Core.Interfaces;
+using Support;
 using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -11,18 +14,19 @@ namespace Gameplay.Cards.Systems
 {
     public sealed class CardDragSystem : DisposableClass
     {
-        public IObservable<ICard> OnStartDrag => _onStartDrag;
-        public IObservable<ICard> OnEndDrag => _onEndDrag;
+        public IObservable<IDragObject> OnStartDrag => _onStartDrag;
+        public IObservable<IDragObject> OnEndDrag => _onEndDrag;
 
-        private readonly Subject<ICard> _onStartDrag = new();
-        private readonly Subject<ICard> _onEndDrag = new();
+        private readonly Subject<IDragObject> _onStartDrag = new();
+        private readonly Subject<IDragObject> _onEndDrag = new();
 
         private readonly Camera _camera;
         private readonly LayerMask _cardLayer;
+        private readonly CardFactory _cardFactory;
         private readonly CardStackSystem _cardStackSystem;
         private readonly CardStackMoveSystem _cardStackMoveSystem;
 
-        private ICard _currentIngredientCard;
+        private IDragObject _currentDragObject;
 
         private Vector3 _offsetDrag;
         private Vector3 _offsetClick;
@@ -35,13 +39,14 @@ namespace Gameplay.Cards.Systems
 
 
         public CardDragSystem(Camera camera, GraphicRaycaster graphicRaycaster,
-            LayerMask cardLayer, CardStackSystem cardStackSystem,
+            LayerMask cardLayer, CardFactory cardFactory, CardStackSystem cardStackSystem,
             CardStackMoveSystem cardStackMoveSystem)
         {
             _camera = camera;
             _graphicRaycaster = graphicRaycaster;
             _eventSystem = EventSystem.current;
             _cardLayer = cardLayer;
+            _cardFactory = cardFactory;
             _cardStackSystem = cardStackSystem;
             _cardStackMoveSystem = cardStackMoveSystem;
         }
@@ -60,13 +65,20 @@ namespace Gameplay.Cards.Systems
                 .Subscribe(_ => EndDrag())
                 .AddTo(Disposables);
 
+            _cardFactory.OnCardRemoved
+                .SafeSubscribe(RemoveCard)
+                .AddTo(Disposables);
+
+
             _onStartDrag.AddTo(Disposables);
             _onEndDrag.AddTo(Disposables);
         }
 
-
         private void TryBeginDrag()
         {
+            if (IsPointerOverUI())
+                return;
+
             var worldPos = _camera.ScreenToWorldPoint(Input.mousePosition);
 
             var allCards = Physics2D.RaycastAll(worldPos, Vector2.zero, 0f, _cardLayer);
@@ -74,30 +86,30 @@ namespace Gameplay.Cards.Systems
             float minPositionY = float.MaxValue;
             foreach (var hit in allCards)
             {
-                if (hit.collider.TryGetComponent<ICard>(out var card))
+                if (hit.collider.TryGetComponent<IDragObject>(out var dragObject))
                 {
                     if (hit.collider.transform.position.y < minPositionY)
                     {
                         minPositionY = hit.collider.transform.position.y;
-                        _currentIngredientCard = card;
+                        _currentDragObject = dragObject;
                     }
                 }
             }
 
-            if (_currentIngredientCard == null) return;
+            if (_currentDragObject == null) return;
 
-            _currentIngredientCard.OnDragStart();
+            _currentDragObject.OnDragStart();
 
-            _offsetClick = _currentIngredientCard.Transform.position - worldPos;
+            _offsetClick = _currentDragObject.Transform.position - worldPos;
             _offsetClick.z = 0;
 
-            _onStartDrag?.OnNext(_currentIngredientCard);
+            _onStartDrag?.OnNext(_currentDragObject);
             _dragDisposable = Observable.EveryUpdate().Subscribe(_ => UpdateDrag());
         }
 
         private void UpdateDrag()
         {
-            if (_currentIngredientCard == null)
+            if (_currentDragObject == null)
                 return;
 
             UpdateCardPositions(Constants.DragSpeed, Constants.CardDragOffset);
@@ -108,21 +120,26 @@ namespace Gameplay.Cards.Systems
             _dragDisposable?.Dispose();
             _dragDisposable = null;
 
-            if (_currentIngredientCard != null)
+            if (_currentDragObject != null)
             {
                 UpdateCardPositions(Constants.MaxDragSpeed, Vector3.zero);
 
-                _onEndDrag?.OnNext(_currentIngredientCard);
-                _currentIngredientCard.OnDragEnd();
-                _currentIngredientCard = null;
+                _onEndDrag?.OnNext(_currentDragObject);
+                _currentDragObject.OnDragEnd();
+                _currentDragObject = null;
+            }
+        }
+
+        private void RemoveCard(ICard card)
+        {
+            if (_currentDragObject == card)
+            {
+                _currentDragObject = null;
             }
         }
 
         private void UpdateCardPositions(float lerpSpeed, Vector3 offset)
         {
-            if (IsPointerOverUI())
-                return;
-
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
             var plane = new Plane(Vector3.forward, Vector3.zero);
 
@@ -130,10 +147,28 @@ namespace Gameplay.Cards.Systems
             var worldPos = ray.GetPoint(distance);
             worldPos.z = 0;
 
-            var basePos = worldPos + _offsetClick + offset;
+            var targetPosition = worldPos + _offsetClick + offset;
 
-            var stack = _cardStackSystem.GetStack(_currentIngredientCard);
-            _cardStackMoveSystem.UpdateWorldPositions(stack, basePos, lerpSpeed);
+            if (_currentDragObject is ICard card)
+            {
+                var stack = _cardStackSystem.GetStack(card);
+                _cardStackMoveSystem.UpdateWorldPositions(stack, targetPosition, lerpSpeed);
+            }
+            else
+            {
+                MoveObject(_currentDragObject, targetPosition, lerpSpeed);
+            }
+        }
+
+        private void MoveObject(IDragObject dragObject, Vector3 targetPosition, float lerpSpeed)
+        {
+            var transform = dragObject.Transform;
+
+            transform.position = Vector3.Lerp(
+                transform.position,
+                targetPosition,
+                Time.deltaTime * lerpSpeed
+            );
         }
 
         private bool IsPointerOverUI()

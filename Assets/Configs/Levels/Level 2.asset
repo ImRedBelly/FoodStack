@@ -27,5 +27,5 @@ MonoBehaviour:
       RecipeConfig: {fileID: 11400000, guid: e22f07d4b660e4a63b1d268f834f67ac, type: 2}
     - ClientConfig: {fileID: 11400000, guid: 2f7933bf01acf4339a79d2e53e2e35a1, type: 2}
       RecipeConfig: {fileID: 11400000, guid: 6e42e246e30674a42a08a53ed76d2d8b, type: 2}
-    LevelTime: 2
+    LevelTime: 20
     DifficultyType: 0
