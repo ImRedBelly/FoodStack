@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Gameplay.Recipes.Configs;
 using Services.WindowService;
 using Support;
@@ -38,7 +39,9 @@ namespace Windows.RecipesPopup
         [SerializeField] private GameObject _equalPrefab;
 
         private readonly List<GameObject> _createdObjects = new List<GameObject>();
-        private readonly Dictionary<ButtonUnlockRecipe, RecipeConfig> _buttonUnlockRecipes = new Dictionary<ButtonUnlockRecipe, RecipeConfig>();
+
+        private readonly Dictionary<ButtonUnlockRecipe, RecipeConfig> _buttonUnlockRecipes =
+            new Dictionary<ButtonUnlockRecipe, RecipeConfig>();
 
         protected override void OnOpen()
         {
@@ -69,7 +72,7 @@ namespace Windows.RecipesPopup
 
             _createdObjects.Clear();
             _buttonUnlockRecipes.Clear();
-            
+
             base.OnClose();
         }
 
@@ -114,17 +117,26 @@ namespace Windows.RecipesPopup
             var enoughMoney = recipeConfig.PriceUnlock <= SaveUtility.GetMoney();
 
             buttonUnlockRecipe.SetState(isUnlocked, enoughMoney);
-            buttonUnlockRecipe.SetTextPrice(isUnlocked ? "Unlocked" : "Unlock: " + recipeConfig.PriceUnlock);
+            buttonUnlockRecipe.SetTextPrice(isUnlocked ? "Unlocked" : "Unlock: " + GetPriceRecipe(recipeConfig));
             buttonUnlockRecipe.ButtonUnlockRecipeClick += UnlockRecipe;
             _buttonUnlockRecipes.Add(buttonUnlockRecipe, recipeConfig);
 
             void UnlockRecipe()
             {
-                var canUnlock = recipeConfig.PriceUnlock <= SaveUtility.GetMoney();
+                var canUnlock = GetPriceRecipe(recipeConfig) <= SaveUtility.GetMoney();
                 if (canUnlock)
                 {
                     SaveUtility.SpendMoney(recipeConfig.PriceUnlock);
                     SaveUtility.RecipeUnlock(recipeConfig.Name);
+
+                    foreach (var config in ActiveModel.RecipesConfig)
+                    {
+                        if (recipeConfig.Ingredients.Contains(config.Result) && !SaveUtility.IsRecipeUnlocked(config.Name))
+                        {
+                            SaveUtility.SpendMoney(config.PriceUnlock);
+                            SaveUtility.RecipeUnlock(config.Name);
+                        }
+                    }
 
                     foreach (var button in _buttonUnlockRecipes)
                     {
@@ -132,10 +144,26 @@ namespace Windows.RecipesPopup
                         enoughMoney = button.Value.PriceUnlock <= SaveUtility.GetMoney();
 
                         button.Key.SetState(isUnlocked, enoughMoney);
-                        button.Key.SetTextPrice(isUnlocked ? "Unlocked" : "Unlock: " + button.Value.PriceUnlock);
+                        button.Key.SetTextPrice(isUnlocked ? "Unlocked" : "Unlock: " + GetPriceRecipe(button.Value));
                     }
                 }
             }
+        }
+
+        private int GetPriceRecipe(RecipeConfig config)
+        {
+            int price = config.PriceUnlock;
+
+            foreach (var recipeConfig in ActiveModel.RecipesConfig)
+            {
+                if (config.Ingredients.Contains(recipeConfig.Result) &&
+                    !SaveUtility.IsRecipeUnlocked(recipeConfig.Name))
+                {
+                    price += recipeConfig.PriceUnlock;
+                }
+            }
+
+            return price;
         }
     }
 }
