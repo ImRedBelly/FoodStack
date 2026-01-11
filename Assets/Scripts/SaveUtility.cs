@@ -7,17 +7,17 @@ using UnityEngine;
 public static class SaveUtility
 {
     private const string LevelKey = "Level";
-    private const string MoneyKey = "Money";
+    private const string StarsKey = "Stars";
     private const string RecipeUnlockKey = "RecipeUnlock";
 
     private static List<string> _recipeUnlockedNames = new();
 
-    public static IntReactiveProperty Money;
+    public static IntReactiveProperty Stars;
 
     public static void Init(CompositeDisposable disposables)
     {
-        Money = new IntReactiveProperty(GetMoney());
-        Money.AddTo(disposables);
+        Stars = new IntReactiveProperty(GetStars());
+        Stars.AddTo(disposables);
     }
 
     public static int Level
@@ -26,22 +26,22 @@ public static class SaveUtility
         set => PlayerPrefs.SetInt(LevelKey, value);
     }
 
-    public static int GetMoney()
+    public static int GetStars()
     {
-        return PlayerPrefs.GetInt(MoneyKey, 25);
+        return PlayerPrefs.GetInt(StarsKey, 25);
     }
 
-    public static void AppendMoney(int value)
+    public static void AppendStars(int value)
     {
-        var futureMoney = Math.Clamp(GetMoney() + value, 0, int.MaxValue);
-        PlayerPrefs.GetInt(MoneyKey, futureMoney);
+        var futureMoney = Math.Clamp(GetStars() + value, 0, int.MaxValue);
+        PlayerPrefs.GetInt(StarsKey, futureMoney);
     }
 
-    public static void SpendMoney(int value)
+    public static void SpendStars(int value)
     {
-        var futureMoney = Math.Clamp(GetMoney() - value, 0, int.MaxValue);
-        PlayerPrefs.SetInt(MoneyKey, futureMoney);
-        Money.Value = futureMoney;
+        var futureMoney = Math.Clamp(GetStars() - value, 0, int.MaxValue);
+        PlayerPrefs.SetInt(StarsKey, futureMoney);
+        Stars.Value = futureMoney;
     }
 
 

@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace UI.Counters
 {
-    public class MoneyCounter : MonoBehaviour
+    public class StarsCounter : MonoBehaviour
     {
         [SerializeField] private TMP_Text _textMoney;
 
         private void Start()
         {
-            SaveUtility.Money
+            SaveUtility.Stars
                 .Subscribe(x => _textMoney.SetText(x.ToString()))
                 .AddTo(this);
         }

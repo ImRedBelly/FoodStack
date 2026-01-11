@@ -23,6 +23,7 @@ namespace Gameplay.Clients.Systems
         private readonly ClientTriggerServiceSystem _clientTriggerServiceSystem;
         private readonly ClientServiceSystem _clientServiceSystem;
         private readonly OrderButtonSelectSystem _orderButtonSelectSystem;
+        private readonly ClientGenerateOrderSystem _clientGenerateOrderSystem;
 
         private readonly Dictionary<IClientCard, IOrderButton> _clientButtons = new();
 
@@ -32,13 +33,15 @@ namespace Gameplay.Clients.Systems
             ClientFactory clientFactory,
             ClientTriggerServiceSystem clientTriggerServiceSystem,
             ClientServiceSystem clientServiceSystem,
-            OrderButtonSelectSystem orderButtonSelectSystem)
+            OrderButtonSelectSystem orderButtonSelectSystem,
+            ClientGenerateOrderSystem clientGenerateOrderSystem)
         {
             _levelData = levelData;
             _clientFactory = clientFactory;
             _clientTriggerServiceSystem = clientTriggerServiceSystem;
             _clientServiceSystem = clientServiceSystem;
             _orderButtonSelectSystem = orderButtonSelectSystem;
+            _clientGenerateOrderSystem = clientGenerateOrderSystem;
         }
 
         protected override void OnInit()
@@ -85,15 +88,17 @@ namespace Gameplay.Clients.Systems
         public void CreateClient(IClientCard clientServiced)
         {
             ResetOrderButton(clientServiced);
-            if (_levelData.OrderQueue.Length <= _currentClientIndex) return;
+
+            //if (_levelData.OrderQueue.Length <= _currentClientIndex) return;
+            var orderData = _clientGenerateOrderSystem.GenerateOrderData();
 
             var orderButton = _orderButtonSelectSystem.GetOrderButton();
 
             if (orderButton == null) return;
             orderButton.HideClient(true);
 
-            var recipeConfig = _levelData.OrderQueue[_currentClientIndex].RecipeConfig;
-            var clientCard = _clientFactory.CreateClient(_levelData.OrderQueue[_currentClientIndex].ClientConfig,
+            var recipeConfig = orderData.recipeConfig;
+            var clientCard = _clientFactory.CreateClient(orderData.clientConfig,
                 recipeConfig.Result, Vector3.up * 0.5f,
                 orderButton.ClientPoint);
 

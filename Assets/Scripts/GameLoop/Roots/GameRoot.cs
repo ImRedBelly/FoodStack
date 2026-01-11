@@ -47,6 +47,7 @@ namespace GameLoop.Roots
 
         [Space] [Header("Data")] 
         [SerializeField] private RecipesConfig _recipesConfig;
+        [SerializeField] private ClientsConfig _clientsConfig;
         [SerializeField] private LevelsConfig _levelsConfig;
 
         private RecipesStorage _recipesStorage;
@@ -214,6 +215,11 @@ namespace GameLoop.Roots
 
         private void InitClientsSystems()
         {
+            ClientGenerateOrderSystem clientGenerateOrderSystem = new ClientGenerateOrderSystem( _clientsConfig.ClientsConfigs, _recipesConfig.RecipeConfigs);
+            clientGenerateOrderSystem
+                .Init()
+                .AddTo(Disposables);
+            
             _orderButtonSelectSystem = new OrderButtonSelectSystem(_orderButtonFactory);
             _orderButtonSelectSystem
                 .Init()
@@ -232,7 +238,7 @@ namespace GameLoop.Roots
                 .AddTo(Disposables);
 
             _clientOrderSystem = new ClientOrderSystem(_levelsConfig.GetLevelData(SaveUtility.Level), _clientFactory,
-                clientTriggerServiceSystem, clientServiceSystem, _orderButtonSelectSystem);
+                clientTriggerServiceSystem, clientServiceSystem, _orderButtonSelectSystem, clientGenerateOrderSystem);
             _clientOrderSystem
                 .Init()
                 .AddTo(Disposables);
@@ -311,8 +317,8 @@ namespace GameLoop.Roots
 
                 _cardFactory.CreateCard(tools[i], position);
             }
-
-           // Instantiate(_cardPackPrefab, Vector2.zero, Quaternion.identity);
+            
+            //Instantiate(_cardPackPrefab, Vector2.zero, Quaternion.identity);
         }
 
 
@@ -326,8 +332,7 @@ namespace GameLoop.Roots
         private UniTask ShowGameDifficulty()
         {
             var difficultyType = _levelsConfig.GetLevelData(SaveUtility.Level).DifficultyType;
-            //Debug.LogError("Difficulty: " + difficultyType);
-            return UniTask.WaitForSeconds(1);
+            return UniTask.CompletedTask;
         }
 
         private void InitClients()

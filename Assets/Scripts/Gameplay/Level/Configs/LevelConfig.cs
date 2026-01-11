@@ -18,17 +18,17 @@ namespace Gameplay.Level.Configs
     {
         public CardConfig[] ToolCards;
         public CardConfig[] IngredientCards;
-        public OrderQueue[] OrderQueue;
+     //   public OrderQueue[] OrderQueue;
         public float LevelTime;
         public DifficultyType DifficultyType;
     }
 
-    [Serializable]
-    public struct OrderQueue
-    {
-        public ClientConfig ClientConfig;
-        public RecipeConfig RecipeConfig;
-    }
+    // [Serializable]
+    // public struct OrderQueue
+    // {
+    //     public ClientConfig ClientConfig;
+    //     public RecipeConfig RecipeConfig;
+    // }
 
     [CreateAssetMenu(menuName = "Gameplay/Configs/Level", fileName = "Level ")]
     public class LevelConfig : ScriptableObject

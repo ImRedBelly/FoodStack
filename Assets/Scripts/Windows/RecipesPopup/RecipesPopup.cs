@@ -114,7 +114,7 @@ namespace Windows.RecipesPopup
             var buttonUnlockRecipe = Instantiate(_buttonUnlockRecipePrefab, recipePanelView.ButtonUnlockRecipeParent);
 
             var isUnlocked = recipeConfig.PriceUnlock <= 0 || SaveUtility.IsRecipeUnlocked(recipeConfig.Name);
-            var enoughMoney = recipeConfig.PriceUnlock <= SaveUtility.GetMoney();
+            var enoughMoney = recipeConfig.PriceUnlock <= SaveUtility.GetStars();
 
             buttonUnlockRecipe.SetState(isUnlocked, enoughMoney);
             buttonUnlockRecipe.SetTextPrice(isUnlocked ? "Unlocked" : "Unlock: " + GetPriceRecipe(recipeConfig));
@@ -123,17 +123,17 @@ namespace Windows.RecipesPopup
 
             void UnlockRecipe()
             {
-                var canUnlock = GetPriceRecipe(recipeConfig) <= SaveUtility.GetMoney();
+                var canUnlock = GetPriceRecipe(recipeConfig) <= SaveUtility.GetStars();
                 if (canUnlock)
                 {
-                    SaveUtility.SpendMoney(recipeConfig.PriceUnlock);
+                    SaveUtility.SpendStars(recipeConfig.PriceUnlock);
                     SaveUtility.RecipeUnlock(recipeConfig.Name);
 
                     foreach (var config in ActiveModel.RecipesConfig)
                     {
                         if (recipeConfig.Ingredients.Contains(config.Result) && !SaveUtility.IsRecipeUnlocked(config.Name))
                         {
-                            SaveUtility.SpendMoney(config.PriceUnlock);
+                            SaveUtility.SpendStars(config.PriceUnlock);
                             SaveUtility.RecipeUnlock(config.Name);
                         }
                     }
@@ -141,7 +141,7 @@ namespace Windows.RecipesPopup
                     foreach (var button in _buttonUnlockRecipes)
                     {
                         isUnlocked = button.Value.PriceUnlock <= 0 || SaveUtility.IsRecipeUnlocked(button.Value.Name);
-                        enoughMoney = button.Value.PriceUnlock <= SaveUtility.GetMoney();
+                        enoughMoney = button.Value.PriceUnlock <= SaveUtility.GetStars();
 
                         button.Key.SetState(isUnlocked, enoughMoney);
                         button.Key.SetTextPrice(isUnlocked ? "Unlocked" : "Unlock: " + GetPriceRecipe(button.Value));
