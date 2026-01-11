@@ -28,6 +28,8 @@ namespace GameLoop.Roots
                 .Concat(InitStates())
                 .SafeSubscribe(_ => LoadStage())
                 .AddTo(_rootDisposable);
+            
+            SaveUtility.Init(_rootDisposable);
         }
 
         private IObservable<Unit> InitStates()

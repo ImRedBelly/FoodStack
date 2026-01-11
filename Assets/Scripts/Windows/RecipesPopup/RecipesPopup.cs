@@ -30,15 +30,15 @@ namespace Windows.RecipesPopup
         }
 
         [SerializeField] private Button _buttonResume;
-        [Space] 
-        [SerializeField] private Transform _parent;
+        [Space] [SerializeField] private Transform _parent;
         [SerializeField] private RecipePanelView _recipePanelViewPrefab;
         [SerializeField] private IngredientPanelView _ingredientPanelViewPrefab;
-
-        [SerializeField] private GameObject _plusPrefab;
+        [SerializeField] private ButtonUnlockRecipe _buttonUnlockRecipePrefab;
+        [Space] [SerializeField] private GameObject _plusPrefab;
         [SerializeField] private GameObject _equalPrefab;
 
         private readonly List<GameObject> _createdObjects = new List<GameObject>();
+        private readonly Dictionary<ButtonUnlockRecipe, RecipeConfig> _buttonUnlockRecipes = new Dictionary<ButtonUnlockRecipe, RecipeConfig>();
 
         protected override void OnOpen()
         {
@@ -61,7 +61,15 @@ namespace Windows.RecipesPopup
                 Destroy(createdObject);
             }
 
+            foreach (var buttonUnlockRecipe in _buttonUnlockRecipes)
+            {
+                buttonUnlockRecipe.Key.Dispose();
+                Destroy(buttonUnlockRecipe.Key);
+            }
+
             _createdObjects.Clear();
+            _buttonUnlockRecipes.Clear();
+            
             base.OnClose();
         }
 
@@ -69,27 +77,62 @@ namespace Windows.RecipesPopup
         {
             foreach (var recipeConfig in ActiveModel.RecipesConfig)
             {
-                var recipePanelView = Instantiate(_recipePanelViewPrefab, _parent);
-                recipePanelView.SetRecipeNameText(recipeConfig.Name);
-                _createdObjects.Add(recipePanelView.gameObject);
+                CreateRecipePanelView(recipeConfig);
+            }
+        }
 
-                var resultPanelView = Instantiate(_ingredientPanelViewPrefab, recipePanelView.Parent);
-                resultPanelView.SetIngredientImage(recipeConfig.Result.Sprite);
-                _createdObjects.Add(resultPanelView.gameObject);
+        private void CreateRecipePanelView(RecipeConfig recipeConfig)
+        {
+            var recipePanelView = Instantiate(_recipePanelViewPrefab, _parent);
+            recipePanelView.SetRecipeNameText(recipeConfig.Name);
+            _createdObjects.Add(recipePanelView.gameObject);
 
-                var equal = Instantiate(_equalPrefab, recipePanelView.Parent);
-                _createdObjects.Add(equal);
+            var resultPanelView = Instantiate(_ingredientPanelViewPrefab, recipePanelView.Parent);
+            resultPanelView.SetIngredientImage(recipeConfig.Result.Sprite);
+            _createdObjects.Add(resultPanelView.gameObject);
 
-                for (int i = 0; i < recipeConfig.Ingredients.Length; i++)
+            var equal = Instantiate(_equalPrefab, recipePanelView.Parent);
+            _createdObjects.Add(equal);
+
+            for (int i = 0; i < recipeConfig.Ingredients.Length; i++)
+            {
+                var ingredientPanelView = Instantiate(_ingredientPanelViewPrefab, recipePanelView.Parent);
+                ingredientPanelView.SetIngredientImage(recipeConfig.Ingredients[i].Sprite);
+                _createdObjects.Add(ingredientPanelView.gameObject);
+
+                if (i != recipeConfig.Ingredients.Length - 1)
                 {
-                    var ingredientPanelView = Instantiate(_ingredientPanelViewPrefab, recipePanelView.Parent);
-                    ingredientPanelView.SetIngredientImage(recipeConfig.Ingredients[i].Sprite);
-                    _createdObjects.Add(ingredientPanelView.gameObject);
+                    var plus = Instantiate(_plusPrefab, recipePanelView.Parent);
+                    _createdObjects.Add(plus);
+                }
+            }
 
-                    if (i != recipeConfig.Ingredients.Length - 1)
+
+            var buttonUnlockRecipe = Instantiate(_buttonUnlockRecipePrefab, recipePanelView.ButtonUnlockRecipeParent);
+
+            var isUnlocked = recipeConfig.PriceUnlock <= 0 || SaveUtility.IsRecipeUnlocked(recipeConfig.Name);
+            var enoughMoney = recipeConfig.PriceUnlock <= SaveUtility.GetMoney();
+
+            buttonUnlockRecipe.SetState(isUnlocked, enoughMoney);
+            buttonUnlockRecipe.SetTextPrice(isUnlocked ? "Unlocked" : "Unlock: " + recipeConfig.PriceUnlock);
+            buttonUnlockRecipe.ButtonUnlockRecipeClick += UnlockRecipe;
+            _buttonUnlockRecipes.Add(buttonUnlockRecipe, recipeConfig);
+
+            void UnlockRecipe()
+            {
+                var canUnlock = recipeConfig.PriceUnlock <= SaveUtility.GetMoney();
+                if (canUnlock)
+                {
+                    SaveUtility.SpendMoney(recipeConfig.PriceUnlock);
+                    SaveUtility.RecipeUnlock(recipeConfig.Name);
+
+                    foreach (var button in _buttonUnlockRecipes)
                     {
-                        var plus = Instantiate(_plusPrefab, recipePanelView.Parent);
-                        _createdObjects.Add(plus);
+                        isUnlocked = button.Value.PriceUnlock <= 0 || SaveUtility.IsRecipeUnlocked(button.Value.Name);
+                        enoughMoney = button.Value.PriceUnlock <= SaveUtility.GetMoney();
+
+                        button.Key.SetState(isUnlocked, enoughMoney);
+                        button.Key.SetTextPrice(isUnlocked ? "Unlocked" : "Unlock: " + button.Value.PriceUnlock);
                     }
                 }
             }
