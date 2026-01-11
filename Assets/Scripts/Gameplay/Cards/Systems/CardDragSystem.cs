@@ -147,8 +147,10 @@ namespace Gameplay.Cards.Systems
             var worldPos = ray.GetPoint(distance);
             worldPos.z = 0;
 
+            var currentPosition = _currentDragObject.Transform.position;
             var targetPosition = worldPos + _offsetClick + offset;
 
+            _currentDragObject.OnDrag((currentPosition - targetPosition).magnitude);
             if (_currentDragObject is ICard card)
             {
                 var stack = _cardStackSystem.GetStack(card);

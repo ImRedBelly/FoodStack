@@ -2,9 +2,7 @@
 using Core;
 using Gameplay.CardsPack.Handlers;
 using Gameplay.Core.Interfaces;
-using Support;
 using UniRx;
-using UniRx.Triggers;
 using UnityEngine;
 
 namespace Gameplay.CardsPack
@@ -15,13 +13,14 @@ namespace Gameplay.CardsPack
         {
         }
 
-        public IObservable<Unit> OnClick => _onClick;
-        private readonly Subject<Unit> _onClick = new();
+        public IObservable<CardPack> OnClick => _onClick;
+        private readonly Subject<CardPack> _onClick = new();
 
         public Transform Transform => transform;
 
-        [SerializeField] private ObservablePointerClickTrigger _clickTrigger;
         [SerializeField] private CardsPackViewHandler _cardsPackViewHandler;
+
+        private float _deltaMove;
 
         protected override void OnInit()
         {
@@ -29,20 +28,31 @@ namespace Gameplay.CardsPack
 
             _onClick.AddTo(Disposables);
 
-            _clickTrigger
-                .OnPointerClickAsObservable()
-                .SafeSubscribe(_ => _onClick.OnNext(Unit.Default))
-                .AddTo(Disposables);
+            _cardsPackViewHandler.Initialize();
         }
 
         public virtual void OnDragStart()
         {
+            _deltaMove = 0;
             _cardsPackViewHandler.SetStateShadow(true);
+        }
+
+        public void OnDrag(float delta)
+        {
+            _deltaMove += delta;
         }
 
         public virtual void OnDragEnd()
         {
+            if (_deltaMove <= 1.25f) _onClick.OnNext(this);
+            _deltaMove = 0;
+
             _cardsPackViewHandler.SetStateShadow(false);
+        }
+
+        public void UpdateCountText(string countCards)
+        {
+            _cardsPackViewHandler.UpdateCountText(countCards);
         }
     }
 }

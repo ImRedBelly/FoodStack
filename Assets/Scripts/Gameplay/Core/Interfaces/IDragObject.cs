@@ -7,5 +7,6 @@ namespace Gameplay.Core.Interfaces
         Transform Transform { get; }
         void OnDragEnd();
         void OnDragStart();
+        void OnDrag(float delta);
     }
 }

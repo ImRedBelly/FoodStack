@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -7,14 +8,11 @@ namespace Gameplay.CardsPack.Handlers
     public class CardsPackViewHandler : MonoBehaviour
     {
         [SerializeField] private SortingGroup _sortingGroup;
-        [SerializeField] private SpriteRenderer _viewCard;
         [SerializeField] private SpriteRenderer _shadowCard;
-        
-        public void Initialize(Sprite sprite, int sortingOrder)
-        {
-            _viewCard.sprite = sprite;
+        [SerializeField] private TMP_Text _textCountCards;
 
-            SetSortingOrder(sortingOrder);
+        public void Initialize()
+        {
             SetStateShadow(false);
         }
 
@@ -31,6 +29,11 @@ namespace Gameplay.CardsPack.Handlers
                 .DOLocalMove(Constants.CardDragOffset * -1, 0.1f)
                 .From(Vector3.zero)
                 .SetLink(_shadowCard.gameObject, LinkBehaviour.KillOnDisable);
+        }
+
+        public void UpdateCountText(string countCards)
+        {
+            _textCountCards.SetText(countCards);
         }
     }
 }

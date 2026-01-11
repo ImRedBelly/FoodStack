@@ -185,6 +185,7 @@ MonoBehaviour:
   _recipesConfig: {fileID: 11400000, guid: f8889850b1055b74abfcd40c7691083b, type: 2}
   _clientsConfig: {fileID: 11400000, guid: 2abb67a1005b554448872a7385888cbe, type: 2}
   _levelsConfig: {fileID: 11400000, guid: c5c5dba39e01841cb921b60dc961f0ae, type: 2}
+  _cardPacksConfig: {fileID: 11400000, guid: 3459261bc67eef34cb072c3aabdeb887, type: 2}
 --- !u!4 &316752952
 Transform:
   m_ObjectHideFlags: 0
@@ -447,6 +448,18 @@ PrefabInstance:
     - target: {fileID: 4574425652225156412, guid: daf5c448cc89e34499736ea9ea395f85, type: 3}
       propertyPath: m_Name
       value: GameCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150524835440628997, guid: daf5c448cc89e34499736ea9ea395f85, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -82.1001
+      objectReference: {fileID: 0}
+    - target: {fileID: 6150524835440628997, guid: daf5c448cc89e34499736ea9ea395f85, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -68.799805
+      objectReference: {fileID: 0}
+    - target: {fileID: 7018839999431749859, guid: daf5c448cc89e34499736ea9ea395f85, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -68.799805
       objectReference: {fileID: 0}
     - target: {fileID: 9021221397227148022, guid: daf5c448cc89e34499736ea9ea395f85, type: 3}
       propertyPath: m_Pivot.x

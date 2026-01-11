@@ -46,6 +46,11 @@ namespace Gameplay.Cards
             _viewHandler.SetStateShadow(true);
         }
 
+        public void OnDrag(float delta)
+        {
+            
+        }
+
         public virtual void OnDragEnd()
         {
             _viewHandler.SetSortingOrder(Constants.DefaultSortingOrder);

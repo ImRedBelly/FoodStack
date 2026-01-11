@@ -1,6 +1,7 @@
 using System;
 using Core;
 using Gameplay.CardsPack.Handlers;
+using Gameplay.CardsPack.Types;
 using Support;
 using UniRx;
 using UniRx.Triggers;
@@ -10,13 +11,14 @@ namespace Gameplay.CardsPack
 {
     public class BuyCardsPackButton : DisposableBehaviour<BuyCardsPackButton.Model>
     {
-        public IObservable<Unit> OnClick => _onClick;
-        private readonly Subject<Unit> _onClick = new();
+        public IObservable<CardPackType> OnClick => _onClick;
+        private readonly Subject<CardPackType> _onClick = new();
 
         public class Model
         {
         }
 
+        [SerializeField] private CardPackType _cardPackType;
         [SerializeField] private BuyCardsPackHandler _buyCardsPackHandler;
         [SerializeField] private ObservablePointerClickTrigger _clickTrigger;
 
@@ -28,7 +30,7 @@ namespace Gameplay.CardsPack
 
             _clickTrigger
                 .OnPointerClickAsObservable()
-                .SafeSubscribe(_ => _onClick.OnNext(Unit.Default))
+                .SafeSubscribe(_ => _onClick.OnNext(_cardPackType))
                 .AddTo(Disposables);
         }
 

@@ -6,6 +6,7 @@ using Gameplay.Cards;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Systems;
 using Gameplay.CardsPack;
+using Gameplay.CardsPack.Systems;
 using Gameplay.Clients;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Systems;
@@ -50,6 +51,7 @@ namespace GameLoop.Roots
         [SerializeField] private RecipesConfig _recipesConfig;
         [SerializeField] private ClientsConfig _clientsConfig;
         [SerializeField] private LevelsConfig _levelsConfig;
+        [SerializeField] private CardPacksConfig _cardPacksConfig;
 
         private RecipesStorage _recipesStorage;
         private PauseGameSystem _pauseGameSystem;
@@ -63,6 +65,8 @@ namespace GameLoop.Roots
         private CardFactory _cardFactory;
         private ClientFactory _clientFactory;
         private OrderButtonFactory _orderButtonFactory;
+        private CardPackFactory _cardPackFactory;
+        
         private OrderButtonSelectSystem _orderButtonSelectSystem;
         private ClientServiceSystem _clientServiceSystem;
         private ClientOrderSystem _clientOrderSystem;
@@ -83,6 +87,7 @@ namespace GameLoop.Roots
             InitToolsSystems();
             InitClientsSystems();
             InitOrderButtonsSystems();
+            InitCardPackSystems();
             InitLevelTargetSystems();
 
             CreateStartCards();
@@ -126,6 +131,11 @@ namespace GameLoop.Roots
                 .AddTo(Disposables);
 
             _orderButtonFactory = new OrderButtonFactory(_orderButtonPrefab);
+            _clientFactory
+                .Init()
+                .AddTo(Disposables);
+
+            _cardPackFactory = new CardPackFactory(_cardPackPrefab);
             _clientFactory
                 .Init()
                 .AddTo(Disposables);
@@ -265,6 +275,27 @@ namespace GameLoop.Roots
         }
 
 
+        private void InitCardPackSystems()
+        {
+            foreach (var cardsPackButton in _buyCardsPackButtons)
+            {
+                cardsPackButton
+                    .Init(new BuyCardsPackButton.Model())
+                    .AddTo(Disposables);
+            }
+            
+            BuyCardPackSystem buyCardPackSystem = new BuyCardPackSystem(_cardPackFactory, _buyCardsPackButtons, _cardPacksConfig.CardPackConfigs);
+            buyCardPackSystem
+                .Init()
+                .AddTo(Disposables);
+            
+            OpenCardPackSystem openCardPackSystem = new OpenCardPackSystem(_cardPackFactory);
+            openCardPackSystem
+                .Init()
+                .AddTo(Disposables);
+        }
+
+
         private void InitLevelTargetSystems()
         {
             UpdateLevelTargetSystem updateLevelTargetSystem = new UpdateLevelTargetSystem(
@@ -340,8 +371,6 @@ namespace GameLoop.Roots
 
                 _cardFactory.CreateCard(tools[i], position);
             }
-            
-            //Instantiate(_cardPackPrefab, Vector2.zero, Quaternion.identity);
         }
 
 
