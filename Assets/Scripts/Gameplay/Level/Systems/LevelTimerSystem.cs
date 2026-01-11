@@ -1,4 +1,5 @@
-﻿using Core;
+﻿using System;
+using Core;
 using Gameplay.Level.Handlers;
 using Support;
 using UniRx;
@@ -8,6 +9,10 @@ namespace Gameplay.Level.Systems
 {
     public class LevelTimerSystem : DisposableClass
     {
+        public IObservable<Unit> OnFinishTimer => _onFinishTimer;
+        private readonly Subject<Unit> _onFinishTimer = new();
+
+
         private readonly DaySliderHandler _daySliderHandler;
         private readonly PauseGameSystem _pauseGameSystem;
         private readonly float _levelTime;
@@ -25,6 +30,8 @@ namespace Gameplay.Level.Systems
         protected override void OnInit()
         {
             base.OnInit();
+
+            _onFinishTimer.AddTo(Disposables);
 
             _pauseGameSystem.OnPauseGame
                 .SafeSubscribe(PauseGame)
@@ -54,7 +61,7 @@ namespace Gameplay.Level.Systems
 
         private void OnLevelTimeEnded()
         {
-            Debug.Log("Level time ended");
+            _onFinishTimer?.OnNext(Unit.Default);
         }
     }
 }

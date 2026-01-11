@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core;
+using Gameplay.Cards.Interfaces;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Interfaces;
-using Gameplay.Level.Configs;
 using Gameplay.OrderButton.Interfaces;
 using Gameplay.Recipes.Configs;
 using Support;
@@ -18,7 +18,6 @@ namespace Gameplay.Clients.Systems
 
         private readonly Subject<(IOrderButton, RecipeConfig)> _onUpdateOrderButton = new();
 
-        private readonly LevelData _levelData;
         private readonly ClientFactory _clientFactory;
         private readonly ClientTriggerServiceSystem _clientTriggerServiceSystem;
         private readonly ClientServiceSystem _clientServiceSystem;
@@ -27,16 +26,14 @@ namespace Gameplay.Clients.Systems
 
         private readonly Dictionary<IClientCard, IOrderButton> _clientButtons = new();
 
-        private int _currentClientIndex = 0;
 
-        public ClientOrderSystem(LevelData levelData,
+        public ClientOrderSystem(
             ClientFactory clientFactory,
             ClientTriggerServiceSystem clientTriggerServiceSystem,
             ClientServiceSystem clientServiceSystem,
             OrderButtonSelectSystem orderButtonSelectSystem,
             ClientGenerateOrderSystem clientGenerateOrderSystem)
         {
-            _levelData = levelData;
             _clientFactory = clientFactory;
             _clientTriggerServiceSystem = clientTriggerServiceSystem;
             _clientServiceSystem = clientServiceSystem;
@@ -54,15 +51,15 @@ namespace Gameplay.Clients.Systems
                 .SafeSubscribe(ClientService)
                 .AddTo(Disposables);
 
-            _clientServiceSystem.OnClientService
+            _clientServiceSystem.OnClientServiceFinish
                 .SafeSubscribe(CreateClient)
                 .AddTo(Disposables);
         }
 
-        private void ClientService(IClientCard clientCard)
+        private void ClientService((IClientCard clientCard, ICard resultCard) data)
         {
-            _clientButtons[clientCard].UpdateOrderSprite(null);
-            _clientButtons[clientCard].SetStateSlider(true);
+            _clientButtons[data.clientCard].UpdateOrderSprite(null);
+            _clientButtons[data.clientCard].SetStateSlider(true);
 
             float duration = Constants.TimeServeClient;
             float elapsed = 0f;
@@ -72,24 +69,23 @@ namespace Gameplay.Clients.Systems
                 .Do(_ =>
                 {
                     elapsed += Time.deltaTime;
-                    _clientButtons[clientCard].SetProgress(elapsed / duration);
+                    _clientButtons[data.clientCard].SetProgress(elapsed / duration);
                 })
                 .SafeSubscribe(
                     _ => { },
                     () =>
                     {
-                        _clientButtons[clientCard].SetStateSlider(false);
-                        _clientButtons[clientCard].HideClient(false);
+                        _clientButtons[data.clientCard].SetStateSlider(false);
+                        _clientButtons[data.clientCard].HideClient(false);
                     })
                 .AddTo(Disposables);
         }
 
 
-        public void CreateClient(IClientCard clientServiced)
+        public void CreateClient((IClientCard clientServiced, ICard resultCard) data)
         {
-            ResetOrderButton(clientServiced);
+            ResetOrderButton(data.clientServiced);
 
-            //if (_levelData.OrderQueue.Length <= _currentClientIndex) return;
             var orderData = _clientGenerateOrderSystem.GenerateOrderData();
 
             var orderButton = _orderButtonSelectSystem.GetOrderButton();
@@ -107,7 +103,6 @@ namespace Gameplay.Clients.Systems
             _onUpdateOrderButton?.OnNext((orderButton, recipeConfig));
 
             orderButton.ShowClient(false);
-            _currentClientIndex++;
         }
 
         private void ResetOrderButton(IClientCard clientServiced)

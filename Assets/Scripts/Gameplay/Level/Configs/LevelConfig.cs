@@ -1,7 +1,5 @@
 ﻿using System;
 using Gameplay.Cards.Configs;
-using Gameplay.Clients.Configs;
-using Gameplay.Recipes.Configs;
 using UnityEngine;
 
 namespace Gameplay.Level.Configs
@@ -18,18 +16,13 @@ namespace Gameplay.Level.Configs
     {
         public CardConfig[] ToolCards;
         public CardConfig[] IngredientCards;
-     //   public OrderQueue[] OrderQueue;
+
         public float LevelTime;
+        public int LevelTarget;
+        
         public DifficultyType DifficultyType;
     }
-
-    // [Serializable]
-    // public struct OrderQueue
-    // {
-    //     public ClientConfig ClientConfig;
-    //     public RecipeConfig RecipeConfig;
-    // }
-
+    
     [CreateAssetMenu(menuName = "Gameplay/Configs/Level", fileName = "Level ")]
     public class LevelConfig : ScriptableObject
     {

@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2893474625381643633}
+  - component: {fileID: 4236292616073833686}
   m_Layer: 5
   m_Name: MoneyCounter
   m_TagString: Untagged
@@ -38,6 +39,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 320, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &4236292616073833686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857511472178770286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b62e1a3a11e46ec8f65d181363e66e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _levelTargetText: {fileID: 9122467467652173607}
 --- !u!1 &2159894274599403107
 GameObject:
   m_ObjectHideFlags: 0

@@ -12,6 +12,7 @@ namespace Gameplay.Recipes.Configs
         [field: SerializeField] public Sprite InfoIcon { get; private set; }
         [field: SerializeField] public bool WithBurn { get; private set; } = true;
         [field: SerializeField] public int PriceUnlock { get; private set; } = 1;
+        [field: SerializeField] public int Profit { get; private set; } = 10;
         [field: SerializeField] public RecipeType RecipeType { get; private set; }
         [field: Space]
         [field: SerializeField] public CardConfig[] Ingredients { get; private set; }

@@ -34,7 +34,8 @@ public static class SaveUtility
     public static void AppendStars(int value)
     {
         var futureMoney = Math.Clamp(GetStars() + value, 0, int.MaxValue);
-        PlayerPrefs.GetInt(StarsKey, futureMoney);
+        PlayerPrefs.SetInt(StarsKey, futureMoney);
+        Stars.Value = futureMoney;
     }
 
     public static void SpendStars(int value)

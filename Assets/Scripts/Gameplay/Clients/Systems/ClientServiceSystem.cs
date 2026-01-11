@@ -1,5 +1,6 @@
 ﻿using System;
 using Core;
+using Gameplay.Cards.Interfaces;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Interfaces;
 using Gameplay.Level.Handlers;
@@ -10,16 +11,18 @@ namespace Gameplay.Clients.Systems
 {
     public class ClientServiceSystem : DisposableClass
     {
-        public IObservable<IClientCard> OnClientService => _onClientService;
+        public IObservable<(IClientCard clientCard, ICard resultCard)> OnClientServiceFinish => _onClientServiceFinishFinish;
+        public IObservable<(IClientCard clientCard, ICard resultCard)> OnClientServiceStart => _onClientServiceStart;
 
-        private readonly Subject<IClientCard> _onClientService = new();
+        private readonly Subject<(IClientCard clientCard, ICard resultCard)> _onClientServiceStart = new();
+        private readonly Subject<(IClientCard clientCard, ICard resultCard)> _onClientServiceFinishFinish = new();
 
         private readonly ClientFactory _clientFactory;
         private readonly ServiceSuccessHandler _serviceSuccessHandler;
         private readonly ClientTriggerServiceSystem _clientTriggerServiceSystem;
 
-        public ClientServiceSystem(ClientTriggerServiceSystem clientTriggerServiceSystem, 
-            ClientFactory clientFactory, 
+        public ClientServiceSystem(ClientTriggerServiceSystem clientTriggerServiceSystem,
+            ClientFactory clientFactory,
             ServiceSuccessHandler serviceSuccessHandler)
         {
             _clientTriggerServiceSystem = clientTriggerServiceSystem;
@@ -31,7 +34,8 @@ namespace Gameplay.Clients.Systems
         {
             base.OnInit();
 
-            _onClientService.AddTo(Disposables);
+            _onClientServiceFinishFinish.AddTo(Disposables);
+            _onClientServiceStart.AddTo(Disposables);
 
             _clientTriggerServiceSystem.OnClientTriggerService
                 .SafeSubscribe(ClientTriggerService)
@@ -39,14 +43,16 @@ namespace Gameplay.Clients.Systems
         }
 
 
-        private void ClientTriggerService(IClientCard clientCard)
+        private void ClientTriggerService((IClientCard clientCard, ICard resultCard) data)
         {
+            _onClientServiceStart?.OnNext(data);
+            
             Observable.Timer(TimeSpan.FromSeconds(Constants.TimeServeClient + Constants.TimeAnimationClient))
                 .SafeSubscribe(_ =>
                 {
                     _serviceSuccessHandler.ShowSuccess();
-                    _clientFactory.RemoveClient(clientCard);
-                    _onClientService?.OnNext(clientCard);
+                    _clientFactory.RemoveClient(data.clientCard);
+                    _onClientServiceFinishFinish?.OnNext(data);
                 })
                 .AddTo(Disposables);
         }

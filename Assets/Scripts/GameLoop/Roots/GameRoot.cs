@@ -36,6 +36,7 @@ namespace GameLoop.Roots
 
         [Space] [Header("UI")] 
         [SerializeField] private DaySliderHandler _daySliderHandler;
+        [SerializeField] private LevelTargetHandler _levelTargetHandler;
         [SerializeField] private ServiceSuccessHandler _serviceSuccessHandler;
         [SerializeField] private BuyCardsPackButton[] _buyCardsPackButtons;
 
@@ -52,6 +53,7 @@ namespace GameLoop.Roots
 
         private RecipesStorage _recipesStorage;
         private PauseGameSystem _pauseGameSystem;
+        private LevelTimerSystem _levelTimerSystem;
 
         private CardDragSystem _cardDragSystem;
         private CardCollisionSystem _cardCollisionSystem;
@@ -62,6 +64,7 @@ namespace GameLoop.Roots
         private ClientFactory _clientFactory;
         private OrderButtonFactory _orderButtonFactory;
         private OrderButtonSelectSystem _orderButtonSelectSystem;
+        private ClientServiceSystem _clientServiceSystem;
         private ClientOrderSystem _clientOrderSystem;
 
         protected override void OnInit()
@@ -80,6 +83,7 @@ namespace GameLoop.Roots
             InitToolsSystems();
             InitClientsSystems();
             InitOrderButtonsSystems();
+            InitLevelTargetSystems();
 
             CreateStartCards();
             CreateStartTools();
@@ -231,14 +235,14 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            ClientServiceSystem clientServiceSystem =
+            _clientServiceSystem =
                 new ClientServiceSystem(clientTriggerServiceSystem, _clientFactory, _serviceSuccessHandler);
-            clientServiceSystem
+            _clientServiceSystem
                 .Init()
                 .AddTo(Disposables);
 
-            _clientOrderSystem = new ClientOrderSystem(_levelsConfig.GetLevelData(SaveUtility.Level), _clientFactory,
-                clientTriggerServiceSystem, clientServiceSystem, _orderButtonSelectSystem, clientGenerateOrderSystem);
+            _clientOrderSystem = new ClientOrderSystem(_clientFactory,
+                clientTriggerServiceSystem, _clientServiceSystem, _orderButtonSelectSystem, clientGenerateOrderSystem);
             _clientOrderSystem
                 .Init()
                 .AddTo(Disposables);
@@ -253,9 +257,28 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            LevelTimerSystem levelTimerSystem = new LevelTimerSystem(_daySliderHandler,
+            _levelTimerSystem = new LevelTimerSystem(_daySliderHandler,
                 _levelsConfig.GetLevelData(SaveUtility.Level).LevelTime, _pauseGameSystem);
-            levelTimerSystem
+            _levelTimerSystem
+                .Init()
+                .AddTo(Disposables);
+        }
+
+
+        private void InitLevelTargetSystems()
+        {
+            UpdateLevelTargetSystem updateLevelTargetSystem = new UpdateLevelTargetSystem(
+                _levelsConfig.GetLevelData(SaveUtility.Level).LevelTarget,
+                _clientServiceSystem, _levelTargetHandler, _recipesConfig.RecipeConfigs);
+            updateLevelTargetSystem
+                .Init()
+                .AddTo(Disposables);
+
+            LevelFinishSystem levelFinishSystem = new LevelFinishSystem(
+                _levelsConfig.GetLevelData(SaveUtility.Level).LevelTarget,
+                updateLevelTargetSystem, _levelTimerSystem, _clientServiceSystem,
+                ActiveModel.WindowsService, ActiveModel.WindowResolver, ActiveModel.OnGameAction);
+            levelFinishSystem
                 .Init()
                 .AddTo(Disposables);
         }
@@ -340,7 +363,7 @@ namespace GameLoop.Roots
             Observable
                 .Interval(TimeSpan.FromSeconds(Constants.TimeAnimationClient))
                 .Take(2)
-                .Subscribe(_ => { _clientOrderSystem.CreateClient(null); })
+                .Subscribe(_ => { _clientOrderSystem.CreateClient((null, null)); })
                 .AddTo(Disposables);
         }
     }

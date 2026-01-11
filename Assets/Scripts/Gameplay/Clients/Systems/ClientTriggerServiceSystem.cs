@@ -14,9 +14,9 @@ namespace Gameplay.Clients.Systems
 {
     public class ClientTriggerServiceSystem : DisposableClass
     {
-        public IObservable<IClientCard> OnClientTriggerService => _onClientTriggerService;
+        public IObservable<(IClientCard, ICard)> OnClientTriggerService => _onClientTriggerService;
 
-        private readonly Subject<IClientCard> _onClientTriggerService = new();
+        private readonly Subject<(IClientCard, ICard)> _onClientTriggerService = new();
 
         private readonly ClientFactory _clientFactory;
         private readonly CardFactory _cardFactory;
@@ -74,7 +74,7 @@ namespace Gameplay.Clients.Systems
                 {
                     _cardFactory.RemoveCard(data.ingredientCard);
                     _cardStackSystem.RemoveCardFromStack(data.ingredientCard);
-                    _onClientTriggerService?.OnNext(data.clientCard);
+                    _onClientTriggerService?.OnNext(data);
                 }
             }
         }

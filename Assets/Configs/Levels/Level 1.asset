@@ -25,14 +25,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 94d75014157cd97468673f9cfd3d2b77, type: 2}
     - {fileID: 11400000, guid: 667d265a229444846ade75f250fba8c3, type: 2}
     - {fileID: 11400000, guid: c0a0f8e0969d89b4ba8f72f06930c8cd, type: 2}
-    OrderQueue:
-    - ClientConfig: {fileID: 11400000, guid: af4a5cfe77f3e42f7bb52418d1e1f76d, type: 2}
-      RecipeConfig: {fileID: 11400000, guid: efb331f9de2340b469c28c77856e8924, type: 2}
-    - ClientConfig: {fileID: 11400000, guid: af4a5cfe77f3e42f7bb52418d1e1f76d, type: 2}
-      RecipeConfig: {fileID: 11400000, guid: 37212f132c55ade46bcee60f9cebf3bf, type: 2}
-    - ClientConfig: {fileID: 11400000, guid: 0dad542ea024a7a4c8e6f4e9e9e5d8ea, type: 2}
-      RecipeConfig: {fileID: 11400000, guid: e22f07d4b660e4a63b1d268f834f67ac, type: 2}
-    - ClientConfig: {fileID: 11400000, guid: 2f7933bf01acf4339a79d2e53e2e35a1, type: 2}
-      RecipeConfig: {fileID: 11400000, guid: 6e42e246e30674a42a08a53ed76d2d8b, type: 2}
-    LevelTime: 20
+    LevelTime: 10
+    LevelTarget: 5
     DifficultyType: 0
