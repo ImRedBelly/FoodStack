@@ -1,5 +1,6 @@
 ﻿using System;
 using Core;
+using Gameplay.CardsPack.Configs;
 using Gameplay.CardsPack.Handlers;
 using Gameplay.Core.Interfaces;
 using UniRx;
@@ -7,16 +8,23 @@ using UnityEngine;
 
 namespace Gameplay.CardsPack
 {
-    public class CardPack : DisposableBehaviour<BuyCardsPackButton.Model>, IDragObject
+    public class CardPack : DisposableBehaviour<CardPack.Model>, IDragObject
     {
         public class Model
         {
+            public readonly CardPackConfig CardPackConfig;
+
+            public Model(CardPackConfig cardPackType)
+            {
+                CardPackConfig = cardPackType;
+            }
         }
 
         public IObservable<CardPack> OnClick => _onClick;
         private readonly Subject<CardPack> _onClick = new();
 
         public Transform Transform => transform;
+        public CardPackConfig CardPackConfig => ActiveModel.CardPackConfig;
 
         [SerializeField] private CardsPackViewHandler _cardsPackViewHandler;
 

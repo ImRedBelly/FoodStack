@@ -485,6 +485,10 @@ PrefabInstance:
       propertyPath: _cardPackType
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6198960649994699344, guid: aae6e02c307476a4baedc533bcd58b61, type: 3}
+      propertyPath: _recipeCategoryType
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 9118175529673655496, guid: aae6e02c307476a4baedc533bcd58b61, type: 3}
       propertyPath: m_Name
       value: BuyCardsPanel (3)
@@ -687,6 +691,10 @@ PrefabInstance:
       propertyPath: _cardPackType
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 6198960649994699344, guid: aae6e02c307476a4baedc533bcd58b61, type: 3}
+      propertyPath: _recipeCategoryType
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 9118175529673655496, guid: aae6e02c307476a4baedc533bcd58b61, type: 3}
       propertyPath: m_Name
       value: BuyCardsPanel (4)
@@ -763,6 +771,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6198960649994699344, guid: aae6e02c307476a4baedc533bcd58b61, type: 3}
       propertyPath: _cardPackType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6198960649994699344, guid: aae6e02c307476a4baedc533bcd58b61, type: 3}
+      propertyPath: _recipeCategoryType
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9114706755750860895, guid: aae6e02c307476a4baedc533bcd58b61, type: 3}

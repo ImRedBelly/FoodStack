@@ -16,7 +16,9 @@ MonoBehaviour:
   <CreateTime>k__BackingField: 2
   <InfoIcon>k__BackingField: {fileID: 21300000, guid: cc4b89d5f7b252d47a04876f56a215c1, type: 3}
   <WithBurn>k__BackingField: 1
-  <PriceUnlock>k__BackingField: 7
+  <PriceUnlock>k__BackingField: 0
+  <Profit>k__BackingField: 10
+  <RecipeType>k__BackingField: 0
   <Ingredients>k__BackingField:
   - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
   - {fileID: 11400000, guid: a71bb69b67a8bc242b52543be1c99f6e, type: 2}

@@ -1,41 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gameplay.CardsPack.Configs;
 using Gameplay.Recipes.Configs;
+using Gameplay.Types;
 using Services.WindowService;
 using Support;
+using TMPro;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Windows.RecipesPopup
 {
+    [Serializable]
+    public struct RecipeCategoryButton
+    {
+        public RecipeCategoryType Category;
+        public Button Button;
+        public TMP_Text[] CategoryTexts;
+    }
+
     public class RecipesPopup : WindowBase<RecipesPopup.Model>
     {
         public class Model
         {
             public readonly IReadOnlyCollection<RecipeConfig> RecipesConfig;
+            public readonly IReadOnlyCollection<CardPackConfig> CardPackConfigs;
             public readonly Action OnClickResume;
             public readonly WindowsService WindowsService;
 
 
-            public Model(
-                IReadOnlyCollection<RecipeConfig> recipesConfig,
+            public Model(IReadOnlyCollection<RecipeConfig> recipesConfig,
+                IReadOnlyCollection<CardPackConfig> cardPackConfigs,
                 Action onClickResume,
                 WindowsService windowsService)
             {
                 RecipesConfig = recipesConfig;
+                CardPackConfigs = cardPackConfigs;
                 OnClickResume = onClickResume;
                 WindowsService = windowsService;
             }
         }
 
         [SerializeField] private Button _buttonResume;
-        [Space] [SerializeField] private Transform _parent;
+        [Space]
+        [SerializeField] private Transform _parent;
         [SerializeField] private RecipePanelView _recipePanelViewPrefab;
         [SerializeField] private IngredientPanelView _ingredientPanelViewPrefab;
         [SerializeField] private ButtonUnlockRecipe _buttonUnlockRecipePrefab;
-        [Space] [SerializeField] private GameObject _plusPrefab;
+        [Space] 
+        [SerializeField] private RecipeCategoryButton[] _recipeCategoryButtons;
+        [Space] 
+        [SerializeField] private GameObject _plusPrefab;
         [SerializeField] private GameObject _equalPrefab;
 
         private readonly List<GameObject> _createdObjects = new List<GameObject>();
@@ -54,10 +71,41 @@ namespace Windows.RecipesPopup
                 })
                 .AddTo(Disposables);
 
-            CreateRecipes();
+            foreach (var recipeCategoryButton in _recipeCategoryButtons)
+            {
+                recipeCategoryButton.Button.onClick.AddListener(ClickOpenCategory);
+
+                foreach (var cardPackConfig in ActiveModel.CardPackConfigs)
+                {
+                    if (cardPackConfig.RecipeCategoryType == recipeCategoryButton.Category)
+                    {
+                        foreach (var categoryText in recipeCategoryButton.CategoryTexts)
+                        {
+                            categoryText.SetText(cardPackConfig.Name);
+                        }
+
+                        break;
+                    }
+                }
+
+                void ClickOpenCategory() => OpenCategory(recipeCategoryButton.Category);
+            }
+
+            OpenCategory(RecipeCategoryType.Pantry);
         }
 
         protected override void OnClose()
+        {
+            ClearRecipes();
+            foreach (var recipeCategoryButton in _recipeCategoryButtons)
+            {
+                recipeCategoryButton.Button.onClick.RemoveAllListeners();
+            }
+
+            base.OnClose();
+        }
+
+        private void ClearRecipes()
         {
             foreach (var createdObject in _createdObjects)
             {
@@ -70,17 +118,20 @@ namespace Windows.RecipesPopup
                 Destroy(buttonUnlockRecipe.Key);
             }
 
+
             _createdObjects.Clear();
             _buttonUnlockRecipes.Clear();
-
-            base.OnClose();
         }
 
-        private void CreateRecipes()
+        private void OpenCategory(RecipeCategoryType recipeCategoryType)
         {
+            ClearRecipes();
             foreach (var recipeConfig in ActiveModel.RecipesConfig)
             {
-                CreateRecipePanelView(recipeConfig);
+                if (recipeConfig.RecipeCategoryType == recipeCategoryType)
+                {
+                    CreateRecipePanelView(recipeConfig);
+                }
             }
         }
 
@@ -131,7 +182,8 @@ namespace Windows.RecipesPopup
 
                     foreach (var config in ActiveModel.RecipesConfig)
                     {
-                        if (recipeConfig.Ingredients.Contains(config.Result) && !SaveUtility.IsRecipeUnlocked(config.Name))
+                        if (recipeConfig.Ingredients.Contains(config.Result) &&
+                            !SaveUtility.IsRecipeUnlocked(config.Name))
                         {
                             SaveUtility.SpendStars(config.PriceUnlock);
                             SaveUtility.RecipeUnlock(config.Name);

@@ -1,6 +1,6 @@
-﻿namespace Gameplay.CardsPack.Types
+﻿namespace Gameplay.Types
 {
-    public enum CardPackType
+    public enum RecipeCategoryType
     {
         Pantry,
         GrillsFries,

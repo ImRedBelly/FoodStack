@@ -5,6 +5,7 @@ using Windows.LosePopup;
 using Windows.OrderInfoPopup;
 using Windows.RecipesPopup;
 using Windows.WinPopup;
+using Gameplay.CardsPack.Configs;
 using Gameplay.Recipes.Configs;
 
 namespace Services.WindowService
@@ -23,9 +24,10 @@ namespace Services.WindowService
             return new(onClickResume, onClickReload, onClickUpgrade, _windowsService);
         }
 
-        public RecipesPopup.Model GetRecipesPopupModel(IReadOnlyCollection<RecipeConfig> recipesConfig, Action onClickResume)
+        public RecipesPopup.Model GetRecipesPopupModel(IReadOnlyCollection<RecipeConfig> recipesConfig,
+            IReadOnlyCollection<CardPackConfig> cardPackConfigs, Action onClickResume)
         {
-            return new(recipesConfig, onClickResume, _windowsService);
+            return new(recipesConfig, cardPackConfigs, onClickResume, _windowsService);
         }
 
         public OrderInfoPopup.Model GeOrderInfoPopupModel(RecipeConfig recipeConfig, IReadOnlyCollection<RecipeConfig> recipesCollection, Action onClickResume)

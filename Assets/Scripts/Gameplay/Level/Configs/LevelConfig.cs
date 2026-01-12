@@ -19,6 +19,7 @@ namespace Gameplay.Level.Configs
 
         public float LevelTime;
         public int LevelTarget;
+        public int StartMoney;
         
         public DifficultyType DifficultyType;
     }

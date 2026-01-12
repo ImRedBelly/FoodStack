@@ -29,7 +29,7 @@ namespace Gameplay.CardsPack.Systems
         public void CreateCardPack(CardPackConfig cardPackType)
         {
             var newCardPack = Object.Instantiate(_cardPackPrefab);
-            newCardPack.Init(new BuyCardsPackButton.Model());
+            newCardPack.Init(new CardPack.Model(cardPackType));
 
             _onCardPackCreated?.OnNext(newCardPack);
         }

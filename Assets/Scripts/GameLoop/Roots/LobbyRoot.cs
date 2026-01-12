@@ -35,6 +35,7 @@ namespace GameLoop.Roots
         
         [Space] [Header("Data")] 
         [SerializeField] private RecipesConfig _recipesConfig;
+        [SerializeField] private CardPacksConfig _cardPacksConfig;
 
 
         protected override void OnInit()
@@ -48,7 +49,7 @@ namespace GameLoop.Roots
                 .SafeSubscribe(_ => ActiveModel.OnGameAction?.Invoke())
                 .AddTo(Disposables);
 
-            var recipesPopupModel = ActiveModel.WindowResolver.GetRecipesPopupModel(_recipesConfig.RecipeConfigs, () => { });
+            var recipesPopupModel = ActiveModel.WindowResolver.GetRecipesPopupModel(_recipesConfig.RecipeConfigs, _cardPacksConfig.CardPackConfigs,() => { });
 
             _recipesButton
                 .OnClickAsObservable()

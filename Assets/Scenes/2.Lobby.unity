@@ -258,6 +258,7 @@ MonoBehaviour:
   _playButton: {fileID: 808903819}
   _recipesButton: {fileID: 7399490447336190595}
   _recipesConfig: {fileID: 11400000, guid: f8889850b1055b74abfcd40c7691083b, type: 2}
+  _cardPacksConfig: {fileID: 11400000, guid: 3459261bc67eef34cb072c3aabdeb887, type: 2}
 --- !u!4 &2101515003
 Transform:
   m_ObjectHideFlags: 0

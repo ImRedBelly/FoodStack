@@ -273,14 +273,14 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
         }
-
-
+        
         private void InitCardPackSystems()
         {
+            
             foreach (var cardsPackButton in _buyCardsPackButtons)
             {
                 cardsPackButton
-                    .Init(new BuyCardsPackButton.Model())
+                    .Init(new BuyCardsPackButton.Model(_cardPacksConfig.CardPackConfigs))
                     .AddTo(Disposables);
             }
             
@@ -289,7 +289,7 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
             
-            OpenCardPackSystem openCardPackSystem = new OpenCardPackSystem(_cardPackFactory);
+            OpenCardPackSystem openCardPackSystem = new OpenCardPackSystem(_cardPackFactory, _cardFactory);
             openCardPackSystem
                 .Init()
                 .AddTo(Disposables);

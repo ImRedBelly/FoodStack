@@ -12,5 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d64288eb9fe64fb9a824a20afe74df21, type: 3}
   m_Name: Pantry
   m_EditorClassIdentifier: 
-  <CardPackType>k__BackingField: 0
+  <RecipeCategoryType>k__BackingField: 0
   <Name>k__BackingField: Pantry
+  <Price>k__BackingField: 5
+  _cardPackGenerateData:
+  - CardConfig: {fileID: 11400000, guid: 667d265a229444846ade75f250fba8c3, type: 2}
+    Percent: 100
+  - CardConfig: {fileID: 11400000, guid: a71bb69b67a8bc242b52543be1c99f6e, type: 2}
+    Percent: 100
+  - CardConfig: {fileID: 11400000, guid: 94d75014157cd97468673f9cfd3d2b77, type: 2}
+    Percent: 100
+  - CardConfig: {fileID: 11400000, guid: c0a0f8e0969d89b4ba8f72f06930c8cd, type: 2}
+    Percent: 100
+  - CardConfig: {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
+    Percent: 100
+  - CardConfig: {fileID: 11400000, guid: ec838ee8855394344b653c19cdc5c895, type: 2}
+    Percent: 10

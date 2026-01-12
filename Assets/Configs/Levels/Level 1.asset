@@ -19,4 +19,5 @@ MonoBehaviour:
     IngredientCards: []
     LevelTime: 10000
     LevelTarget: 5
+    StartMoney: 15
     DifficultyType: 0

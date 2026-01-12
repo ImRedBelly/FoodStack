@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core;
 using Gameplay.CardsPack.Configs;
-using Gameplay.CardsPack.Types;
+using Gameplay.Types;
 using Support;
 using UniRx;
 
@@ -33,11 +33,11 @@ namespace Gameplay.CardsPack.Systems
             }
         }
 
-        private void AddCardPack(CardPackType cardPackType)
+        private void AddCardPack(RecipeCategoryType recipeCategoryType)
         {
             foreach (var cardPackConfig in _cardPackConfigs)
             {
-                if (cardPackConfig.CardPackType == cardPackType)
+                if (cardPackConfig.RecipeCategoryType == recipeCategoryType)
                 {
                     _cardPackFactory.CreateCardPack(cardPackConfig);
                     break;

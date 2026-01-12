@@ -880,8 +880,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 757f93c61de678745a7935870e090f4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardPackType: 0
+  _recipeCategoryType: 0
   _buyCardsPackHandler: {fileID: 1932770281431859706}
+  _categoryTexts: {fileID: 253050512617253369}
   _clickTrigger: {fileID: 5427387963017431006}
 --- !u!114 &1932770281431859706
 MonoBehaviour:

@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d64288eb9fe64fb9a824a20afe74df21, type: 3}
   m_Name: Italian
   m_EditorClassIdentifier: 
-  <CardPackType>k__BackingField: 2
+  <RecipeCategoryType>k__BackingField: 2
   <Name>k__BackingField: Italian
+  <Price>k__BackingField: 20
