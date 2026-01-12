@@ -21,9 +21,8 @@ namespace Gameplay.Level.Systems
         private readonly LevelTargetHandler _levelTargetHandler;
         private readonly IReadOnlyCollection<RecipeConfig> _recipeConfigs;
 
-        private int _money;
 
-        public UpdateLevelTargetSystem(int targetLevel, ClientServiceSystem clientServiceSystem,
+        public UpdateLevelTargetSystem(int targetLevel, int startMoney, ClientServiceSystem clientServiceSystem,
             LevelTargetHandler levelTargetHandler,
             IReadOnlyCollection<RecipeConfig> recipeConfigs)
         {
@@ -31,6 +30,7 @@ namespace Gameplay.Level.Systems
             _clientServiceSystem = clientServiceSystem;
             _levelTargetHandler = levelTargetHandler;
             _recipeConfigs = recipeConfigs;
+            SaveUtility.Money = new IntReactiveProperty(startMoney);
         }
 
         protected override void OnInit()
@@ -42,9 +42,19 @@ namespace Gameplay.Level.Systems
                 .SafeSubscribe(ClientServiceFinish)
                 .AddTo(Disposables);
 
+            SaveUtility.Money
+                .Subscribe(x => UpdateTargetText())
+                .AddTo(Disposables);
+
             UpdateTargetText();
         }
 
+        public void AppendMoney(int money)
+        {
+            SaveUtility.Money.Value = Math.Clamp(SaveUtility.Money.Value + money, 0, int.MaxValue);
+            _onUpdateLevelTarget?.OnNext(money);
+            UpdateTargetText();
+        }
 
         private void ClientServiceFinish((IClientCard clientCard, ICard resultCard) data)
         {
@@ -58,15 +68,12 @@ namespace Gameplay.Level.Systems
                 }
             }
 
-            _money += money;
-            _onUpdateLevelTarget?.OnNext(money);
-
-            UpdateTargetText();
+            AppendMoney(money);
         }
 
         private void UpdateTargetText()
         {
-            _levelTargetHandler.SetLevelTarget($"{_money}/{_targetLevel}");
+            _levelTargetHandler.SetLevelTarget($"{SaveUtility.Money.Value}/{_targetLevel}");
         }
     }
 }

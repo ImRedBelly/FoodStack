@@ -7,14 +7,14 @@ using Gameplay.Cards.Factory;
 using Gameplay.Cards.Interfaces;
 using Gameplay.Cards.Systems;
 using Gameplay.Cards.Types;
-using Gameplay.Level.Handlers;
 using Gameplay.Level.Systems;
 using Gameplay.Recipes.Configs;
+using Gameplay.Recipes.Services;
 using Support;
 using UniRx;
 using UnityEngine;
 
-namespace Gameplay.Recipes.Services
+namespace Gameplay.Recipes.Systems
 {
     public struct CreateTaskData
     {
@@ -30,7 +30,7 @@ namespace Gameplay.Recipes.Services
 
     public class CreateDishService : DisposableClass
     {
-        private readonly CardCollisionSystem _cardCollisionSystem;
+        private readonly CardPlacementSystem _cardPlacementSystem;
         private readonly CardStackSystem _cardStackSystem;
         private readonly CardFactory _cardFactory;
         private readonly RecipesStorage _recipesStorage;
@@ -42,13 +42,13 @@ namespace Gameplay.Recipes.Services
         private bool _pauseState;
 
         public CreateDishService(
-            CardCollisionSystem cardCollisionSystem,
+            CardPlacementSystem cardPlacementSystem,
             CardStackSystem cardStackSystem,
             CardFactory cardFactory,
             RecipesStorage recipesStorage,
             PauseGameSystem pauseGameSystem)
         {
-            _cardCollisionSystem = cardCollisionSystem;
+            _cardPlacementSystem = cardPlacementSystem;
             _cardStackSystem = cardStackSystem;
             _cardFactory = cardFactory;
             _recipesStorage = recipesStorage;
@@ -180,7 +180,8 @@ namespace Gameplay.Recipes.Services
                         lastCard.SetStateFlame(false);
 
                         _activeCreateTasks.Remove(toolCard);
-                        _cardFactory.CreateCard(recipeConfig.Result, Vector3.zero);
+                        var newDishCard = _cardFactory.CreateCard(recipeConfig.Result, Vector3.zero);
+                        _cardPlacementSystem.CardDropWithoutMerge(newDishCard);
 
                         List<ICard> removeCards = new();
                         foreach (var card in _toolToStack[toolCard].Cards)

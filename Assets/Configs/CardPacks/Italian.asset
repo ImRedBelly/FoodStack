@@ -15,3 +15,5 @@ MonoBehaviour:
   <RecipeCategoryType>k__BackingField: 2
   <Name>k__BackingField: Italian
   <Price>k__BackingField: 20
+  <CountCards>k__BackingField: 5
+  _cardPackGenerateData: []

@@ -17,7 +17,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
     - {fileID: 11400000, guid: 3032ee54530da6f4d93ca96f90dc9a02, type: 2}
     IngredientCards: []
-    LevelTime: 10000
-    LevelTarget: 5
+    LevelTime: 300
+    LevelTarget: 250
     StartMoney: 15
     DifficultyType: 0

@@ -13,10 +13,13 @@ MonoBehaviour:
   m_Name: Waffle
   m_EditorClassIdentifier: 
   <Name>k__BackingField: Waffle
-  <CreateTime>k__BackingField: 2
+  <CreateTime>k__BackingField: 5
   <InfoIcon>k__BackingField: {fileID: 21300000, guid: ca91d6aaac2017c4aa862f351d509faf, type: 3}
   <WithBurn>k__BackingField: 1
   <PriceUnlock>k__BackingField: 8
+  <Profit>k__BackingField: 10
+  <RecipeType>k__BackingField: 0
+  <RecipeCategoryType>k__BackingField: 0
   <Ingredients>k__BackingField:
   - {fileID: 11400000, guid: adb83778f31798e4a830dcbbd8661b87, type: 2}
   - {fileID: 11400000, guid: 94d75014157cd97468673f9cfd3d2b77, type: 2}

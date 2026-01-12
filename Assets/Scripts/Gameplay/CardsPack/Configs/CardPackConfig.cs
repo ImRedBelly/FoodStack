@@ -20,6 +20,7 @@ namespace Gameplay.CardsPack.Configs
         [field: SerializeField] public RecipeCategoryType RecipeCategoryType { get; private set; }
         [field: SerializeField] public string Name { get; private set; }
         [field: SerializeField] public int Price { get; private set; }
+        [field: SerializeField] public int CountCards { get; private set; }
         [SerializeField] public CardPackGenerateData[] _cardPackGenerateData;
     }
 }

@@ -13,6 +13,7 @@ public static class SaveUtility
     private static List<string> _recipeUnlockedNames = new();
 
     public static IntReactiveProperty Stars;
+    public static IntReactiveProperty Money;
 
     public static void Init(CompositeDisposable disposables)
     {

@@ -16,6 +16,7 @@ using Gameplay.OrderButton;
 using Gameplay.OrderButton.Factory;
 using Gameplay.OrderButton.Services;
 using Gameplay.Recipes.Services;
+using Gameplay.Recipes.Systems;
 using Support;
 using UniRx;
 using UnityEngine;
@@ -40,6 +41,7 @@ namespace GameLoop.Roots
         [SerializeField] private LevelTargetHandler _levelTargetHandler;
         [SerializeField] private ServiceSuccessHandler _serviceSuccessHandler;
         [SerializeField] private BuyCardsPackButton[] _buyCardsPackButtons;
+        [SerializeField] private SellCardPanel _sellCardPanel;
 
         [Space] [Header("Prefabs")] 
         [SerializeField] private Card _cardPrefab;
@@ -64,6 +66,7 @@ namespace GameLoop.Roots
 
         private CardFactory _cardFactory;
         private ClientFactory _clientFactory;
+        private CardPlacementSystem _cardPlacementSystem;
         private OrderButtonFactory _orderButtonFactory;
         private CardPackFactory _cardPackFactory;
         
@@ -200,13 +203,13 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
 
-            CardPlacementSystem cardPlacementSystem = new CardPlacementSystem(
+            _cardPlacementSystem = new CardPlacementSystem(
                 _cardFactory,
                 _cardCollisionSystem,
                 _cardStackSystem,
                 _cardStackMoveSystem);
 
-            cardPlacementSystem
+            _cardPlacementSystem
                 .Init()
                 .AddTo(Disposables);
         }
@@ -214,7 +217,7 @@ namespace GameLoop.Roots
         private void InitToolsSystems()
         {
             CreateDishService createDishService =
-                new CreateDishService(_cardCollisionSystem, _cardStackSystem, _cardFactory, _recipesStorage,
+                new CreateDishService(_cardPlacementSystem, _cardStackSystem, _cardFactory, _recipesStorage,
                     _pauseGameSystem);
             createDishService
                 .Init()
@@ -262,7 +265,6 @@ namespace GameLoop.Roots
         private void InitLevelSystems()
         {
             _pauseGameSystem = new PauseGameSystem();
-
             _pauseGameSystem
                 .Init()
                 .AddTo(Disposables);
@@ -276,7 +278,6 @@ namespace GameLoop.Roots
         
         private void InitCardPackSystems()
         {
-            
             foreach (var cardsPackButton in _buyCardsPackButtons)
             {
                 cardsPackButton
@@ -289,7 +290,7 @@ namespace GameLoop.Roots
                 .Init()
                 .AddTo(Disposables);
             
-            OpenCardPackSystem openCardPackSystem = new OpenCardPackSystem(_cardPackFactory, _cardFactory);
+            OpenCardPackSystem openCardPackSystem = new OpenCardPackSystem(_cardPackFactory, _cardFactory, _cardPlacementSystem, _cardStackSystem);
             openCardPackSystem
                 .Init()
                 .AddTo(Disposables);
@@ -299,7 +300,7 @@ namespace GameLoop.Roots
         private void InitLevelTargetSystems()
         {
             UpdateLevelTargetSystem updateLevelTargetSystem = new UpdateLevelTargetSystem(
-                _levelsConfig.GetLevelData(SaveUtility.Level).LevelTarget,
+                _levelsConfig.GetLevelData(SaveUtility.Level).LevelTarget,_levelsConfig.GetLevelData(SaveUtility.Level).StartMoney,
                 _clientServiceSystem, _levelTargetHandler, _recipesConfig.RecipeConfigs);
             updateLevelTargetSystem
                 .Init()
@@ -310,6 +311,12 @@ namespace GameLoop.Roots
                 updateLevelTargetSystem, _levelTimerSystem, _clientServiceSystem,
                 ActiveModel.WindowsService, ActiveModel.WindowResolver, ActiveModel.OnGameAction);
             levelFinishSystem
+                .Init()
+                .AddTo(Disposables);
+            
+            CardSellSystem cardSellSystem = new CardSellSystem(_sellCardPanel, _cardCollisionSystem, 
+                _cardFactory, _cardStackSystem);
+            cardSellSystem
                 .Init()
                 .AddTo(Disposables);
         }

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5315a78aa244cd5a81bd69199f677fe, type: 3}
   m_Name: MixingBowl
   m_EditorClassIdentifier: 
-  <Name>k__BackingField: Pan
+  <Name>k__BackingField: MixingBowl
   <Sprite>k__BackingField: {fileID: 21300000, guid: 63feb1e1407dd5847b94d3f23f944ba2, type: 3}
   <CardType>k__BackingField: 1
+  <SellProfit>k__BackingField: 1

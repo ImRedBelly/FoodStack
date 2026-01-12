@@ -12,6 +12,8 @@ namespace Gameplay.Cards.Systems
 
     public class CardStackSystem
     {
+        public IReadOnlyCollection<CardStack> Stacks => _stacks;
+
         public IObservable<List<CardStack>> OnUpdateStacks => _onUpdateStacks;
         private readonly Subject<List<CardStack>> _onUpdateStacks = new();
 

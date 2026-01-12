@@ -4,6 +4,9 @@ using System.Linq;
 using Core;
 using Gameplay.Cards.Configs;
 using Gameplay.Cards.Factory;
+using Gameplay.Cards.Interfaces;
+using Gameplay.Cards.Systems;
+using Gameplay.Cards.Types;
 using Gameplay.CardsPack.Configs;
 using Support;
 using UniRx;
@@ -15,16 +18,21 @@ namespace Gameplay.CardsPack.Systems
     {
         private readonly CardPackFactory _cardPackFactory;
         private readonly CardFactory _cardFactory;
+        private readonly CardPlacementSystem _cardPlacementSystem;
+        private readonly CardStackSystem _cardStackSystem;
 
         private Dictionary<CardPack, int> _cardPacks = new();
         private Dictionary<CardConfig, int> _generatedCardConfigs = new();
 
         private readonly int _value = 3;
 
-        public OpenCardPackSystem(CardPackFactory cardPackFactory, CardFactory cardFactory)
+        public OpenCardPackSystem(CardPackFactory cardPackFactory, CardFactory cardFactory,
+            CardPlacementSystem cardPlacementSystem, CardStackSystem cardStackSystem)
         {
             _cardPackFactory = cardPackFactory;
             _cardFactory = cardFactory;
+            _cardPlacementSystem = cardPlacementSystem;
+            _cardStackSystem = cardStackSystem;
         }
 
         protected override void OnInit()
@@ -42,7 +50,7 @@ namespace Gameplay.CardsPack.Systems
                 .SafeSubscribe(OpenCardPack)
                 .AddTo(Disposables);
 
-            _cardPacks.Add(cardPack, 5);
+            _cardPacks.Add(cardPack, cardPack.CardPackConfig.CountCards);
             cardPack.UpdateCountText(_cardPacks[cardPack].ToString());
         }
 
@@ -51,7 +59,9 @@ namespace Gameplay.CardsPack.Systems
             if (_cardPacks.TryGetValue(cardPack, out int count))
             {
                 _cardPacks[cardPack]--;
-                _cardFactory.CreateCard(CalculateCreateCard(cardPack.CardPackConfig), Vector3.zero);
+                var card = _cardFactory.CreateCard(CalculateCreateCard(cardPack.CardPackConfig), Vector3.zero);
+
+                SetPlaceNewCard(card);
 
                 if (_cardPacks[cardPack] == 0)
                 {
@@ -62,6 +72,27 @@ namespace Gameplay.CardsPack.Systems
                 {
                     cardPack.UpdateCountText(_cardPacks[cardPack].ToString());
                 }
+            }
+        }
+
+        private void SetPlaceNewCard(ICard card)
+        {
+            bool isMerge = false;
+            foreach (var stack in _cardStackSystem.Stacks)
+            {
+                if (stack.Cards == null || stack.Cards.Count == 0) continue;
+                if (stack.Cards.Any(x => x.CardConfig.CardType == CardType.Tool)) continue;
+                if (stack.Cards[^1].CardConfig.Name == card.CardConfig.Name)
+                {
+                    _cardStackSystem.MergeStacks(card, stack);
+                    isMerge = true;
+                    break;
+                }
+            }
+
+            if (!isMerge)
+            {
+                _cardPlacementSystem.CardDropWithoutMerge(card);
             }
         }
 
@@ -134,13 +165,13 @@ namespace Gameplay.CardsPack.Systems
         //
         //     return selected;
         // }
-        
+
         private CardConfig CalculateCreateCard(CardPackConfig cardPackConfig)
         {
             if (cardPackConfig.CardPackGenerateData == null || cardPackConfig.CardPackGenerateData.Count == 0)
                 throw new InvalidOperationException("CardPackGenerateData пустой.");
 
-            
+
             var data = cardPackConfig.CardPackGenerateData
                 .Where(x => x.Percent > 0f && x.CardConfig != null)
                 .ToList();

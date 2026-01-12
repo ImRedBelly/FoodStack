@@ -32,13 +32,14 @@ namespace Gameplay.Cards.Factory
             _onCardRemoved.AddTo(Disposables);
         }
 
-        public void CreateCard(CardConfig config, Vector3 position)
+        public ICard CreateCard(CardConfig config, Vector3 position)
         {
             var card = Object.Instantiate(_cardPrefab, position, Quaternion.identity);
             card.name = config.Name;
             card.Init(new Card.Model(config));
 
             _onCardCreated?.OnNext(card);
+            return card;
         }
 
         public void RemoveCard(ICard card)

@@ -18,6 +18,11 @@ namespace Gameplay.Cards.Systems
         private readonly List<ICard> _cards = new();
         private readonly Rect _placementZone = new(-2.4f, -2.7f, 4.8f, 4.9f);
 
+        private readonly Dictionary<Collider2D, ICard> _cardByCollider = new();
+        private readonly Collider2D[] _overlapBuffer = new Collider2D[64];
+        private readonly int _cardsLayerMask = ~0;
+
+
         public CardPlacementSystem(
             CardFactory cardFactory,
             CardCollisionSystem cardCollisionSystem,
@@ -50,115 +55,203 @@ namespace Gameplay.Cards.Systems
         private void AddCard(ICard newIngredientCard)
         {
             if (!_cards.Contains(newIngredientCard))
-            {
                 _cards.Add(newIngredientCard);
-            }
+
+            if (newIngredientCard?.Collider != null)
+                _cardByCollider[newIngredientCard.Collider] = newIngredientCard;
         }
 
         private void RemoveCard(ICard newIngredientCard)
         {
             if (_cards.Contains(newIngredientCard))
-            {
                 _cards.Remove(newIngredientCard);
-            }
+
+            if (newIngredientCard?.Collider != null)
+                _cardByCollider.Remove(newIngredientCard.Collider);
         }
 
-        private void CardDropWithoutMerge(ICard draggedCard)
+
+        public void CardDropWithoutMerge(ICard sourceCard)
         {
-            var dragStack = _cardStackSystem.GetStack(draggedCard);
-            var draggedBounds = draggedCard.Collider.bounds;
-            if (!IsWithinZone(draggedBounds.center))
+            var queue = new Queue<CardStack>();
+            var inQueue = new HashSet<CardStack>();
+
+            void EnqueueStack(CardStack s)
             {
-                var clampedPosition = ClampToZone(draggedBounds.center, dragStack.Cards.Count);
-                var draggedStack = _cardStackSystem.GetStack(draggedCard);
-                _cardStackMoveSystem.UpdateWorldPositions(
-                    draggedStack,
-                    draggedCard,
-                    clampedPosition,
-                    Constants.MaxDragSpeed);
-                return;
+                if (s == null) return;
+                if (inQueue.Add(s))
+                    queue.Enqueue(s);
             }
 
-            foreach (var otherCard in _cards)
+            void EnqueueStackAndNeighbours(CardStack movedStack)
             {
-                if (otherCard == draggedCard) continue;
-                if (dragStack.Cards.Contains(otherCard)) continue;
+                if (movedStack == null) return;
 
-                if (IsIntersecting(draggedCard, otherCard))
+                EnqueueStack(movedStack);
+
+                foreach (var neighbourStack in GetIntersectingStacks(movedStack))
                 {
-                    var otherCardStack = _cardStackSystem.GetStack(otherCard);
-
-                    Vector3 targetPosition = FindFreePosition(draggedCard, otherCard);
-                    targetPosition = ClampToZone(targetPosition, otherCardStack.Cards.Count);
-                    
-                    _cardStackMoveSystem.UpdateWorldPositions(otherCardStack, otherCard, targetPosition, Constants.MaxDragSpeed);
+                    if (neighbourStack != null && neighbourStack != movedStack)
+                        EnqueueStack(neighbourStack);
                 }
             }
+
+            EnqueueStack(_cardStackSystem.GetStack(sourceCard));
+
+            const int maxIterations = 250;
+            int iterations = 0;
+
+            while (queue.Count > 0 && iterations++ < maxIterations)
+            {
+                var stack = queue.Dequeue();
+                inQueue.Remove(stack);
+
+                if (stack == null || stack.Cards == null || stack.Cards.Count == 0)
+                    continue;
+
+                var anchor = stack.Cards[^1];
+                var anchorBounds = anchor.Collider.bounds;
+
+                if (!IsWithinZone(anchorBounds.center))
+                {
+                    var clamped = ClampToZone(anchorBounds.center, stack.Cards.Count);
+
+                    _cardStackMoveSystem.UpdateWorldPositions(
+                        stack,
+                        anchor,
+                        clamped,
+                        Constants.MaxDragSpeed);
+
+                    Physics2D.SyncTransforms();
+
+                    EnqueueStackAndNeighbours(stack);
+                    continue;
+                }
+
+                bool movedSomeone = false;
+
+                foreach (var cardInStack in stack.Cards)
+                {
+                    var b = cardInStack.Collider.bounds;
+                    int hitCount = Physics2D.OverlapBoxNonAlloc(b.center, b.size, 0f, _overlapBuffer, _cardsLayerMask);
+
+                    for (int i = 0; i < hitCount; i++)
+                    {
+                        var hit = _overlapBuffer[i];
+                        if (hit == null) continue;
+
+                        if (!_cardByCollider.TryGetValue(hit, out var otherCard) || otherCard == null)
+                            continue;
+
+                        if (stack.Cards.Contains(otherCard))
+                            continue;
+
+                        var otherStack = _cardStackSystem.GetStack(otherCard);
+                        if (otherStack == null || otherStack.Cards.Count == 0)
+                            continue;
+
+                        var target = FindFreePositionForCard(otherCard, otherStack);
+                        target = ClampToZone(target, otherStack.Cards.Count);
+
+                        _cardStackMoveSystem.UpdateWorldPositions(
+                            otherStack,
+                            otherCard,
+                            target,
+                            Constants.MaxDragSpeed);
+
+                        Physics2D.SyncTransforms();
+
+                        movedSomeone = true;
+
+                        EnqueueStackAndNeighbours(otherStack);
+                    }
+                }
+
+                if (movedSomeone)
+                    EnqueueStackAndNeighbours(stack);
+            }
         }
 
-        private Vector3 FindFreePosition(
-            ICard draggedCard,
-            ICard otherCard)
+        private Vector3 FindFreePositionForCard(ICard cardToMove, CardStack movingStack)
         {
-            var origin = otherCard.Transform.position;
-            var bounds = otherCard.Collider.bounds;
+            var origin = cardToMove.Transform.position;
+            var size = cardToMove.Collider.bounds.size;
 
-            float step = 0.1f;
+            float step = Random.Range(0.09f, 0.11f);
             int maxSteps = 50;
 
-            Vector3 bestPosition = origin;
-            float bestDistance = float.MaxValue;
+            Vector3 best = origin;
+            float bestDist = float.MaxValue;
+
+            var allowed = new HashSet<Collider2D>();
+            foreach (var c in movingStack.Cards)
+                allowed.Add(c.Collider);
 
             for (int x = -maxSteps; x <= maxSteps; x++)
             {
                 for (int y = -maxSteps; y <= maxSteps; y++)
                 {
-                    if (x == 0 && y == 0)
-                        continue;
+                    if (x == 0 && y == 0) continue;
 
-                    var offset = new Vector3(x * step, y * step, 0);
-                    var candidate = origin + offset;
+                    var candidate = origin + new Vector3(x * step, y * step, 0);
 
-                    if (!IsIntersectingAtPosition(draggedCard, candidate, bounds))
+                    if (IsPositionFree(candidate, size, allowed))
                     {
-                        float distance = offset.sqrMagnitude;
-                        if (distance < bestDistance)
+                        float d = (x * x + y * y);
+                        if (d < bestDist)
                         {
-                            bestDistance = distance;
-                            bestPosition = candidate;
+                            bestDist = d;
+                            best = candidate;
                         }
                     }
                 }
             }
 
-            return bestPosition;
+            return best;
         }
 
-        private bool IsIntersecting(ICard draggedIngredientCard, ICard otherCard)
+        private bool IsPositionFree(Vector3 center, Vector3 size, HashSet<Collider2D> allowed)
         {
-            return draggedIngredientCard.Collider.bounds.Intersects(otherCard.Collider.bounds);
-        }
-
-        private bool IsIntersectingAtPosition(
-            ICard draggedCard,
-            Vector3 position,
-            Bounds bounds)
-        {
-            var size = bounds.size;
-            var center = position;
-
             var hits = Physics2D.OverlapBoxAll(center, size, 0f);
 
             foreach (var hit in hits)
             {
-                if (hit == null)
-                    continue;
+                if (hit == null) continue;
 
-                if (draggedCard.Collider == hit)
-                    return true;
+                if (!allowed.Contains(hit))
+                    return false;
             }
 
-            return false;
+            return true;
+        }
+
+        private IEnumerable<CardStack> GetIntersectingStacks(CardStack movedStack)
+        {
+            var result = new HashSet<CardStack>();
+
+            foreach (var card in movedStack.Cards)
+            {
+                var b = card.Collider.bounds;
+                int hitCount = Physics2D.OverlapBoxNonAlloc(b.center, b.size, 0f, _overlapBuffer, _cardsLayerMask);
+
+                for (int i = 0; i < hitCount; i++)
+                {
+                    var hit = _overlapBuffer[i];
+                    if (hit == null) continue;
+
+                    if (!_cardByCollider.TryGetValue(hit, out var otherCard) || otherCard == null)
+                        continue;
+
+                    if (movedStack.Cards.Contains(otherCard))
+                        continue;
+
+                    var otherStack = _cardStackSystem.GetStack(otherCard);
+                    if (otherStack != null && otherStack != movedStack)
+                        result.Add(otherStack);
+                }
+            }
+
+            return result;
         }
 
         private bool IsWithinZone(Vector3 position)

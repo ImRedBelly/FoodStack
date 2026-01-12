@@ -15,3 +15,9 @@ MonoBehaviour:
   <RecipeCategoryType>k__BackingField: 1
   <Name>k__BackingField: Grills & Fries
   <Price>k__BackingField: 10
+  <CountCards>k__BackingField: 5
+  _cardPackGenerateData:
+  - CardConfig: {fileID: 11400000, guid: b0dc045589a27f34a97bb3b4f5c2bb44, type: 2}
+    Percent: 100
+  - CardConfig: {fileID: 11400000, guid: 50c9acf77dba91949a1efe566fffb111, type: 2}
+    Percent: 100

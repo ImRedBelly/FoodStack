@@ -4,16 +4,6 @@ namespace Gameplay.CardsPack
 {
     public class SellCardPanel : MonoBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
-        {
-        
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-        
-        }
+        [field: SerializeField] public Collider2D Collider { get; private set; }
     }
 }

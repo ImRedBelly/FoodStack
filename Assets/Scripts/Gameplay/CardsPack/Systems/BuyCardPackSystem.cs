@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core;
 using Gameplay.CardsPack.Configs;
+using Gameplay.Level.Systems;
 using Gameplay.Types;
 using Support;
 using UniRx;
@@ -39,7 +40,10 @@ namespace Gameplay.CardsPack.Systems
             {
                 if (cardPackConfig.RecipeCategoryType == recipeCategoryType)
                 {
+                    if (SaveUtility.Money.Value < cardPackConfig.Price) continue;
                     _cardPackFactory.CreateCardPack(cardPackConfig);
+                    
+                    SaveUtility.Money.Value -= cardPackConfig.Price;
                     break;
                 }
             }
