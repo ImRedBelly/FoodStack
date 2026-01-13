@@ -1,24 +1,30 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Configs;
 using Core;
 using Cysharp.Threading.Tasks;
 using Gameplay.Cards;
+using Gameplay.Cards.Configs;
 using Gameplay.Cards.Factory;
 using Gameplay.Cards.Systems;
+using Gameplay.Cards.Types;
 using Gameplay.CardsPack;
 using Gameplay.CardsPack.Systems;
 using Gameplay.Clients;
 using Gameplay.Clients.Factory;
 using Gameplay.Clients.Systems;
+using Gameplay.GameCamera.Systems;
 using Gameplay.Level.Handlers;
 using Gameplay.Level.Systems;
 using Gameplay.OrderButton;
 using Gameplay.OrderButton.Factory;
 using Gameplay.OrderButton.Services;
-using Gameplay.Recipes.Services;
+using Gameplay.Recipes.Configs;
 using Gameplay.Recipes.Systems;
 using Support;
 using UniRx;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -96,7 +102,8 @@ namespace GameLoop.Roots
             CreateStartCards();
             CreateStartTools();
             CreateOrderButtons();
-
+            
+            InitGameCamera();
             InitGame();
         }
 
@@ -362,12 +369,22 @@ namespace GameLoop.Roots
 
         private void CreateStartTools()
         {
-            var tools = _levelsConfig.GetLevelData(SaveUtility.Level).ToolCards;
+            List<CardConfig> tools = new List<CardConfig>();
+            foreach (var recipeConfig in _recipesStorage.GetOpenRecipes())
+            {
+                foreach (var cardConfig in recipeConfig.Ingredients)
+                {
+                    if (cardConfig.CardType == CardType.Tool && !tools.Contains(cardConfig))
+                    {
+                        tools.Add(cardConfig);
+                    }
+                }
+            }
 
             float spacing = 1f;
             float startY = 2f;
 
-            int count = tools.Length;
+            int count = tools.Count;
 
             float offsetX = (count - 1) * spacing * 0.5f;
 
@@ -380,6 +397,13 @@ namespace GameLoop.Roots
             }
         }
 
+        private void InitGameCamera()
+        {
+            OrthoCameraScaleSystem orthoCameraScaleSystem = new OrthoCameraScaleSystem(_camera);
+            orthoCameraScaleSystem
+                .Init()
+                .AddTo(Disposables);
+        }
 
         private async void InitGame()
         {

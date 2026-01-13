@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: befc3375c3914d8ba33e7729bb1dab64, type: 3}
-  m_Name: CheeseSausage
+  m_Name: GrilledSkewers
   m_EditorClassIdentifier: 
-  <Name>k__BackingField: CheeseSausage
+  <Name>k__BackingField: GrilledSkewers
   <CreateTime>k__BackingField: 5
-  <InfoIcon>k__BackingField: {fileID: 21300000, guid: cc4b89d5f7b252d47a04876f56a215c1, type: 3}
+  <InfoIcon>k__BackingField: {fileID: 21300000, guid: e3aec23a802d4bc419b947f48edba9ea, type: 3}
   <WithBurn>k__BackingField: 1
-  <PriceUnlock>k__BackingField: 0
+  <PriceUnlock>k__BackingField: 10
   <Profit>k__BackingField: 10
   <RecipeType>k__BackingField: 0
-  <RecipeCategoryType>k__BackingField: 0
+  <RecipeCategoryType>k__BackingField: 1
   <Ingredients>k__BackingField:
-  - {fileID: 11400000, guid: 831628faa39c9a248902dfd7c873e0d5, type: 2}
-  - {fileID: 11400000, guid: a71bb69b67a8bc242b52543be1c99f6e, type: 2}
+  - {fileID: 11400000, guid: 86810a0f2dab1a24ba3aa4e5d0b11dc0, type: 2}
+  - {fileID: 11400000, guid: bbbb9272ed2e05046944fd681387028e, type: 2}
   - {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
-  <Result>k__BackingField: {fileID: 11400000, guid: c90bc0920bdf2544e81df05da50d800b, type: 2}
+  <Result>k__BackingField: {fileID: 11400000, guid: 88492d12bf7070d4c9278c8797a9d381, type: 2}

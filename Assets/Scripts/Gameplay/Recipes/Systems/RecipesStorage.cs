@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Gameplay.Cards.Systems;
 using Gameplay.Recipes.Configs;
 
-namespace Gameplay.Recipes.Services
+namespace Gameplay.Recipes.Systems
 {
     public class RecipesStorage
     {
@@ -13,8 +14,9 @@ namespace Gameplay.Recipes.Services
             RecipeConfigs = configs;
         }
 
-        public void GetRecipe(CardStack cardStack)
+        public IReadOnlyCollection<RecipeConfig> GetOpenRecipes()
         {
+            return RecipeConfigs.Where(x => x.PriceUnlock <= 0 || SaveUtility.IsRecipeUnlocked(x.Name)).ToList();
         }
     }
 }

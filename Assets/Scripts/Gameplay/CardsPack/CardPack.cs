@@ -37,6 +37,8 @@ namespace Gameplay.CardsPack
             _onClick.AddTo(Disposables);
 
             _cardsPackViewHandler.Initialize();
+
+            _cardsPackViewHandler.UpdateNameText(ActiveModel.CardPackConfig.Name);
         }
 
         public virtual void OnDragStart()

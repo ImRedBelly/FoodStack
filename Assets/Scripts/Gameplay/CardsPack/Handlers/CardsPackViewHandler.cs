@@ -9,6 +9,7 @@ namespace Gameplay.CardsPack.Handlers
     {
         [SerializeField] private SortingGroup _sortingGroup;
         [SerializeField] private SpriteRenderer _shadowCard;
+        [SerializeField] private TMP_Text _textNamePack;
         [SerializeField] private TMP_Text _textCountCards;
 
         public void Initialize()
@@ -29,6 +30,11 @@ namespace Gameplay.CardsPack.Handlers
                 .DOLocalMove(Constants.CardDragOffset * -1, 0.1f)
                 .From(Vector3.zero)
                 .SetLink(_shadowCard.gameObject, LinkBehaviour.KillOnDisable);
+        }
+
+        public void UpdateNameText(string namePack)
+        {
+            _textNamePack.SetText(namePack);
         }
 
         public void UpdateCountText(string countCards)

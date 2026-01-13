@@ -17,7 +17,13 @@ MonoBehaviour:
   <Price>k__BackingField: 10
   <CountCards>k__BackingField: 5
   _cardPackGenerateData:
-  - CardConfig: {fileID: 11400000, guid: b0dc045589a27f34a97bb3b4f5c2bb44, type: 2}
-    Percent: 100
+  - CardConfig: {fileID: 11400000, guid: e5a15839b2e54d941b54eb2ce6c52caf, type: 2}
+    Percent: 135
   - CardConfig: {fileID: 11400000, guid: 50c9acf77dba91949a1efe566fffb111, type: 2}
+    Percent: 120
+  - CardConfig: {fileID: 11400000, guid: e97d8d84501ae494da0f62059a5ae736, type: 2}
     Percent: 100
+  - CardConfig: {fileID: 11400000, guid: 10eb304c500acf844ab56983d25f42f6, type: 2}
+    Percent: 75
+  - CardConfig: {fileID: 11400000, guid: 3ab98fdc8fe0cc1449fe8376be56e92f, type: 2}
+    Percent: 75

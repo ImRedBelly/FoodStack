@@ -178,6 +178,7 @@ MonoBehaviour:
   _serviceSuccessHandler: {fileID: 721235840}
   _buyCardsPackButtons:
   - {fileID: 6041178129386552305}
+  - {fileID: 6041178129386552307}
   _sellCardPanel: {fileID: 6041178129386552306}
   _cardPrefab: {fileID: 1544634973983324521, guid: b3b55a921a629794299f02e44e4fa8e3, type: 3}
   _clientCardPrefab: {fileID: 7033583315055903008, guid: bac565fc065b147d2b0cff73fb745340, type: 3}
@@ -420,6 +421,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2655119853690044606, guid: 835a3e6d313464be189e8273209c399c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 9035881523034570904, guid: 835a3e6d313464be189e8273209c399c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
     - targetCorrespondingSourceObject: {fileID: 8657923902932757157, guid: 835a3e6d313464be189e8273209c399c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
@@ -447,6 +451,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 04687c5ebeb58e94e800aa6c97033647, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6041178129386552307 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 118669416437646501, guid: 835a3e6d313464be189e8273209c399c, type: 3}
+  m_PrefabInstance: {fileID: 6041178129386552304}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 757f93c61de678745a7935870e090f4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &6952751487788461381

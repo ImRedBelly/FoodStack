@@ -14,7 +14,6 @@ namespace Gameplay.Level.Configs
     [Serializable]
     public struct LevelData
     {
-        public CardConfig[] ToolCards;
         public CardConfig[] IngredientCards;
 
         public float LevelTime;

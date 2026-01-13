@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: befc3375c3914d8ba33e7729bb1dab64, type: 3}
-  m_Name: BeefSteak
+  m_Name: Bun
   m_EditorClassIdentifier: 
-  <Name>k__BackingField: BeefSteak
+  <Name>k__BackingField: Bun
   <CreateTime>k__BackingField: 5
-  <InfoIcon>k__BackingField: {fileID: 21300000, guid: f650dc3c07cdd084287ed963e8a43da8, type: 3}
+  <InfoIcon>k__BackingField: {fileID: 21300000, guid: 72b361a6d6ba39841936429629a4e803, type: 3}
   <WithBurn>k__BackingField: 1
-  <PriceUnlock>k__BackingField: 15
+  <PriceUnlock>k__BackingField: 10
   <Profit>k__BackingField: 10
   <RecipeType>k__BackingField: 0
   <RecipeCategoryType>k__BackingField: 1
   <Ingredients>k__BackingField:
-  - {fileID: 11400000, guid: e5a15839b2e54d941b54eb2ce6c52caf, type: 2}
-  - {fileID: 11400000, guid: 50c9acf77dba91949a1efe566fffb111, type: 2}
+  - {fileID: 11400000, guid: 58a39e8090ac46e4da39df78d14c9a72, type: 2}
   - {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
-  <Result>k__BackingField: {fileID: 11400000, guid: b0dc045589a27f34a97bb3b4f5c2bb44, type: 2}
+  <Result>k__BackingField: {fileID: 11400000, guid: 55da0f2bd607afc4189ef34374478c9b, type: 2}
