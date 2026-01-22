@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: befc3375c3914d8ba33e7729bb1dab64, type: 3}
+  m_Name: Waffle
+  m_EditorClassIdentifier: 
+  <Name>k__BackingField: Waffle
+  <CreateTime>k__BackingField: 5
+  <InfoIcon>k__BackingField: {fileID: 21300000, guid: ca91d6aaac2017c4aa862f351d509faf, type: 3}
+  <WithBurn>k__BackingField: 1
+  <PriceUnlock>k__BackingField: 10
+  <Profit>k__BackingField: 10
+  <RecipeType>k__BackingField: 0
+  <RecipeCategoryType>k__BackingField: 0
+  <Ingredients>k__BackingField:
+  - {fileID: 11400000, guid: adb83778f31798e4a830dcbbd8661b87, type: 2}
+  - {fileID: 11400000, guid: 94d75014157cd97468673f9cfd3d2b77, type: 2}
+  - {fileID: 11400000, guid: c83eeb768aa6543e3b580c682d0d456d, type: 2}
+  <Result>k__BackingField: {fileID: 11400000, guid: 32a5a5997f76e2e41aec119e7c24bd41, type: 2}

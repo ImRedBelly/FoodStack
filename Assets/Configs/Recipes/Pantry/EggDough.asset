@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: befc3375c3914d8ba33e7729bb1dab64, type: 3}
+  m_Name: EggDough
+  m_EditorClassIdentifier: 
+  <Name>k__BackingField: EggDough
+  <CreateTime>k__BackingField: 5
+  <InfoIcon>k__BackingField: {fileID: 0}
+  <WithBurn>k__BackingField: 1
+  <PriceUnlock>k__BackingField: 10
+  <Profit>k__BackingField: 10
+  <RecipeType>k__BackingField: 1
+  <RecipeCategoryType>k__BackingField: 0
+  <Ingredients>k__BackingField:
+  - {fileID: 11400000, guid: 94d75014157cd97468673f9cfd3d2b77, type: 2}
+  - {fileID: 11400000, guid: c0a0f8e0969d89b4ba8f72f06930c8cd, type: 2}
+  - {fileID: 11400000, guid: 667d265a229444846ade75f250fba8c3, type: 2}
+  - {fileID: 11400000, guid: 3032ee54530da6f4d93ca96f90dc9a02, type: 2}
+  <Result>k__BackingField: {fileID: 11400000, guid: 83bceee97ef01764b9f43c54fe315481, type: 2}

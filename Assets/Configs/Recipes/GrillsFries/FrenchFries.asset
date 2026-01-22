@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: befc3375c3914d8ba33e7729bb1dab64, type: 3}
+  m_Name: FrenchFries
+  m_EditorClassIdentifier: 
+  <Name>k__BackingField: FrenchFries
+  <CreateTime>k__BackingField: 5
+  <InfoIcon>k__BackingField: {fileID: 21300000, guid: aa28b2806d09c13439ca4677d1760f2b, type: 3}
+  <WithBurn>k__BackingField: 1
+  <PriceUnlock>k__BackingField: 10
+  <Profit>k__BackingField: 10
+  <RecipeType>k__BackingField: 0
+  <RecipeCategoryType>k__BackingField: 1
+  <Ingredients>k__BackingField:
+  - {fileID: 11400000, guid: 319a06c74c555d544ac1f261f0950182, type: 2}
+  - {fileID: 11400000, guid: a7b7992d4ca7f934593ba1c9e25e6fd8, type: 2}
+  <Result>k__BackingField: {fileID: 11400000, guid: 58de6cc162b2ca045bdcd5b777fac059, type: 2}

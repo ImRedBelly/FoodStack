@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using Core;
+using Gameplay.Cards.Configs;
+using Gameplay.Cards.Factory;
+using Gameplay.Cards.Interfaces;
+using Gameplay.Cards.Systems;
+using Gameplay.Clients.Factory;
+using Gameplay.Clients.Interfaces;
+using Support;
+using UniRx;
+
+namespace Gameplay.Clients.Systems
+{
+    public class ClientTriggerServiceSystem : DisposableClass
+    {
+        public IObservable<(IClientCard, ICard)> OnClientTriggerService => _onClientTriggerService;
+
+        private readonly Subject<(IClientCard, ICard)> _onClientTriggerService = new();
+
+        private readonly ClientFactory _clientFactory;
+        private readonly CardFactory _cardFactory;
+        private readonly CardCollisionSystem _cardCollisionSystem;
+        private readonly CardStackSystem _cardStackSystem;
+
+        private readonly Dictionary<IClientCard, CardConfig> _clients = new();
+
+        public ClientTriggerServiceSystem(
+            ClientFactory clientFactory,
+            CardFactory cardFactory,
+            CardCollisionSystem cardCollisionSystem, CardStackSystem cardStackSystem)
+        {
+            _clientFactory = clientFactory;
+            _cardFactory = cardFactory;
+            _cardCollisionSystem = cardCollisionSystem;
+            _cardStackSystem = cardStackSystem;
+        }
+
+        protected override void OnInit()
+        {
+            base.OnInit();
+
+            _onClientTriggerService.AddTo(Disposables);
+
+            _clientFactory.OnClientCreated
+                .SafeSubscribe(AddClient)
+                .AddTo(Disposables);
+
+            _clientFactory.OnClientRemoved
+                .SafeSubscribe(RemoveClient)
+                .AddTo(Disposables);
+
+            _cardCollisionSystem.OnCardCollisionWithClient
+                .SafeSubscribe(CollisionWithClient)
+                .AddTo(Disposables);
+        }
+
+        private void AddClient((IClientCard client, CardConfig target) data)
+        {
+            _clients[data.client] = data.target;
+        }
+
+        private void RemoveClient(IClientCard clientCard)
+        {
+            _clients.Remove(clientCard);
+        }
+
+
+        private void CollisionWithClient((IClientCard clientCard, ICard ingredientCard) data)
+        {
+            if (_clients.TryGetValue(data.clientCard, out var target))
+            {
+                if (target == data.ingredientCard.CardConfig)
+                {
+                    _cardFactory.RemoveCard(data.ingredientCard);
+                    _cardStackSystem.RemoveCardFromStack(data.ingredientCard);
+                    _onClientTriggerService?.OnNext(data);
+                }
+            }
+        }
+    }
+}
